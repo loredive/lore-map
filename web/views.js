@@ -1,6 +1,5 @@
 import { S, $, esc, MORPH_MS, reducedMotion } from "./state.js";
-import { buildGrid, draw, render } from "./render.js";
-import { setHover } from "./app.js";
+import { buildGrid, draw, render, setHover } from "./render.js";
 
 // ------------------------------------------------------------------ vues (projections)
 // Les mêmes textes et les mêmes groupes, aplatis autrement : passer d'une vue à l'autre

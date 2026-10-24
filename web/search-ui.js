@@ -1,6 +1,6 @@
 // La recherche dans la page : saisie, chargement du modèle, liste des résultats.
 import { BM25, tokenize, corpusText, lexicalRanking, hybridRanking } from "./search.js";
-import { S, panel, input, mode, esc, fold, colorOf, MAX_HITS_ON_MAP, MAX_RESULTS } from "./state.js";
+import { S, panel, input, mode, esc, fold, resetContext, docRow, MAX_HITS_ON_MAP, MAX_RESULTS } from "./state.js";
 import { draw } from "./render.js";
 import { select, snippet, mark } from "./panel.js";
 import { bindEntityButtons } from "./entities-ui.js";
@@ -42,7 +42,7 @@ export function resetSearch() {
 }
 
 export function applyResults(ranked, q) {
-  S.cluster = S.entity = S.lit = S.path = S.pathSet = null;   // un chemin en attente garde son départ
+  resetContext();   // un chemin en attente garde son départ (S.pathFrom)
   S.results = ranked.map(([i]) => i);
   S.hits = new Map(S.results.slice(0, MAX_HITS_ON_MAP).map((i, r) => [i, r]));
   S.query = q;
@@ -94,9 +94,7 @@ export function renderResults() {
     <p class="count">${visible.length} textes trouvés${more}. Les plus pertinents brillent sur la carte.</p>
     <ol class="results">${shown.map(i => {
       const d = S.docs[i];
-      return `<li><button type="button" data-i="${i}">
-        <span class="head"><span class="dot" style="--c:${colorOf(d.cat)}"></span><span class="name">${mark(esc(d.name), terms)}</span></span>
-        <span class="snip">${mark(esc(snippet(d.text, terms)), terms)}</span></button></li>`;
+      return docRow(d, mark(esc(d.name), terms), mark(esc(snippet(d.text, terms)), terms));
     }).join("")}</ol>`;
   panel.querySelectorAll("button[data-i]").forEach(b =>
     b.addEventListener("click", () => select(+b.dataset.i)));

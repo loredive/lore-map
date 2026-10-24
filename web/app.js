@@ -1,6 +1,6 @@
 // Point d'entrée : chargement des données, souris, clavier, légende.
 import { S, $, canvas, panel, tip, status, input, mode, esc, colorOf } from "./state.js";
-import { buildGrid, buildSprites, computeHulls, resize, draw, toWorld, nearest, flyTo, zoomAt } from "./render.js";
+import { buildGrid, buildSprites, computeHulls, resize, draw, toWorld, nearest, flyTo, zoomAt, setHover } from "./render.js";
 import { buildViewSwitch } from "./views.js";
 import { buildIndex, runSearch, renderResults } from "./search-ui.js";
 import { select, deselect, openCluster, closePanel, openFromHash, cancelPath } from "./panel.js";
@@ -159,13 +159,6 @@ function updateHover(sx, sy) {
     tip.style.left = Math.min(sx + 16, S.W - tw - 8) + "px";
     tip.style.top = Math.min(sy + 14, S.H - th - 8) + "px";
   }
-}
-export function setHover(i) {
-  if (i === S.hover) return;
-  S.hover = i;
-  if (i < 0) tip.hidden = true;
-  canvas.classList.toggle("pointing", i >= 0);
-  draw();
 }
 
 // ------------------------------------------------------------------ légende

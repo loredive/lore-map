@@ -52,4 +52,16 @@ export function esc(s) {
 // minuscules sans accents : pour comparer une saisie à un nom
 export function fold(s) { return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").trim(); }
 
+// Ce qu'affiche le panneau (groupe, entité, chemin) : un seul à la fois.
+export function resetContext() { S.cluster = S.entity = S.lit = S.path = S.pathSet = null; }
+
+export function clusterById(id) { return S.clusters.find(c => c.id === id); }
+
+// Une ligne de liste de textes (résultats, groupe, entité, chemin) : nom et extrait déjà en HTML.
+export function docRow(d, nameHtml, snipHtml, lead = "") {
+  return `<li><button type="button" data-i="${d.i}">
+    <span class="head">${lead}<span class="dot" style="--c:${colorOf(d.cat)}"></span><span class="name">${nameHtml}</span></span>
+    <span class="snip">${snipHtml}</span></button></li>`;
+}
+
 export function clearHash() { history.replaceState(null, "", location.pathname + location.search); }

@@ -21,9 +21,9 @@ marche pas, le navigateur bloque la lecture des fichiers de données.
 ## Régénérer les données (embeddings sémantiques, t-SNE et UMAP)
 
 ```bash
-pip install sentence-transformers umap-learn scikit-learn numpy
-git clone https://github.com/EldenRingExplorer/EldenRingTextExplorer
-python prepare.py --source EldenRingTextExplorer/elden_ring_text.json
+git clone https://github.com/EldenRingExplorer/EldenRingTextExplorer ../EldenRingTextExplorer
+uv sync
+uv run python prepare.py --source ../EldenRingTextExplorer/elden_ring_text.json
 ```
 
 Quelques minutes sur CPU, moins d'une sur GPU. Le script télécharge
@@ -35,8 +35,8 @@ Quelques minutes sur CPU, moins d'une sur GPU. Le script télécharge
 
 Avec ces données, la recherche devient hybride : mots-clés (BM25) et sens (le même modèle e5,
 chargé dans le navigateur par transformers.js au premier usage, ~120 Mo mis en cache), fusionnés
-par Reciprocal Rank Fusion. On peut alors chercher en français (« qui a assassiné Godwyn ») dans des
-textes anglais.
+par Reciprocal Rank Fusion, les mots-clés comptant moitié moins que le sens (voir *Évaluer la
+recherche*). On peut alors chercher en français (« qui a assassiné Godwyn ») dans des textes anglais.
 
 Options : `--embedder tfidf` (sans réseau ni GPU, pas de recherche par sens),
 `--reducer` (carte principale, `tsne` par défaut, ou `umap`), `--alt-reducer` (vue alternative
@@ -57,6 +57,10 @@ sur la carte, puis les groupes de HDBSCAN (15/5) calculés sur chaque carte.
 | Groupes / textes hors groupe | 69 / 19 % | 64 / 21 % |
 | Contiguïté des groupes sur la carte | 0,976 | 0,972 |
 | Accord des groupes avec les vrais voisins | 0,793 | **0,811** |
+
+Le résultat tient sur 5 graines (`uv run python eval/projection_seeds.py`) : voisins gardés
+0,543 ± 0,001 pour t-SNE contre 0,467 ± 0,003 pour UMAP, t-SNE devant à chaque graine, et plus
+stable d'une graine à l'autre ; accord des groupes 0,812 ± 0,004 contre 0,792 ± 0,009.
 
 Des UMAP plus « globaux » (nn 30 ou 50) gardent moins de voisins, et à nn 50 HDBSCAN ne trouve plus
 que deux masses. Une carte en 3D gagnerait environ 4 points de voisins pour beaucoup de complexité
@@ -110,6 +114,17 @@ en respectant la casse : « Mohg » ne prend pas « Mohgwyn », « Death » (la 
 « death ». Les identités qui relèvent de la théorie (Godfrey et Hoarah Loux, par exemple) restent
 deux entrées distinctes.
 
+Deux options pour les noms trop présents : `"body_only": true` ignore les mentions dans le nom
+du texte (« Erdtree Greatshield » ne parle pas de l'Erdtree) ; `"broad": true` garde la fiche de
+l'entité mais la retire des pastilles « Mentionne » et des listes « Liés à » (Erdtree, Entre-terre,
+Seigneur d'Elden, présents partout).
+
+Sur une fiche, les textes sont classés par pertinence : nombre de mentions dans le corps du texte,
+plus un demi-point si son nom la contient ; ceux qui ne la nomment que dans leur titre passent en
+dernier. « Liés à » liste les entités citées dans les mêmes textes (au moins deux), classées par
+affinité (textes en commun divisés par la racine du produit des deux tailles), pour que les noms très
+fréquents ne l'emportent pas partout.
+
 `prepare.py` écrit `web/data/entities.md` : pour chaque entrée, le nombre de textes et les groupes où
 elle revient le plus, puis les noms propres fréquents que la liste ne couvre pas encore.
 
@@ -119,6 +134,13 @@ elle revient le plus, puis les noms propres fréquents que la liste ne couvre pa
 - Cliquer une étoile ouvre sa fiche : texte complet, version japonaise, et ses **échos**,
   les textes les plus proches par le sens, reliés à elle sur la carte.
 - Cliquer le nom d'un groupe ouvre sa fiche : titre, description, mots clés et liste de ses textes.
+  Un fin pointillé marque le contour des groupes, comme les frontières des constellations sur les
+  atlas anciens ; celui du groupe ouvert ou survolé passe en or et englobe tous ses textes.
+- La fiche d'un texte indique son groupe ; pour un texte hors groupe, celui de la plupart de ses
+  échos (« Hors groupe · le plus proche : … »).
+- « Tracer un chemin vers un autre texte », sur la fiche d'un texte, puis un clic sur une étoile
+  ou une recherche pour choisir l'arrivée : la carte trace le plus court chemin d'écho en écho entre
+  les deux (de Ranni à l'icône de Radagon : 5 échos, en passant par Miriel qui parle de Rennala).
 - « Comment lire cette carte », sous le titre, rappelle comment lire la carte.
 - « Personnages et lieux » ouvre l'index des personnages, lieux, factions et notions. Chaque fiche
   liste les textes qui en parlent, les fait briller sur la carte et indique les groupes où ils se
@@ -128,8 +150,36 @@ elle revient le plus, puis les noms propres fréquents que la liste ne couvre pa
   groupes, autre façon d'aplatir. Ce qui reste proche dans les deux vues l'est vraiment.
 - La légende masque ou réaffiche une catégorie.
 - Clavier : `/` pour chercher, `Échap` pour fermer, `+`/`-` et flèches, `0` pour recentrer.
-- L'adresse de la page change avec le texte ou la fiche ouverte (`#entite=Godwyn`) : on peut copier
-  un lien vers une fiche.
+- L'adresse de la page change avec le texte ou la fiche ouverte (`#entite=Godwyn`,
+  `#groupe=Pots à lancer`) : on peut copier un lien vers une fiche. Le lien d'un groupe passe par son
+  titre ; un groupe sans titre (nommé par ses mots clés) n'a pas de lien stable d'une génération à
+  l'autre.
+
+## Tests et évaluation de la recherche
+
+```bash
+uv run pytest                                    # Python : titres, entités, projections
+node --test tests/*.test.mjs                     # page : recherche, chemins d'échos, seuil d'évaluation
+uv run python eval/embed_queries.py              # après un changement de requêtes ou de modèle
+node eval/search_eval.mjs                        # détail requête par requête
+```
+
+`eval/queries.json` contient 42 questions et noms, avec les textes qui y répondent vraiment (vérifiés
+dans le corpus : aucun texte ne dit par exemple que Marika est la mère de Miquella, la question n'y
+figure donc pas). Une requête réussit si l'un de ces textes est dans les 10 premiers résultats.
+Deux lots : `dev` (30 requêtes, qui ont servi à régler le poids de la fusion) et `test`
+(12 requêtes écrites ensuite et jamais utilisées pour régler quoi que ce soit, pour juger les
+changements à venir, dont les fonctions LLM). `node --test` échoue sous 78 % de réussite.
+
+| | mots-clés | sens | fusion |
+|---|---|---|---|
+| `dev` : réussite@10 / MRR | 50 % / 0,378 | 83 % / 0,645 | 83 % / 0,601 |
+| `test` : réussite@10 / MRR | 33 % / 0,198 | 75 % / 0,611 | 75 % / 0,514 |
+
+À poids égaux, la fusion faisait moins bien que le sens seul sur `dev` (80 %, MRR 0,585) ; d'où le
+poids 0,5 des mots-clés. Sur `test`, le sens seul garde un meilleur MRR : piste pour plus tard, à
+régler sur `dev` seulement. Les embeddings des requêtes viennent du modèle complet ; la page utilise
+sa version quantifiée (q8), aux scores très proches.
 
 ## Fichiers
 
@@ -140,10 +190,18 @@ labels.json       titres et descriptions des groupes
 layouts.py        projections 2D, alignement de la vue alternative, cohésion des groupes
 entities.py       textes qui mentionnent chaque entité de entities.json
 entities.json     personnages, lieux, factions et notions
-tests/            tests (uv run pytest)
+eval/             requêtes d'évaluation, leurs embeddings, évaluation, comparaison des projections
+tests/            tests Python (pytest) et JavaScript (node --test)
 web/index.html    la page
-web/app.js        rendu canvas, caméra, recherche, fiche
+web/app.js        point d'entrée : chargement, souris, clavier, légende
+web/state.js      état partagé, constantes, petits utilitaires
+web/render.js     canvas : étoiles, contours, noms des groupes, chemins, caméra
+web/views.js      bascule entre projections
 web/search.js     BM25, similarité int8, fusion RRF (fonctions pures)
+web/search-ui.js  champ de recherche, modèle, liste des résultats
+web/panel.js      fiches d'un texte et d'un groupe, chemins, aide, liens (#…)
+web/entities-ui.js  index et fiches des personnages, lieux…
+web/graph.js      graphe des échos, plus court chemin (fonctions pures)
 web/style.css
 ```
 
@@ -152,12 +210,15 @@ web/style.css
 - Le dump de textes date du jeu de base : **pas de textes du DLC Shadow of the Erdtree**.
   Pour l'ajouter, extraire les fichiers `msg` de son propre jeu (WitchyBND / Smithbox) et
   adapter `item_docs()` dans `prepare.py`.
-- Environ 19 % des textes n'appartiennent à aucun groupe (bruit de HDBSCAN) : on les trouve par
-  la recherche ou en cliquant leur étoile, pas par la fiche d'un groupe.
+- Environ 21 % des textes n'appartiennent à aucun groupe (bruit de HDBSCAN) : leur fiche indique le
+  groupe le plus proche, mais ils n'apparaissent dans la liste d'aucun groupe.
 - Les grands groupes homogènes (armes, compétences, armures) ne se laissent pas découper en
   sous-groupes utiles ; ce sont les noms des petits groupes, affichés en zoomant, qui donnent le détail.
 - Les groupes de dialogues se forment souvent autour d'un personnage plutôt que d'un sujet.
 - Les dialogues sont découpés en passages de quelques répliques ; l'identité de l'interlocuteur
-  n'est pas toujours connue.
+  n'est pas toujours connue. Les libellés du dump qui ne sont pas des noms (« Narator »,
+  « Stage Directions », « (cut npc) »…) sont traduits à l'affichage ; les embeddings gardent ceux
+  du dump, pour que les corriger ne déplace pas les textes sur la carte.
+- Pas de texte français officiel : le dump n'a que l'anglais et le japonais.
 
 Textes d'Elden Ring © FromSoftware / Bandai Namco. Projet de fan, non commercial.

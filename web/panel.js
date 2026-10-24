@@ -1,7 +1,7 @@
 // Le panneau de droite : fiche d'un texte, fiche d'un groupe, aide, liens (#…).
 import { tokenize } from "./search.js";
-import { S, $, panel, esc, colorOf, clearHash } from "./state.js";
-import { draw, focusDoc } from "./render.js";
+import { S, $, panel, esc, colorOf, clearHash, resetContext, clusterById, docRow } from "./state.js";
+import { draw, focusDoc, fitPoints } from "./render.js";
 import { echoGraph, echoPath } from "./graph.js";
 import { renderResults, resetSearch } from "./search-ui.js";
 import { entityChips, bindEntityButtons, openEntity } from "./entities-ui.js";
@@ -92,8 +92,8 @@ export function deselect() {
 
 // ------------------------------------------------------------------ fiche d'un groupe
 export function openCluster(c, { fly = true } = {}) {
+  resetContext();
   S.cluster = c;
-  S.entity = S.lit = S.path = S.pathSet = null;
   S.selected = -1;
   const members = S.docs.filter(d => d.cluster === c.id);
   // les textes du cœur du groupe d'abord
@@ -110,24 +110,18 @@ export function openCluster(c, { fly = true } = {}) {
     ${c.description ? `<p class="text">${esc(c.description)}</p>` : ""}
     <p class="count">${c.n} textes${visible.length < members.length ? `, dont ${visible.length} dans les catégories affichées` : ""}.</p>
     ${keywords}
-    <ol class="results">${visible.map(d => `<li><button type="button" data-i="${d.i}">
-        <span class="head"><span class="dot" style="--c:${colorOf(d.cat)}"></span><span class="name">${esc(d.name)}</span></span>
-        <span class="snip">${esc(snippet(d.text, []))}</span></button></li>`).join("")}</ol>
+    <ol class="results">${visible.map(d => docRow(d, esc(d.name), esc(snippet(d.text, [])))).join("")}</ol>
   </article>`;
   panel.querySelectorAll("button[data-i]").forEach(b =>
     b.addEventListener("click", () => select(+b.dataset.i)));
   panel.scrollTop = 0;
   history.replaceState(null, "", "#groupe=" + encodeURIComponent(c.label));
-  if (fly) {
-    // zoom pour que la plupart des étoiles du groupe tiennent à l'écran
-    const r = Math.sqrt(dist(members[Math.floor(members.length * 0.9)] || c)) || 0.1;
-    focusDoc(c, Math.max(1, Math.min(12, 0.8 / r)));
-  }
+  if (fly) fitPoints(members);      // la plupart des étoiles du groupe à l'écran
   draw();
 }
 
 export function closePanel() {
-  S.cluster = S.entity = S.lit = S.path = S.pathSet = null;
+  resetContext();
   cancelPath();
   panel.hidden = true;
   panel.dataset.view = "";
@@ -137,7 +131,7 @@ export function closePanel() {
 
 
 export function showHelp() {
-  S.cluster = S.entity = S.lit = S.path = S.pathSet = null;
+  resetContext();
   if (S.selected >= 0) { S.selected = -1; clearHash(); }
   panel.hidden = false;
   panel.dataset.view = "help";
@@ -179,14 +173,14 @@ addEventListener("hashchange", () => { if (S.docs.length) openFromHash(); });
 // ------------------------------------------------------------------ groupe d'un texte
 // Le groupe du texte, ou pour un texte hors groupe celui de la plupart de ses échos.
 function groupOf(d) {
-  if (d.cluster >= 0) return { c: S.clusters.find(x => x.id === d.cluster), near: false };
+  if (d.cluster >= 0) return { c: clusterById(d.cluster), near: false };
   const votes = new Map();
   for (const e of d.echoes) {
     const k = S.docs[e].cluster;
     if (k >= 0) votes.set(k, (votes.get(k) || 0) + 1);
   }
   const best = [...votes].sort((a, b) => b[1] - a[1])[0];
-  return best ? { c: S.clusters.find(x => x.id === best[0]), near: true } : null;
+  return best ? { c: clusterById(best[0]), near: true } : null;
 }
 function groupLine(d) {
   const g = groupOf(d);
@@ -196,7 +190,7 @@ function groupLine(d) {
 }
 function bindGroupButtons() {
   panel.querySelectorAll("button.glink").forEach(b =>
-    b.addEventListener("click", () => openCluster(S.clusters.find(c => c.id === +b.dataset.c))));
+    b.addEventListener("click", () => openCluster(clusterById(+b.dataset.c))));
 }
 
 // ------------------------------------------------------------------ chemin d'échos
@@ -218,16 +212,11 @@ function showPath(a, b) {
   resetSearch();      // la recherche a servi à choisir l'arrivée
   S.echoAdj ||= echoGraph(S.docs.map(d => d.echoes));
   const path = echoPath(S.echoAdj, a, b);
-  S.cluster = S.entity = S.lit = null;
+  resetContext();
   S.selected = -1;
   S.path = path; S.pathSet = path ? new Set(path) : null;
   showPathView({ from: a, to: b });
-  if (path) {
-    const xs = path.map(i => S.docs[i].x), ys = path.map(i => S.docs[i].y);
-    const r = Math.max(Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys)) / 2 || 0.1;
-    focusDoc({ x: (Math.max(...xs) + Math.min(...xs)) / 2, y: (Math.max(...ys) + Math.min(...ys)) / 2 },
-             Math.max(0.8, Math.min(12, 0.75 / r)));
-  }
+  if (path) fitPoints(path.map(i => S.docs[i]), 0);
 }
 
 function showPathView({ from, to } = {}) {
@@ -248,9 +237,7 @@ function showPathView({ from, to } = {}) {
     <p class="count">${hops} ${hops > 1 ? "échos" : "écho"} : à chaque étape, le texte suivant est l'un des plus proches par le sens.</p>
     <ol class="results path">${S.path.map((i, k) => {
       const d = S.docs[i];
-      return `<li><button type="button" data-i="${i}">
-        <span class="head"><span class="step">${k + 1}</span><span class="dot" style="--c:${colorOf(d.cat)}"></span><span class="name">${esc(d.name)}</span></span>
-        <span class="snip">${esc(snippet(d.text, []))}</span></button></li>`;
+      return docRow(d, esc(d.name), esc(snippet(d.text, [])), `<span class="step">${k + 1}</span>`);
     }).join("")}</ol>
   </article>`;
   panel.querySelectorAll("button[data-i]").forEach(b => b.addEventListener("click", () => select(+b.dataset.i)));

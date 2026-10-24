@@ -104,7 +104,8 @@ export function semanticRanking(queryVec, emb, dim) { return topK(semanticScores
 // Les mots-clés comptent moitié moins que le sens : sur eval/queries.json (30 requêtes),
 // poids égaux 80 % de réussite@10 et MRR 0,585 ; mots-clés à 0,5 : 83 % et 0,601.
 export const LEXICAL_WEIGHT = 0.5;
+export const RRF_K = 60;          // valeur usuelle de la fusion RRF
 
 export function hybridRanking(lexical, queryVec, emb, dim) {
-  return rrf([lexical, semanticRanking(queryVec, emb, dim)], 60, [LEXICAL_WEIGHT, 1]);
+  return rrf([lexical, semanticRanking(queryVec, emb, dim)], RRF_K, [LEXICAL_WEIGHT, 1]);
 }

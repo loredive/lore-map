@@ -100,8 +100,8 @@ SPEAKER_NAMES = {
 
 
 def speaker_name(raw):
-    name = re.sub(r"\s+dialog$", "", raw.strip(), flags=re.I)
-    name = re.sub(r"\s*\(cut npc\)$", " (PNJ coupé)", name, flags=re.I)
+    """Nom affiché d'un interlocuteur (raw : nom du dump, sans le suffixe « dialog »)."""
+    name = re.sub(r"\s*\(cut npc\)$", " (PNJ coupé)", raw, flags=re.I)
     return SPEAKER_NAMES.get(name, name)
 
 

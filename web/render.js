@@ -1,5 +1,5 @@
 // Rendu du ciel sur le canvas : grille de sélection, étoiles, noms des groupes, caméra.
-import { S, $, canvas, ctx, panel, GRACE, MIN_COHESION, reducedMotion, colorOf } from "./state.js";
+import { S, $, canvas, ctx, panel, tip, GRACE, MIN_COHESION, reducedMotion, colorOf } from "./state.js";
 
 // Grille spatiale pour retrouver vite l'étoile sous le curseur
 const CELL = 0.02;
@@ -263,12 +263,17 @@ function drawClusterLabels() {
     const size = Math.max(12, Math.min(25, 9 + Math.sqrt(c.n) * 0.95)) * Math.min(1.25, 0.85 + S.cam.s * 0.08);
     const [sx, sy] = toScreen(c.x, c.y);
     if (sx < -100 || sy < -30 || sx > S.W + 100 || sy > S.H + 30) continue;
-    ctx.font = `italic 600 ${size}px "Cormorant Garamond", Georgia, serif`;
-    const w = ctx.measureText(c.label).width;
-    if (w + 16 > S.W) continue;
+    let fs = size;
+    ctx.font = `italic 600 ${fs}px "Cormorant Garamond", Georgia, serif`;
+    let w = ctx.measureText(c.label).width;
+    if (w + 16 > S.W) {                       // plus large que l'écran (mobile) : en plus petit
+      fs = size * (S.W - 16) / w;
+      ctx.font = `italic 600 ${fs}px "Cormorant Garamond", Georgia, serif`;
+      w = ctx.measureText(c.label).width;
+    }
     // un nom qui déborderait de l'écran est rentré vers l'intérieur plutôt que coupé
     const lx = Math.min(Math.max(sx, w / 2 + 8), S.W - w / 2 - 8);
-    const box = [lx - w / 2 - 6, sy - size * 0.6 - 3, lx + w / 2 + 6, sy + size * 0.6 + 3];
+    const box = [lx - w / 2 - 6, sy - fs * 0.6 - 3, lx + w / 2 + 6, sy + fs * 0.6 + 3];
     if (placed.some(b => box[0] < b[2] && box[2] > b[0] && box[1] < b[3] && box[3] > b[1])) continue;
     placed.push(box);
     S.labelBoxes.push([...box, c]);
@@ -306,6 +311,25 @@ export function zoomAt(sx, sy, factor) {
   S.cam.x += wx - nx; S.cam.y += wy - ny;
   draw();
 }
+// Cadre la vue sur des étoiles : centre et étendue entre les quantiles trim et 1 - trim
+// (trim = 0 pour tout garder, comme les étapes d'un chemin).
+export function fitPoints(points, trim = 0.1) {
+  if (!points.length) return;
+  const q = (a, t) => a[Math.min(a.length - 1, Math.floor((a.length - 1) * t))];
+  const xs = points.map(p => p.x).sort((a, b) => a - b), ys = points.map(p => p.y).sort((a, b) => a - b);
+  const [x0, x1, y0, y1] = [q(xs, trim), q(xs, 1 - trim), q(ys, trim), q(ys, 1 - trim)];
+  const r = Math.max(x1 - x0, y1 - y0) / 2 || 0.1;
+  focusDoc({ x: (x0 + x1) / 2, y: (y0 + y1) / 2 }, Math.max(0.8, Math.min(12, 0.8 / r)));
+}
+
+export function setHover(i) {
+  if (i === S.hover) return;
+  S.hover = i;
+  if (i < 0) tip.hidden = true;
+  canvas.classList.toggle("pointing", i >= 0);
+  draw();
+}
+
 // Centre la vue sur un point en tenant compte du panneau ouvert à droite
 export function focusDoc(d, s) {
   const offset = panel.hidden || innerWidth <= 760 ? 0 : 210 / (s * S.base);

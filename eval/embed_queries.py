@@ -7,15 +7,18 @@ diffèrent un peu, le classement presque pas.
 Usage : uv run python eval/embed_queries.py
 """
 import json
+import sys
 from pathlib import Path
 
 from sentence_transformers import SentenceTransformer
 
 HERE = Path(__file__).parent
-MODEL_NAME = "intfloat/multilingual-e5-small"     # le même que prepare.py
 
 
 def main():
+    sys.path.insert(0, str(HERE.parent))
+    from prepare import MODEL_NAME  # le même modèle que pour les textes
+
     queries = [q["query"] for q in json.loads((HERE / "queries.json").read_text(encoding="utf-8"))["queries"]]
     model = SentenceTransformer(MODEL_NAME)
     vecs = model.encode(["query: " + q for q in queries], normalize_embeddings=True)

@@ -52,17 +52,17 @@ def related_entities(entities, found, min_shared=2, top=6):
 
     Classées par textes partagés / sqrt(taille de chacune), pour que les noms très fréquents ne
     l'emportent pas partout ; les entités « broad » n'entrent pas dans ces listes."""
-    sets = {e["name"]: set(found[e["name"]]) for e in entities if not e.get("broad")}
+    texts = {e["name"]: set(found[e["name"]]) for e in entities if not e.get("broad")}
     related = {}
     for e in entities:
-        a = e["name"]
+        name = e["name"]
         if e.get("broad"):
-            related[a] = []
+            related[name] = []
             continue
-        pairs = [(b, len(sets[a] & sb)) for b, sb in sets.items() if b != a]
-        pairs = [(b, n) for b, n in pairs if n >= min_shared]
-        pairs.sort(key=lambda p: -p[1] / (len(sets[a]) * len(sets[p[0]])) ** 0.5)
-        related[a] = pairs[:top]
+        shared = [(other, len(texts[name] & ts)) for other, ts in texts.items() if other != name]
+        shared = [(other, n) for other, n in shared if n >= min_shared]
+        shared.sort(key=lambda p: -p[1] / (len(texts[name]) * len(texts[p[0]])) ** 0.5)
+        related[name] = shared[:top]
     return related
 
 
