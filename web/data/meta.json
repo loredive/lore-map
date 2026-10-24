@@ -1,1 +1,1 @@
-{"n": 3105, "dim": 384, "semantic": true, "model": "Xenova/multilingual-e5-small", "queryPrefix": "query: "}
+{"n": 3049, "dim": 384, "semantic": true, "model": "Xenova/multilingual-e5-small", "queryPrefix": "query: "}

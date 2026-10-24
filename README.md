@@ -39,7 +39,33 @@ par Reciprocal Rank Fusion. On peut alors chercher en français (« la mère de 
 textes anglais.
 
 Options : `--embedder tfidf` (sans réseau ni GPU, pas de recherche par sens),
-`--reducer tsne` (sans umap-learn), `--min-cluster 25` (taille minimale d'un cluster).
+`--reducer tsne` (sans umap-learn), `--min-cluster 15` et `--min-samples 5` (réglages de HDBSCAN :
+taille minimale d'un groupe, et à quel point il doit être dense).
+
+Les groupes sont calculés sur la carte 2D elle-même : ils restent d'un seul tenant à l'écran. Un
+clustering sur une projection UMAP en 10 dimensions a été essayé ; il colle à peine mieux au sens
+(+0,5 point de voisins communs) mais déborde nettement sur la carte (−6 points de contiguïté).
+
+## Titres des groupes
+
+Les titres sont écrits à la main dans `labels.json`, une liste d'entrées :
+
+```json
+{"title": "Pots à lancer", "description": "…", "members": ["Fire Pot", "Poison Pot", "…"]}
+```
+
+`members` liste les textes les plus centraux du groupe. À chaque `prepare.py`, un titre va au groupe
+qui contient au moins la moitié de ses `members` (les meilleurs recouvrements d'abord, un titre
+par groupe) : il suit donc son groupe même si les numéros de clusters changent.
+
+`prepare.py` écrit aussi `web/data/clusters.md`, de quoi écrire les titres : pour chaque groupe son
+titre actuel, ses mots clés, sa taille et ses 15 textes les plus centraux ; pour un groupe sans
+titre, une entrée prête à copier dans `labels.json` ; et à la fin les titres dont le groupe s'est
+dispersé. Les groupes sans titre gardent leurs mots clés sur la carte.
+
+Quand un groupe change peu à peu, `--refresh-labels` réécrit `labels.json` en remplaçant les
+`members` de chaque titre retrouvé par les textes centraux actuels. Après une scission, relire le
+titre : il suit la plus grande part du groupe, mais son sens a pu se resserrer.
 
 ## Utiliser la carte
 
@@ -56,6 +82,9 @@ Options : `--embedder tfidf` (sans réseau ni GPU, pas de recherche par sens),
 
 ```
 prepare.py        données -> documents -> embeddings -> UMAP -> clusters -> export
+labels.py         rattachement des titres de labels.json aux clusters
+labels.json       titres et descriptions des groupes
+tests/            tests (uv run pytest)
 web/index.html    la page
 web/app.js        rendu canvas, caméra, recherche, fiche
 web/search.js     BM25, similarité int8, fusion RRF (fonctions pures)
@@ -67,11 +96,11 @@ web/style.css
 - Le dump de textes date du jeu de base : **pas de textes du DLC Shadow of the Erdtree**.
   Pour l'ajouter, extraire les fichiers `msg` de son propre jeu (WitchyBND / Smithbox) et
   adapter `item_docs()` dans `prepare.py`.
-- Les noms des clusters viennent de `labels.json` (`{"<id>": {"title", "description"}}`), écrits
-  à la main à partir de `web/data/clusters.md` (mots clés c-TF-IDF, taille et 15 textes proches du
-  centroïde de chaque cluster, régénéré à chaque `prepare.py`). Les clusters sans entrée gardent
-  leurs mots clés. Les identifiants changent si les données ou les options changent : relire
-  `clusters.md` et mettre `labels.json` à jour dans ce cas.
+- Environ 19 % des textes n'appartiennent à aucun groupe (bruit de HDBSCAN) : on les trouve par
+  la recherche ou en cliquant leur étoile, pas par la fiche d'un groupe.
+- Les grands groupes homogènes (armes, compétences, armures) ne se laissent pas découper en
+  sous-groupes utiles ; ce sont les noms des petits groupes, affichés en zoomant, qui donnent le détail.
+- Les groupes de dialogues se forment souvent autour d'un personnage plutôt que d'un sujet.
 - Les dialogues sont découpés en passages de quelques répliques ; l'identité de l'interlocuteur
   n'est pas toujours connue.
 

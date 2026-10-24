@@ -92,7 +92,7 @@ LINE_RE = re.compile(r"\[(\d+)\]\s*(.*?)(?=<br/><br/>\s*\[\d+\]|$)", re.S)
 
 def dialog_docs(data, max_chars=550):
     """Découpe chaque dialogue de PNJ en passages de quelques répliques consécutives."""
-    docs = []
+    docs, seen = [], set()      # certains dialogues (didascalies) répètent les mêmes passages
     for rec in data.get("dialog", {}).values():
         npc = re.sub(r"\s+dialog$", "", rec.get("name_en", "").strip(), flags=re.I)
         lines = [(int(i), clean(t)) for i, t in LINE_RE.findall(rec.get("info_en", ""))]
@@ -102,7 +102,8 @@ def dialog_docs(data, max_chars=550):
         def flush():
             nonlocal chunk, part
             text = "\n".join(chunk).strip()
-            if len(text) >= 40:
+            if len(text) >= 40 and text not in seen:
+                seen.add(text)
                 docs.append({"name": f"{npc} — passage {part}", "cat": DIALOG_LABEL,
                              "text": text, "jp": "", "jp_name": ""})
                 part += 1
@@ -167,9 +168,11 @@ def neighbors(emb, k=8, block=2048):
 
 
 # ---------------------------------------------------------------- clusters
-def cluster(xy, min_size):
+def cluster(xy, min_size, min_samples):
+    """HDBSCAN sur la carte 2D elle-même : les groupes restent d'un seul tenant à l'écran
+    (un clustering en 10D colle à peine mieux au sens, mais déborde sur la carte)."""
     from sklearn.cluster import HDBSCAN
-    return HDBSCAN(min_cluster_size=min_size, min_samples=8).fit_predict(xy)
+    return HDBSCAN(min_cluster_size=min_size, min_samples=min_samples, copy=True).fit_predict(xy)
 
 
 def label_clusters(docs, labels, top=3):
@@ -282,7 +285,8 @@ def main():
     p.add_argument("--source", required=True, help="elden_ring_text.json")
     p.add_argument("--embedder", choices=["e5", "tfidf"], default="e5")
     p.add_argument("--reducer", choices=["umap", "tsne"], default="umap")
-    p.add_argument("--min-cluster", type=int, default=25)
+    p.add_argument("--min-cluster", type=int, default=15)
+    p.add_argument("--min-samples", type=int, default=5)
     p.add_argument("--labels", type=Path, default=Path(__file__).parent / "labels.json",
                    help="titres des clusters (optionnel)")
     p.add_argument("--refresh-labels", action="store_true",
@@ -297,7 +301,7 @@ def main():
     emb = embed(docs, a.embedder)
     print("Projection 2D…")
     xy = reduce_2d(emb, a.reducer)
-    labels = cluster(xy, a.min_cluster)
+    labels = cluster(xy, a.min_cluster, a.min_samples)
     names = label_clusters(docs, labels)
     print(f"{len(names)} clusters, {(labels == -1).mean():.0%} de points hors cluster")
     central = central_texts(emb, labels, names)
