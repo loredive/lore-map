@@ -13,21 +13,57 @@ def _pattern(entity):
     return re.compile(r"(?<![\w-])(?:" + "|".join(map(re.escape, names)) + r")(?![\w-])")
 
 
-def _mentions(pat, exclude, text):
+def _count(pat, exclude, text):
     # les expressions exclues (« Crystal Torrent ») sont retirées avant la recherche
     for x in exclude:
         text = text.replace(x, " ")
-    return pat.search(text) is not None
+    return len(pat.findall(text))
+
+
+TITLE_WEIGHT = 0.5   # un nom dans le titre seul compte moins qu'une mention dans le texte
+
+
+def rank_mentions(entities, docs):
+    """{nom: [(indice, score)]} des textes qui mentionnent l'entité, les plus pertinents d'abord.
+
+    Score : nombre de mentions dans le corps du texte, plus TITLE_WEIGHT si son nom la contient
+    (sauf entités « body_only », dont le nom apparaît dans trop de noms d'objets)."""
+    ranked = {}
+    for e in entities:
+        pat, exclude = _pattern(e), e.get("exclude", [])
+        scored = []
+        for i, d in enumerate(docs):
+            score = _count(pat, exclude, d["text"])
+            if not e.get("body_only") and _count(pat, exclude, d["name"]):
+                score += TITLE_WEIGHT
+            if score:
+                scored.append((i, score))
+        ranked[e["name"]] = sorted(scored, key=lambda p: -p[1])   # tri stable : ordre des textes à égalité
+    return ranked
 
 
 def find_mentions(entities, docs):
     """{nom de l'entité: [indices des textes qui la mentionnent]}, dans l'ordre des textes."""
-    found = {}
+    return {n: sorted(i for i, _ in r) for n, r in rank_mentions(entities, docs).items()}
+
+
+def related_entities(entities, found, min_shared=2, top=6):
+    """{nom: [(autre nom, textes en commun)]} : les entités les plus souvent citées ensemble.
+
+    Classées par textes partagés / sqrt(taille de chacune), pour que les noms très fréquents ne
+    l'emportent pas partout ; les entités « broad » n'entrent pas dans ces listes."""
+    sets = {e["name"]: set(found[e["name"]]) for e in entities if not e.get("broad")}
+    related = {}
     for e in entities:
-        pat, exclude = _pattern(e), e.get("exclude", [])
-        found[e["name"]] = [i for i, d in enumerate(docs)
-                            if _mentions(pat, exclude, d["name"]) or _mentions(pat, exclude, d["text"])]
-    return found
+        a = e["name"]
+        if e.get("broad"):
+            related[a] = []
+            continue
+        pairs = [(b, len(sets[a] & sb)) for b, sb in sets.items() if b != a]
+        pairs = [(b, n) for b, n in pairs if n >= min_shared]
+        pairs.sort(key=lambda p: -p[1] / (len(sets[a]) * len(sets[p[0]])) ** 0.5)
+        related[a] = pairs[:top]
+    return related
 
 
 KINDS = ["personnage", "lieu", "faction", "notion"]

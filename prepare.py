@@ -22,7 +22,7 @@ from pathlib import Path
 import numpy as np
 
 import layouts
-from entities import KINDS, candidate_names, find_mentions, load_entities
+from entities import KINDS, candidate_names, load_entities, rank_mentions, related_entities
 from labels import load_titles, match_titles, save_titles
 
 MODEL_NAME = "intfloat/multilingual-e5-small"      # mêmes poids que Xenova/multilingual-e5-small (navigateur)
@@ -256,7 +256,9 @@ def resolve_titles(docs, labels, names, central, path, refresh):
 def resolve_entities(docs, labels, titles, names, path):
     """Textes qui mentionnent chaque entité de entities.json, et entities.md pour compléter la liste."""
     entities = load_entities(path)
-    found = find_mentions(entities, docs)
+    ranked = rank_mentions(entities, docs)
+    found = {n: [i for i, _ in r] for n, r in ranked.items()}      # les plus pertinents d'abord
+    related = related_entities(entities, found)
     lines = ["# Personnages, lieux, factions et notions\n",
              "Pour chaque entrée de entities.json : nombre de textes qui la mentionnent et groupes "
              "où elle apparaît le plus. Puis les noms propres fréquents pas encore couverts.\n"]
@@ -277,7 +279,8 @@ def resolve_entities(docs, labels, titles, names, path):
     (OUT / "entities.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"{len(entities)} entités dans {path.name}")
     return [{"name": e["name"], "label": e.get("label", e["name"]), "kind": e["kind"],
-             "aliases": e.get("aliases", []), "docs": found[e["name"]]}
+             "aliases": e.get("aliases", []), "docs": found[e["name"]], "broad": bool(e.get("broad")),
+             "related": [[b, n] for b, n in related[e["name"]]]}
             for e in entities if found[e["name"]]]
 
 

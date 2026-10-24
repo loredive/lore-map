@@ -290,7 +290,8 @@
   "name": "Lands Between",
   "kind": "lieu",
   "aliases": [],
-  "label": "Entre-terre"
+  "label": "Entre-terre",
+  "broad": true
  },
  {
   "name": "Leyndell",
@@ -572,7 +573,9 @@
  {
   "name": "Erdtree",
   "kind": "notion",
-  "aliases": []
+  "aliases": [],
+  "body_only": true,
+  "broad": true
  },
  {
   "name": "Elden Ring",
@@ -615,7 +618,8 @@
   "name": "Elden Lord",
   "kind": "notion",
   "aliases": [],
-  "label": "Seigneur d'Elden"
+  "label": "Seigneur d'Elden",
+  "broad": true
  },
  {
   "name": "Empyrean",

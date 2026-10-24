@@ -32,7 +32,7 @@ export function select(i, { fly = true } = {}) {
   const back = S.results.length ? "Retour aux résultats"
     : S.cluster ? `Retour au groupe « ${S.cluster.label} »`
     : S.entity ? `Retour à « ${S.entity.label} »` : "";
-  const mentions = S.docEntities[i];
+  const mentions = S.docEntities[i].filter(e => !e.broad);   // Erdtree, Entre-terre… : partout, donc sans intérêt ici
   panel.innerHTML = `<article class="card">
     ${back ? `<button type="button" class="back">${esc(back)}</button>` : ""}
     <div class="cat"><span class="dot" style="--c:${colorOf(d.cat)}"></span>${esc(S.cats[d.cat])}</div>

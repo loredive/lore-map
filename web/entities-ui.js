@@ -49,6 +49,8 @@ export function openEntity(e, { fly = true } = {}) {
   for (const d of docs) if (d.cluster >= 0) counts.set(d.cluster, (counts.get(d.cluster) || 0) + 1);
   const groups = [...counts].sort((a, b) => b[1] - a[1]).slice(0, 5)
     .map(([id, n]) => [S.clusters.find(c => c.id === id), n]).filter(([c]) => c);
+  const byName = new Map(S.entities.map(x => [x.name, x]));
+  const related = (e.related || []).map(([n, k]) => [byName.get(n), k]).filter(([r]) => r);
   panel.hidden = false;
   panel.dataset.view = "entity";
   panel.innerHTML = `<article class="card">
@@ -57,14 +59,20 @@ export function openEntity(e, { fly = true } = {}) {
     <h2>${esc(e.label)}</h2>
     ${e.label !== e.name ? `<p class="jpname">${esc(e.name)} dans les textes</p>` : ""}
     <p class="count">${e.docs.length} textes en parlent${visible.length < docs.length ? `, dont ${visible.length} dans les catégories affichées` : ""}. Ils brillent sur la carte.</p>
+    ${related.length ? `<h3>Liés à</h3>
+    <p class="hint">Les noms le plus souvent cités dans les mêmes textes (le chiffre : textes en commun).</p>
+    <div class="chips">${related.map(([r, n]) => `<button type="button" class="chip" data-e="${S.entities.indexOf(r)}">
+      ${esc(r.label)} <span class="n">${n}</span></button>`).join("")}</div>` : ""}
     ${groups.length ? `<h3>Surtout dans</h3><div class="chips">${groups.map(([c, n]) =>
       `<button type="button" class="chip" data-c="${c.id}">${esc(c.label)} <span class="n">${n}</span></button>`).join("")}</div>` : ""}
     <h3>Les textes</h3>
+    <p class="hint">Ceux qui en parlent le plus d'abord ; ceux qui ne la nomment que dans leur titre en dernier.</p>
     <ol class="results">${visible.map(d => `<li><button type="button" data-i="${d.i}">
         <span class="head"><span class="dot" style="--c:${colorOf(d.cat)}"></span><span class="name">${mark(esc(d.name), names)}</span></span>
         <span class="snip">${mark(esc(snippet(d.text, folded)), names)}</span></button></li>`).join("")}</ol>
   </article>`;
   panel.querySelector(".back").addEventListener("click", showIndex);
+  bindEntityButtons();
   panel.querySelectorAll("button[data-i]").forEach(b => b.addEventListener("click", () => select(+b.dataset.i)));
   panel.querySelectorAll("button[data-c]").forEach(b =>
     b.addEventListener("click", () => openCluster(S.clusters.find(c => c.id === +b.dataset.c))));
