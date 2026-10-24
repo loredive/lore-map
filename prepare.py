@@ -21,6 +21,7 @@ from pathlib import Path
 
 import numpy as np
 
+from entities import KINDS, candidate_names, find_mentions, load_entities
 from labels import load_titles, match_titles, save_titles
 
 MODEL_NAME = "intfloat/multilingual-e5-small"      # mêmes poids que Xenova/multilingual-e5-small (navigateur)
@@ -245,8 +246,36 @@ def resolve_titles(docs, labels, names, central, path, refresh):
     return titles, stale
 
 
+def resolve_entities(docs, labels, titles, names, path):
+    """Textes qui mentionnent chaque entité de entities.json, et entities.md pour compléter la liste."""
+    entities = load_entities(path)
+    found = find_mentions(entities, docs)
+    lines = ["# Personnages, lieux, factions et notions\n",
+             "Pour chaque entrée de entities.json : nombre de textes qui la mentionnent et groupes "
+             "où elle apparaît le plus. Puis les noms propres fréquents pas encore couverts.\n"]
+    for kind in KINDS:
+        lines.append(f"## {kind.capitalize()}s\n")
+        for e in (e for e in entities if e["kind"] == kind):
+            idx = found[e["name"]]
+            groups = {}
+            for i in idx:
+                if labels[i] >= 0:
+                    groups[labels[i]] = groups.get(labels[i], 0) + 1
+            top = sorted(groups.items(), key=lambda g: -g[1])[:3]
+            where = ", ".join(f"{titles[c]['title'] if c in titles else names[c]} ({k})" for c, k in top)
+            lines.append(f"- **{e.get('label', e['name'])}** : {len(idx)} textes — {where}")
+        lines.append("")
+    lines.append("## Candidats\n")
+    lines += [f"- {w} ({n} textes)" for w, n in candidate_names(entities, docs)]
+    (OUT / "entities.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    print(f"{len(entities)} entités dans {path.name}")
+    return [{"name": e["name"], "label": e.get("label", e["name"]), "kind": e["kind"],
+             "aliases": e.get("aliases", []), "docs": found[e["name"]]}
+            for e in entities if found[e["name"]]]
+
+
 # ---------------------------------------------------------------- export
-def export(docs, emb, xy, labels, names, titles, nbrs, embedder):
+def export(docs, emb, xy, labels, names, titles, entities, nbrs, embedder):
     OUT.mkdir(parents=True, exist_ok=True)
     xy = xy - xy.mean(axis=0)
     xy = xy / np.abs(xy).max()
@@ -266,7 +295,7 @@ def export(docs, emb, xy, labels, names, titles, nbrs, embedder):
     fields = ["name", "cat", "text", "jp", "jpName", "x", "y", "cluster", "echoes"]
     with open(OUT / "lore.json", "w", encoding="utf-8") as f:
         json.dump({"fields": fields, "categories": cats, "clusters": clusters,
-                   "docs": rows}, f, ensure_ascii=False, separators=(",", ":"))
+                   "entities": entities, "docs": rows}, f, ensure_ascii=False, separators=(",", ":"))
 
     semantic = embedder == "e5"
     meta = {"n": len(docs), "dim": int(emb.shape[1]), "semantic": semantic,
@@ -289,6 +318,8 @@ def main():
     p.add_argument("--min-samples", type=int, default=5)
     p.add_argument("--labels", type=Path, default=Path(__file__).parent / "labels.json",
                    help="titres des clusters (optionnel)")
+    p.add_argument("--entities", type=Path, default=Path(__file__).parent / "entities.json",
+                   help="personnages, lieux, factions et notions (optionnel)")
     p.add_argument("--refresh-labels", action="store_true",
                    help="réécrit labels.json avec les textes centraux actuels de chaque titre")
     a = p.parse_args()
@@ -307,7 +338,8 @@ def main():
     central = central_texts(emb, labels, names)
     titles, stale = resolve_titles(docs, labels, names, central, a.labels, a.refresh_labels)
     write_cluster_digest(docs, labels, names, central, titles, stale)
-    export(docs, emb, xy, labels, names, titles, neighbors(emb), a.embedder)
+    entities = resolve_entities(docs, labels, titles, names, a.entities)
+    export(docs, emb, xy, labels, names, titles, entities, neighbors(emb), a.embedder)
 
 
 if __name__ == "__main__":

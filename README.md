@@ -67,6 +67,24 @@ Quand un groupe change peu à peu, `--refresh-labels` réécrit `labels.json` en
 `members` de chaque titre retrouvé par les textes centraux actuels. Après une scission, relire le
 titre : il suit la plus grande part du groupe, mais son sens a pu se resserrer.
 
+## Personnages, lieux, factions et notions
+
+`entities.json` liste à la main les noms qui traversent les textes, avec leur type (`personnage`,
+`lieu`, `faction`, `notion`), d'éventuels `aliases` (variantes du même nom seulement), un `label`
+français facultatif et des expressions à `exclude` (« Crystal Torrent » n'est pas Torrent) :
+
+```json
+{"name": "Mohg", "kind": "personnage", "aliases": ["Lord of Blood"]}
+```
+
+Un texte mentionne une entité si son nom ou son corps contient l'un de ses noms, en mot entier et
+en respectant la casse : « Mohg » ne prend pas « Mohgwyn », « Death » (la notion) ne prend pas
+« death ». Les identités qui relèvent de la théorie (Godfrey et Hoarah Loux, par exemple) restent
+deux entrées distinctes.
+
+`prepare.py` écrit `web/data/entities.md` : pour chaque entrée, le nombre de textes et les groupes où
+elle revient le plus, puis les noms propres fréquents que la liste ne couvre pas encore.
+
 ## Utiliser la carte
 
 - Molette ou pincement pour zoomer, glisser pour se déplacer, double-clic pour zoomer.
@@ -74,9 +92,14 @@ titre : il suit la plus grande part du groupe, mais son sens a pu se resserrer.
   les textes les plus proches par le sens, reliés à elle sur la carte.
 - Cliquer le nom d'un groupe ouvre sa fiche : titre, description, mots clés et liste de ses textes.
 - « Comment lire cette carte », sous le titre, rappelle comment lire la carte.
+- « Personnages et lieux » ouvre l'index des personnages, lieux, factions et notions. Chaque fiche
+  liste les textes qui en parlent, les fait briller sur la carte et indique les groupes où ils se
+  trouvent. La fiche d'un texte liste aussi ce qu'il mentionne, et chercher un nom connu
+  (« Godwyn », « Lord of Blood ») propose sa fiche en tête des résultats.
 - La légende masque ou réaffiche une catégorie.
 - Clavier : `/` pour chercher, `Échap` pour fermer, `+`/`-` et flèches, `0` pour recentrer.
-- L'adresse de la page change avec le texte ouvert : on peut copier un lien vers une fiche.
+- L'adresse de la page change avec le texte ou la fiche ouverte (`#entite=Godwyn`) : on peut copier
+  un lien vers une fiche.
 
 ## Fichiers
 
@@ -84,6 +107,8 @@ titre : il suit la plus grande part du groupe, mais son sens a pu se resserrer.
 prepare.py        données -> documents -> embeddings -> UMAP -> clusters -> export
 labels.py         rattachement des titres de labels.json aux clusters
 labels.json       titres et descriptions des groupes
+entities.py       textes qui mentionnent chaque entité de entities.json
+entities.json     personnages, lieux, factions et notions
 tests/            tests (uv run pytest)
 web/index.html    la page
 web/app.js        rendu canvas, caméra, recherche, fiche
