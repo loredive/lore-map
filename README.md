@@ -146,7 +146,8 @@ elle revient le plus, puis les noms propres fréquents que la liste ne couvre pa
   liste les textes qui en parlent, les fait briller sur la carte et indique les groupes où ils se
   trouvent. La fiche d'un texte liste aussi ce qu'il mentionne, et chercher un nom connu
   (« Godwyn », « Lord of Blood ») propose sa fiche en tête des résultats.
-- « Projection », en bas à droite, passe de la carte t-SNE à la carte UMAP : mêmes textes, mêmes
+- « Carte : principale · autre agencement », en bas à droite, passe de la carte t-SNE à la carte UMAP
+  (la méthode est indiquée dans l'infobulle) : mêmes textes, mêmes
   groupes, autre façon d'aplatir. Ce qui reste proche dans les deux vues l'est vraiment.
 - La légende masque ou réaffiche une catégorie.
 - Clavier : `/` pour chercher, `Échap` pour fermer, `+`/`-` et flèches, `0` pour recentrer.

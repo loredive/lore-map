@@ -1,6 +1,6 @@
 // Le panneau de droite : fiche d'un texte, fiche d'un groupe, aide, liens (#…).
 import { tokenize } from "./search.js";
-import { S, $, panel, esc, colorOf, clearHash, resetContext, clusterById, docRow } from "./state.js";
+import { S, $, panel, esc, colorOf, clearHash, resetContext, clusterById, docRow, focusPanel } from "./state.js";
 import { draw, focusDoc, fitPoints } from "./render.js";
 import { echoGraph, echoPath } from "./graph.js";
 import { renderResults, resetSearch } from "./search-ui.js";
@@ -26,6 +26,7 @@ export function mark(html, terms) {
 // ------------------------------------------------------------------ fiche d'un texte
 export function select(i, { fly = true } = {}) {
   if (S.pathFrom >= 0 && i !== S.pathFrom) { showPath(S.pathFrom, i); return; }
+  S.returnTo = -1;
   S.selected = i;
   const d = S.docs[i];
   const terms = tokenize(S.query || "");
@@ -75,6 +76,7 @@ export function select(i, { fly = true } = {}) {
   bindEntityButtons();
   panel.scrollTop = 0;
   history.replaceState(null, "", "#" + encodeURIComponent(d.name));
+  focusPanel(`Texte : ${d.name}`);
   if (fly) focusDoc(d, Math.max(S.cam.s, 4));
   draw();
 }
@@ -91,7 +93,7 @@ export function deselect() {
 }
 
 // ------------------------------------------------------------------ fiche d'un groupe
-export function openCluster(c, { fly = true } = {}) {
+export function openCluster(c, { fly = true, focus = true } = {}) {
   resetContext();
   S.cluster = c;
   S.selected = -1;
@@ -116,6 +118,7 @@ export function openCluster(c, { fly = true } = {}) {
     b.addEventListener("click", () => select(+b.dataset.i)));
   panel.scrollTop = 0;
   history.replaceState(null, "", "#groupe=" + encodeURIComponent(c.label));
+  if (focus) focusPanel(`Groupe ${c.label} : ${c.n} textes`);
   if (fly) fitPoints(members);      // la plupart des étoiles du groupe à l'écran
   draw();
 }
@@ -145,6 +148,7 @@ export function showHelp() {
     </ul>
   </article>`;
   panel.scrollTop = 0;
+  focusPanel("Aide : comment lire cette carte");
   draw();
 }
 $("#help").addEventListener("click", showHelp);
@@ -242,5 +246,6 @@ function showPathView({ from, to } = {}) {
   </article>`;
   panel.querySelectorAll("button[data-i]").forEach(b => b.addEventListener("click", () => select(+b.dataset.i)));
   panel.scrollTop = 0;
+  focusPanel(`Chemin de ${hops} ${hops > 1 ? "échos" : "écho"}`);
   draw();
 }

@@ -1,5 +1,5 @@
 import { S, $, esc, MORPH_MS, reducedMotion } from "./state.js";
-import { buildGrid, draw, render, setHover } from "./render.js";
+import { buildGrid, draw, render, setHover, focusDoc, fitPoints } from "./render.js";
 
 // ------------------------------------------------------------------ vues (projections)
 // Les mêmes textes et les mêmes groupes, aplatis autrement : passer d'une vue à l'autre
@@ -8,8 +8,10 @@ export function buildViewSwitch() {
   const box = $("#views");
   if (S.views.length < 2) return;
   box.hidden = false;
-  box.innerHTML = `<span class="label">Projection</span>${S.views.map((v, k) =>
-    `<button type="button" data-v="${k}" aria-pressed="${k === S.view}">${esc(v)}</button>`).join("")}`;
+  // des noms parlants ; la méthode (t-SNE, UMAP) reste dans l'infobulle
+  const names = ["principale", "autre agencement"];
+  box.innerHTML = `<span class="label">Carte</span>${S.views.map((v, k) =>
+    `<button type="button" data-v="${k}" aria-pressed="${k === S.view}" title="Calculée par ${esc(v)}">${esc(names[k] || v)}</button>`).join("")}`;
   box.querySelectorAll("button").forEach(b => b.addEventListener("click", () => setView(+b.dataset.v)));
 }
 
@@ -29,7 +31,14 @@ export function setView(k) {
       c.y = cfrom[i][1] + (c.views[k].y - cfrom[i][1]) * e;
     });
   };
-  const done = () => { S.morphing = false; buildGrid(); draw(); };
+  // à l'arrivée, ce qui est ouvert revient au centre (sinon le texte choisi peut sortir de l'écran)
+  const recenter = () => {
+    if (S.selected >= 0) focusDoc(S.docs[S.selected], S.cam.s);
+    else if (S.path) fitPoints(S.path.map(i => S.docs[i]), 0);
+    else if (S.cluster) fitPoints(S.docs.filter(d => d.cluster === S.cluster.id));
+    else if (S.entity) fitPoints(S.entity.docs.map(i => S.docs[i]));
+  };
+  const done = () => { S.morphing = false; buildGrid(); recenter(); draw(); };
   cancelAnimationFrame(morph);
   setHover(-1);
   if (reducedMotion) { place(1); done(); return; }

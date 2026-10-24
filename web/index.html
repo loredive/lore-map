@@ -33,12 +33,17 @@
     <button type="button" class="cancel">Annuler</button>
   </div>
 
+  <!-- le panneau suit la recherche dans l'ordre de tabulation ; il n'est pas une région « live » :
+       un court message dans #announce dit ce qui vient de s'ouvrir -->
+  <main>
+    <aside id="panel" aria-label="Fiche" hidden></aside>
+  </main>
+  <div id="announce" class="visually-hidden" role="status"></div>
+
   <nav class="legend" id="legend" aria-label="Afficher ou masquer une catégorie"></nav>
 
-  <div id="views" class="views" role="group" aria-label="Choisir la projection" hidden
-       title="Deux façons d'aplatir les mêmes textes sur une carte : seules les proximités ont un sens, pas les positions."></div>
-
-  <aside id="panel" aria-live="polite" hidden></aside>
+  <div id="views" class="views" role="group" aria-label="Choisir l'agencement de la carte" hidden
+       title="Deux façons de disposer les mêmes textes sur la carte : seules les proximités ont un sens, pas les positions."></div>
 
   <div id="tip" role="tooltip" hidden></div>
   <div id="status" role="status">Chargement des textes…</div>

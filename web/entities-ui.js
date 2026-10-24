@@ -1,5 +1,5 @@
 // Personnages, lieux, factions et notions : index, fiches et pastilles.
-import { S, $, panel, esc, fold, clearHash, resetContext, clusterById, docRow } from "./state.js";
+import { S, $, panel, esc, fold, clearHash, resetContext, clusterById, docRow, focusPanel } from "./state.js";
 import { draw, fitPoints } from "./render.js";
 import { select, openCluster, snippet, mark } from "./panel.js";
 
@@ -33,10 +33,11 @@ export function showIndex() {
   bindEntityButtons();
   panel.scrollTop = 0;
   clearHash();
+  focusPanel("Personnages et lieux");
   draw();
 }
 
-export function openEntity(e, { fly = true } = {}) {
+export function openEntity(e, { fly = true, focus = true } = {}) {
   resetContext();
   S.entity = e;
   S.selected = -1;
@@ -77,6 +78,7 @@ export function openEntity(e, { fly = true } = {}) {
     b.addEventListener("click", () => openCluster(clusterById(+b.dataset.c))));
   panel.scrollTop = 0;
   history.replaceState(null, "", "#entite=" + encodeURIComponent(e.name));
+  if (focus) focusPanel(`${e.label} : ${e.docs.length} textes en parlent`);
   if (fly) fitPoints(docs);
   draw();
 }

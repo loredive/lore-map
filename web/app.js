@@ -177,8 +177,8 @@ function buildLegend() {
       on ? S.hidden.delete(i) : S.hidden.add(i);
       b.setAttribute("aria-pressed", String(on));
       if (S.results.length && S.selected < 0) renderResults();
-      else if (S.cluster && S.selected < 0) openCluster(S.cluster, { fly: false });
-      else if (S.entity && S.selected < 0) openEntity(S.entity, { fly: false });
+      else if (S.cluster && S.selected < 0) openCluster(S.cluster, { fly: false, focus: false });
+      else if (S.entity && S.selected < 0) openEntity(S.entity, { fly: false, focus: false });
       draw();
     });
     nav.append(b);

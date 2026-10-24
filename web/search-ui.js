@@ -1,6 +1,6 @@
 // La recherche dans la page : saisie, chargement du modèle, liste des résultats.
 import { BM25, tokenize, corpusText, lexicalRanking, hybridRanking } from "./search.js";
-import { S, panel, input, mode, esc, fold, resetContext, docRow, MAX_HITS_ON_MAP, MAX_RESULTS } from "./state.js";
+import { S, panel, input, mode, esc, fold, resetContext, docRow, announce, clearHash, MAX_HITS_ON_MAP, MAX_RESULTS } from "./state.js";
 import { draw } from "./render.js";
 import { select, snippet, mark } from "./panel.js";
 import { bindEntityButtons } from "./entities-ui.js";
@@ -11,13 +11,22 @@ export function buildIndex() { S.bm25 = new BM25(S.docs.map(corpusText)); }
 
 let searchSeq = 0, debounce = 0;
 input.addEventListener("input", () => { clearTimeout(debounce); debounce = setTimeout(runSearch, 180); });
+// Entrée : la recherche part tout de suite et le focus passe au premier résultat
+input.addEventListener("keydown", e => {
+  if (e.key !== "Enter") return;
+  e.preventDefault();
+  clearTimeout(debounce);
+  runSearch();                       // la partie mots-clés est synchrone : la liste est déjà là
+  panel.querySelector(".entity-link, .results button")?.focus();
+});
 
 export async function runSearch() {
   const q = input.value.trim();
   const seq = ++searchSeq;
   if (q.length < 2) {
     S.hits = null; S.results = [];
-    if (S.selected < 0 && panel.dataset.view === "results") panel.hidden = true;
+    if (S.returnTo >= 0) select(S.returnTo, { fly: false });      // la fiche d'avant la recherche
+    else if (S.selected < 0 && panel.dataset.view === "results") panel.hidden = true;
     mode.textContent = S.meta?.semantic ? "Recherche par mots-clés et par sens" : "Recherche par mots-clés";
     draw();
     return;
@@ -38,7 +47,7 @@ export function resetSearch() {
   searchSeq++;
   clearTimeout(debounce);
   input.value = "";
-  S.hits = null; S.results = []; S.query = "";
+  S.hits = null; S.results = []; S.query = ""; S.returnTo = -1;
 }
 
 export function applyResults(ranked, q) {
@@ -46,9 +55,9 @@ export function applyResults(ranked, q) {
   S.results = ranked.map(([i]) => i);
   S.hits = new Map(S.results.slice(0, MAX_HITS_ON_MAP).map((i, r) => [i, r]));
   S.query = q;
-  // en attendant l'arrivée d'un chemin, les résultats remplacent la fiche : c'est là qu'on la choisit
-  if (S.pathFrom >= 0) S.selected = -1;
-  if (S.selected < 0) renderResults();
+  // une recherche remplace la fiche ouverte, qui reste à un « Retour » (et revient si on efface)
+  if (S.selected >= 0) { S.returnTo = S.selected; S.selected = -1; clearHash(); }
+  renderResults();
   draw();
 }
 
@@ -79,6 +88,8 @@ export function renderResults() {
   const visible = S.results.filter(i => !S.hidden.has(S.docs[i].cat));
   const shown = visible.slice(0, MAX_RESULTS);
   const terms = tokenize(S.query || "");
+  // la liste est remplacée quand les résultats « par sens » arrivent : garder le focus sur le même texte
+  const focused = panel.contains(document.activeElement) ? document.activeElement.dataset.i : undefined;
   panel.hidden = false;
   panel.dataset.view = "results";
   if (!shown.length) {
@@ -89,7 +100,9 @@ export function renderResults() {
   // une recherche qui nomme une entité connue mène à sa fiche
   const q = fold(S.query || "");
   const known = S.entities.find(e => [e.name, e.label, ...e.aliases].some(n => fold(n) === q));
-  panel.innerHTML = `${known ? `<button type="button" class="entity-link" data-e="${S.entities.indexOf(known)}">
+  const back = S.returnTo >= 0
+    ? `<button type="button" class="back">Retour à « ${esc(S.docs[S.returnTo].name)} »</button>` : "";
+  panel.innerHTML = `${back}${known ? `<button type="button" class="entity-link" data-e="${S.entities.indexOf(known)}">
       Fiche « ${esc(known.label)} » : ${known.docs.length} textes qui en parlent</button>` : ""}
     <p class="count">${visible.length} textes trouvés${more}. Les plus pertinents brillent sur la carte.</p>
     <ol class="results">${shown.map(i => {
@@ -98,7 +111,10 @@ export function renderResults() {
     }).join("")}</ol>`;
   panel.querySelectorAll("button[data-i]").forEach(b =>
     b.addEventListener("click", () => select(+b.dataset.i)));
+  panel.querySelector(".back")?.addEventListener("click", () => select(S.returnTo));
   bindEntityButtons();
   panel.scrollTop = 0;
+  if (focused !== undefined) (panel.querySelector(`button[data-i="${focused}"]`) || panel.querySelector(".results button"))?.focus();
+  announce(`${visible.length} textes trouvés`);
 }
 

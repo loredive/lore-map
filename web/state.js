@@ -36,6 +36,7 @@ export const S = {
   hits: null,            // Map index -> rang, résultats affichés sur la carte
   results: [],           // liste ordonnée d'indices
   hidden: new Set(),     // catégories masquées
+  returnTo: -1,          // fiche ouverte quand une recherche a commencé : on peut y revenir
   pathFrom: -1,          // texte de départ d'un chemin en attente de son arrivée
   path: null, pathSet: null,   // chemin d'échos affiché (indices) et le même en Set
   echoAdj: null,         // graphe des échos, construit au premier chemin
@@ -62,6 +63,19 @@ export function docRow(d, nameHtml, snipHtml, lead = "") {
   return `<li><button type="button" data-i="${d.i}">
     <span class="head">${lead}<span class="dot" style="--c:${colorOf(d.cat)}"></span><span class="name">${nameHtml}</span></span>
     <span class="snip">${snipHtml}</span></button></li>`;
+}
+
+// Accessibilité : le titre de ce qui vient de s'ouvrir reçoit le focus, et un court message
+// est lu par les lecteurs d'écran (le panneau entier n'est plus une région « live »).
+export function announce(msg) {
+  const a = $("#announce");
+  a.textContent = "";
+  requestAnimationFrame(() => { a.textContent = msg; });
+}
+export function focusPanel(msg) {
+  const h = panel.querySelector("h2");
+  if (h) { h.tabIndex = -1; h.focus({ preventScroll: true }); }
+  if (msg) announce(msg);
 }
 
 export function clearHash() { history.replaceState(null, "", location.pathname + location.search); }
