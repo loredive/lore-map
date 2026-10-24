@@ -14,6 +14,8 @@ const CAT_COLORS = {
 const GRACE = "#f0dc9f";
 const MAX_HITS_ON_MAP = 150;
 const MAX_RESULTS = 40;
+const MIN_COHESION = 0.6;   // en dessous, un groupe est trop éparpillé dans cette vue pour y porter un nom
+const MORPH_MS = 1100;
 const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const $ = s => document.querySelector(s);
@@ -25,6 +27,7 @@ const S = {
   cam: { x: 0, y: 0, s: 1 },
   W: 0, H: 0, dpr: 1, base: 1,
   hover: -1, selected: -1,
+  views: [], view: 0, morphing: false,   // projections disponibles, vue affichée, transition en cours
   cluster: null,         // groupe ouvert dans le panneau
   entities: [], docEntities: [],   // personnages, lieux… et, par texte, ceux qu'il mentionne
   entity: null,          // entité ouverte dans le panneau (exclusif avec cluster)
@@ -55,10 +58,18 @@ async function load() {
   S.cats = lore.categories;
   S.clusters = lore.clusters.sort((a, b) => b.n - a.n);
   S.meta = meta;
-  S.docs = lore.docs.map((r, i) => ({
-    i, name: r[F.name], cat: r[F.cat], text: r[F.text], jp: r[F.jp], jpName: r[F.jpName],
-    x: r[F.x], y: r[F.y], cluster: r[F.cluster], echoes: r[F.echoes],
-  }));
+  // chaque texte a une position par vue ([x1, y1, x2, y2…]) ; la première est la carte principale
+  S.views = lore.views || ["Carte"];
+  S.docs = lore.docs.map((r, i) => {
+    const xy = F.xy !== undefined ? r[F.xy] : [r[F.x], r[F.y]];
+    const views = S.views.map((_, k) => [xy[2 * k], xy[2 * k + 1]]);
+    return { i, name: r[F.name], cat: r[F.cat], text: r[F.text], jp: r[F.jp], jpName: r[F.jpName],
+             views, x: views[0][0], y: views[0][1], cluster: r[F.cluster], echoes: r[F.echoes] };
+  });
+  for (const c of S.clusters) {
+    c.views = c.views || [{ x: c.x, y: c.y, cohesion: 1 }];
+    Object.assign(c, { x: c.views[0].x, y: c.views[0].y });
+  }
   S.entities = (lore.entities || []).sort((a, b) => b.docs.length - a.docs.length);
   S.docEntities = S.docs.map(() => []);
   S.entities.forEach(e => e.docs.forEach(i => S.docEntities[i].push(e)));
@@ -66,6 +77,7 @@ async function load() {
   buildGrid();
   buildSprites();
   buildLegend();
+  buildViewSwitch();
   status.textContent = "";
   mode.textContent = meta.semantic ? "Recherche par mots-clés et par sens" : "Recherche par mots-clés";
   resize();
@@ -84,6 +96,7 @@ function buildGrid() {
   }
 }
 function nearest(wx, wy, wr) {
+  if (S.morphing) return -1;               // la grille ne suit pas les étoiles en mouvement
   let best = -1, bd = wr * wr;
   const r = Math.ceil(wr / CELL);
   const cx = Math.floor(wx / CELL), cy = Math.floor(wy / CELL);
@@ -220,7 +233,7 @@ function render() {
 
   // 4. noms des constellations (clusters), les plus grandes d'abord, sans chevauchement
   S.labelBoxes = [];
-  if (!S.hits && !sel) drawClusterLabels();
+  if (!S.hits && !sel && !S.morphing) drawClusterLabels();
 
   // 5. étoile survolée
   if (S.hover >= 0) {
@@ -242,6 +255,7 @@ function drawClusterLabels() {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   for (const c of S.clusters) {
+    if (c.views[S.view].cohesion < MIN_COHESION) continue;
     const size = Math.max(12, Math.min(25, 9 + Math.sqrt(c.n) * 0.95)) * Math.min(1.25, 0.85 + S.cam.s * 0.08);
     const [sx, sy] = toScreen(c.x, c.y);
     if (sx < -100 || sy < -30 || sx > S.W + 100 || sy > S.H + 30) continue;
@@ -430,6 +444,50 @@ function buildLegend() {
     });
     nav.append(b);
   });
+}
+
+// ------------------------------------------------------------------ vues (projections)
+// Les mêmes textes et les mêmes groupes, aplatis autrement : passer d'une vue à l'autre
+// fait glisser les étoiles, ce qui montre que seules les proximités ont un sens.
+function buildViewSwitch() {
+  const box = $("#views");
+  if (S.views.length < 2) return;
+  box.hidden = false;
+  box.innerHTML = `<span class="label">Projection</span>${S.views.map((v, k) =>
+    `<button type="button" data-v="${k}" aria-pressed="${k === S.view}">${esc(v)}</button>`).join("")}`;
+  box.querySelectorAll("button").forEach(b => b.addEventListener("click", () => setView(+b.dataset.v)));
+}
+
+let morph = 0;
+function setView(k) {
+  if (k === S.view) return;
+  S.view = k;
+  $("#views").querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(+b.dataset.v === k)));
+  const from = S.docs.map(d => [d.x, d.y]), cfrom = S.clusters.map(c => [c.x, c.y]);
+  const place = e => {
+    S.docs.forEach((d, i) => {
+      d.x = from[i][0] + (d.views[k][0] - from[i][0]) * e;
+      d.y = from[i][1] + (d.views[k][1] - from[i][1]) * e;
+    });
+    S.clusters.forEach((c, i) => {
+      c.x = cfrom[i][0] + (c.views[k].x - cfrom[i][0]) * e;
+      c.y = cfrom[i][1] + (c.views[k].y - cfrom[i][1]) * e;
+    });
+  };
+  const done = () => { S.morphing = false; buildGrid(); draw(); };
+  cancelAnimationFrame(morph);
+  setHover(-1);
+  if (reducedMotion) { place(1); done(); return; }
+  S.morphing = true;
+  const t0 = performance.now();
+  const ease = t => t < .5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
+  const step = now => {
+    const t = Math.min(1, (now - t0) / MORPH_MS);
+    place(ease(t));
+    render();
+    if (t < 1) morph = requestAnimationFrame(step); else done();
+  };
+  morph = requestAnimationFrame(step);
 }
 
 // ------------------------------------------------------------------ recherche

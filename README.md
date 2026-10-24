@@ -7,8 +7,8 @@ Tout tourne en local, sans LLM ni serveur.
 
 ## Voir la carte tout de suite
 
-Le dossier `web/data/` contient déjà une version de test (embeddings TF-IDF, projection t-SNE),
-utilisable sans rien installer :
+Le dossier `web/data/` contient déjà les données générées (embeddings e5, cartes t-SNE et UMAP,
+groupes titrés), utilisables sans rien installer :
 
 ```bash
 python -m http.server 8000 -d web
@@ -18,7 +18,7 @@ python -m http.server 8000 -d web
 Il faut passer par un serveur local : ouvrir `index.html` directement depuis le disque ne
 marche pas, le navigateur bloque la lecture des fichiers de données.
 
-## Générer la vraie version (embeddings sémantiques + UMAP)
+## Régénérer les données (embeddings sémantiques, t-SNE et UMAP)
 
 ```bash
 pip install sentence-transformers umap-learn scikit-learn numpy
@@ -39,12 +39,40 @@ par Reciprocal Rank Fusion. On peut alors chercher en français (« la mère de 
 textes anglais.
 
 Options : `--embedder tfidf` (sans réseau ni GPU, pas de recherche par sens),
-`--reducer tsne` (sans umap-learn), `--min-cluster 15` et `--min-samples 5` (réglages de HDBSCAN :
-taille minimale d'un groupe, et à quel point il doit être dense).
+`--reducer` (carte principale, `tsne` par défaut, ou `umap`), `--alt-reducer` (vue alternative
+proposée dans la page, `umap` par défaut, `none` pour s'en passer), `--min-cluster 15` et
+`--min-samples 5` (réglages de HDBSCAN : taille minimale d'un groupe, et à quel point il doit être
+dense).
 
-Les groupes sont calculés sur la carte 2D elle-même : ils restent d'un seul tenant à l'écran. Un
-clustering sur une projection UMAP en 10 dimensions a été essayé ; il colle à peine mieux au sens
-(+0,5 point de voisins communs) mais déborde nettement sur la carte (−6 points de contiguïté).
+### Pourquoi t-SNE pour la carte principale
+
+Mesuré sur les 3 049 textes : part des 10 vrais voisins (dans l'espace des embeddings) retrouvés
+parmi les 10 plus proches sur la carte, corrélation de rang entre distances d'origine et distances
+sur la carte, puis les groupes de HDBSCAN (15/5) calculés sur chaque carte.
+
+| | UMAP (nn 15) | t-SNE (perplexité 30) |
+|---|---|---|
+| Voisins gardés | 0,470 | **0,542** |
+| Structure globale | 0,386 | **0,421** |
+| Groupes / textes hors groupe | 69 / 19 % | 64 / 21 % |
+| Contiguïté des groupes sur la carte | 0,976 | 0,972 |
+| Accord des groupes avec les vrais voisins | 0,793 | **0,811** |
+
+Des UMAP plus « globaux » (nn 30 ou 50) gardent moins de voisins, et à nn 50 HDBSCAN ne trouve plus
+que deux masses. Une carte en 3D gagnerait environ 4 points de voisins pour beaucoup de complexité
+(WebGL, noms qui se cachent, sélection en profondeur) : écartée.
+
+Les groupes sont calculés sur la carte principale elle-même, pour rester d'un seul tenant à l'écran.
+Un clustering sur une projection UMAP en 10 dimensions colle à peine mieux au sens (+0,5 point de
+voisins communs) mais déborde nettement sur la carte (−6 points de contiguïté).
+
+### La vue alternative
+
+La page propose aussi la carte UMAP, avec **les mêmes groupes** : on bascule de l'une à l'autre et
+les étoiles glissent jusqu'à leur nouvelle place. La vue alternative est alignée sur la principale
+(Procrustes : rotation, miroir, échelle) pour que seul bouge ce qui diffère vraiment. Les groupes
+qui s'y éparpillent (cohésion sous 0,6 : moins de 60 % des voisins d'un texte sur la carte sont de
+son groupe) n'y affichent pas leur nom.
 
 ## Titres des groupes
 
@@ -96,6 +124,8 @@ elle revient le plus, puis les noms propres fréquents que la liste ne couvre pa
   liste les textes qui en parlent, les fait briller sur la carte et indique les groupes où ils se
   trouvent. La fiche d'un texte liste aussi ce qu'il mentionne, et chercher un nom connu
   (« Godwyn », « Lord of Blood ») propose sa fiche en tête des résultats.
+- « Projection », en bas à droite, passe de la carte t-SNE à la carte UMAP : mêmes textes, mêmes
+  groupes, autre façon d'aplatir. Ce qui reste proche dans les deux vues l'est vraiment.
 - La légende masque ou réaffiche une catégorie.
 - Clavier : `/` pour chercher, `Échap` pour fermer, `+`/`-` et flèches, `0` pour recentrer.
 - L'adresse de la page change avec le texte ou la fiche ouverte (`#entite=Godwyn`) : on peut copier
@@ -104,9 +134,10 @@ elle revient le plus, puis les noms propres fréquents que la liste ne couvre pa
 ## Fichiers
 
 ```
-prepare.py        données -> documents -> embeddings -> UMAP -> clusters -> export
+prepare.py        données -> documents -> embeddings -> t-SNE (+ UMAP) -> clusters -> export
 labels.py         rattachement des titres de labels.json aux clusters
 labels.json       titres et descriptions des groupes
+layouts.py        projections 2D, alignement de la vue alternative, cohésion des groupes
 entities.py       textes qui mentionnent chaque entité de entities.json
 entities.json     personnages, lieux, factions et notions
 tests/            tests (uv run pytest)
