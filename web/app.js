@@ -217,7 +217,11 @@ function render() {
 }
 
 function drawClusterLabels() {
-  const placed = [];
+  // le titre, la recherche et la légende comptent comme déjà occupés : pas de nom dessous
+  const placed = [".masthead", ".seek", "#legend"].map(s => {
+    const r = $(s).getBoundingClientRect();
+    return [r.left, r.top, r.right, r.bottom];
+  });
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   for (const c of S.clusters) {
