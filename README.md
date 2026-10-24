@@ -131,6 +131,10 @@ elle revient le plus, puis les noms propres fréquents que la liste ne couvre pa
 ## Utiliser la carte
 
 - Molette ou pincement pour zoomer, glisser pour se déplacer, double-clic pour zoomer.
+- Chaque groupe se dessine en constellation : ses étoiles sont reliées par l'arbre couvrant minimal de
+  leurs positions. Une étoile est d'autant plus grosse que d'autres textes la comptent parmi leurs
+  échos ; les grands groupes sont nommés en capitales, les petits apparaissent en zoomant.
+  `?style=a` affiche la carte sans cet habillage, `?style=b` sans halos ni nébuleuses.
 - Au doigt, toucher un endroit où plusieurs étoiles se serrent zoome sur lui, puis propose la liste
   de leurs noms (et du groupe, si un nom de groupe est dessous) : on choisit au lieu d'ouvrir une
   voisine par erreur.

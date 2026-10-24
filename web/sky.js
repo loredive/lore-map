@@ -1,14 +1,15 @@
-// Habillage du ciel, au choix par ?style= (a : sobre, b : constellations, c : nébuleuses) :
-// lignes de constellation, taille des étoiles, nébuleuses des groupes, couleurs atténuées de loin,
-// noms des grands groupes en capitales espacées qui apparaissent avec le zoom.
+// Habillage du ciel : lignes de constellation, taille des étoiles, halos additifs, nébuleuses des
+// groupes, noms des grands groupes en capitales espacées, petits noms qui apparaissent en zoomant.
+// Style c par défaut ; ?style=a (sans habillage) et ?style=b (sans halos ni nébuleuses) pour comparer.
+// Les couleurs atténuées de loin (muted) ont été essayées puis écartées : les catégories doivent rester lisibles.
 import { S, ctx, colorOf } from "./state.js";
 
 const STYLES = {
   a: {},
   b: { lines: true, sizes: true, caps: true, fade: true },
-  c: { lines: true, sizes: true, caps: true, fade: true, glow: true, nebula: true, muted: true },
+  c: { lines: true, sizes: true, caps: true, fade: true, glow: true, nebula: true },
 };
-export const STYLE = STYLES[new URLSearchParams(location.search).get("style")] || STYLES.a;
+export const STYLE = STYLES[new URLSearchParams(location.search).get("style")] || STYLES.c;
 
 // ------------------------------------------------------------------ préparation (au chargement)
 // Arbre couvrant minimal de chaque groupe (Prim, O(n²) : 284 textes au plus) ; les arêtes bien plus
