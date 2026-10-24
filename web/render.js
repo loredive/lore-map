@@ -1,6 +1,6 @@
 // Rendu du ciel sur le canvas : grille de sélection, étoiles, noms des groupes, caméra.
 import { S, $, canvas, ctx, panel, tip, GRACE, MIN_COHESION, reducedMotion, colorOf } from "./state.js";
-import { STYLE, drawNebulae, drawConstellations, labelStyle, muteColor } from "./sky.js";
+import { STYLE, drawNebulae, drawConstellations, drawThread, labelStyle, muteColor } from "./sky.js";
 
 // Grille spatiale pour retrouver vite l'étoile sous le curseur
 const CELL = 0.02;
@@ -248,6 +248,9 @@ export function render() {
     });
     ctx.restore();
   }
+
+  // 2 quater. fil du dialogue ouvert (début et fin marqués)
+  if (S.thread && !sel) drawThread(toScreen, R);
 
   // 3. constellation : le texte choisi relié à ses échos
   if (sel && !S.path) {

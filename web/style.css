@@ -107,6 +107,19 @@ body {
 .results .snip { display: block; margin: .15rem 0 0 1rem; color: var(--faint); font-size: .9rem; line-height: 1.4; }
 mark { background: none; color: var(--grace); }
 .count .refined { color: var(--dim); font-style: italic; }
+.understood { margin: 0 0 .4rem; color: var(--moon); font-style: italic; font-size: .92rem; }
+.search-tip { margin: 1rem 0 0; }
+/* dialogue d'un PNJ */
+.card .tools .tdial, .card > .tools .tdial { text-align: left; }
+ol.script { list-style: none; margin: 1rem 0 0; padding: 0; }
+ol.script li { display: grid; grid-template-columns: 2.2rem 1fr; gap: .2rem .6rem; padding: .5rem 0; border-top: 1px solid rgba(51, 64, 95, .5); }
+ol.script li.here { background: rgba(217, 196, 142, .06); border-radius: 4px; }
+ol.script .text { margin: 0; white-space: pre-line; line-height: 1.6; }
+.pnum {
+  align-self: start; min-height: 28px; padding: .1rem 0; border: 0; border-radius: 4px; background: none; cursor: pointer;
+  color: var(--grace); font: italic 600 1.05rem var(--display); text-align: right;
+}
+.pnum:hover, .pnum:focus-visible { color: var(--parch); text-decoration: underline; }
 .refine {
   display: block; margin: 0 0 .6rem; padding: .35rem .6rem; min-height: 28px; border: 1px solid var(--rim-strong);
   border-radius: 4px; background: rgba(167, 182, 214, .06); color: var(--moon); font: italic .9rem var(--body); cursor: pointer;
@@ -135,7 +148,7 @@ mark { background: none; color: var(--grace); }
 .card .jp { margin: 1rem 0 0; font: .95rem/1.85 var(--jp); white-space: pre-line; color: #cfc8b6; }
 .card .tools { display: flex; flex-wrap: wrap; gap: .4rem 1rem; margin: 1.2rem 0 0; }
 .card .tools button {
-  padding: .2rem 0; min-height: 24px; border: 0; background: none; color: var(--moon);
+  padding: .2rem 0; min-height: 24px; text-align: left; border: 0; background: none; color: var(--moon);
   font: italic .95rem var(--body); cursor: pointer; text-decoration: underline;
   text-decoration-color: var(--rim); text-underline-offset: 3px;
 }

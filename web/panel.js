@@ -6,6 +6,7 @@ import { echoGraph, echoPath } from "./graph.js";
 import { runSearch, resetSearch } from "./search-ui.js";
 import { entityChips, bindEntityButtons, openEntity, showIndex } from "./entities-ui.js";
 import { record, goBack, backLabel, setOpener, poppedHere } from "./nav.js";
+import { openDialogue, dialogueButtons, bindDialogueButtons } from "./dialogue-ui.js";
 
 // En-tête commun du panneau : « Retour à … » (l'entrée précédente de l'historique) et « Fermer ».
 export function panelTop() {
@@ -56,6 +57,7 @@ export function select(i, { fly = true } = {}) {
       ${d.jp ? `<button type="button" class="tjp" aria-expanded="false">Voir le texte japonais</button>` : ""}
       <button type="button" class="tlink">Copier le lien vers ce texte</button>
       <button type="button" class="tpath">Tracer un chemin vers un autre texte</button>
+      ${d.speaker && S.dialogues.get(d.speaker).length > 1 ? dialogueButtons([d.speaker]) : ""}
     </div>
     ${mentions.length ? `<h3>Mentionne</h3>
     <p class="hint">Personnages, lieux et notions cités : chacun ouvre les autres textes qui en parlent.</p>
@@ -79,6 +81,7 @@ export function select(i, { fly = true } = {}) {
   });
   panel.querySelectorAll(".echoes button").forEach(b => b.addEventListener("click", () => select(+b.dataset.i)));
   panel.querySelector(".tpath").addEventListener("click", () => startPath(i));
+  bindDialogueButtons(i);
   bindGroupButtons();
   bindEntityButtons();
   panel.scrollTop = 0;
@@ -147,7 +150,7 @@ export function showHelp() {
     </ul>
     <h3>Ce qu'on peut faire</h3>
     <ul class="help">
-      <li><strong>Chercher</strong> en français ou en anglais : « qui a tué Godwyn », « Malenia ».</li>
+      <li><strong>Chercher</strong> en français ou en anglais : « qui a tué Godwyn », « Malenia » ; et précisément : « Ranni + Blaidd », « -Malenia », « "Destined Death" », « dans:armes ».</li>
       <li><strong>Personnages et lieux</strong> : tous les textes qui parlent de Ranni, de Leyndell…, et les noms qui leur sont liés.</li>
       <li><strong>Échos</strong> : sous chaque texte, ceux qui en sont le plus proches par le sens.</li>
       <li><strong>Tracer un chemin</strong> entre deux textes, d'écho en écho, depuis la fiche d'un texte.</li>
@@ -178,6 +181,10 @@ export function openFromHash() {
     if (a >= 0 && b >= 0) showPath(a, b);
     return;
   }
+  if (name.startsWith("dialogue=")) {
+    openDialogue(name.slice(9));
+    return;
+  }
   if (name.startsWith("entite=")) {
     const e = S.entities.find(x => x.name === name.slice(7));
     if (e) openEntity(e);
@@ -199,6 +206,7 @@ setOpener(e => {
   else if (e.view === "index") showIndex();
   else if (e.view === "help") showHelp();
   else if (e.view === "path") showPath(e.a, e.b);
+  else if (e.view === "dialogue") openDialogue(e.speaker);
   else if (e.view === "results") { input.value = e.q; runSearch(); }
   else closePanel();
 });

@@ -3,6 +3,7 @@ import { S, $, panel, esc, fold, resetContext, clusterById, docRow, focusPanel }
 import { draw, fitPoints } from "./render.js";
 import { select, openCluster, snippet, mark, panelTop, bindPanelTop } from "./panel.js";
 import { record } from "./nav.js";
+import { speakersFor, dialogueButtons, bindDialogueButtons } from "./dialogue-ui.js";
 
 // ------------------------------------------------------------------ personnages, lieux…
 const KIND_LABELS = { personnage: ["Personnage", "Personnages"], lieu: ["Lieu", "Lieux"],
@@ -31,8 +32,13 @@ export function showIndex() {
       const list = S.entities.filter(e => e.kind === k);
       return list.length ? `<h3>${plural}</h3>${entityChips(list)}` : "";
     }).join("")}
+    <h3>Dialogues</h3>
+    <p class="hint">Tout ce que dit un personnage, dans l'ordre (le chiffre : nombre de passages).</p>
+    <div class="chips">${[...S.dialogues].filter(([, l]) => l.length > 1).sort((a, b) => b[1].length - a[1].length)
+      .map(([sp, l]) => `<button type="button" class="chip" data-sp="${esc(sp)}">${esc(sp)} <span class="n">${l.length}</span></button>`).join("")}</div>
   </article>`;
   bindEntityButtons();
+  bindDialogueButtons();
   bindPanelTop();
   panel.scrollTop = 0;
   focusPanel("Personnages et lieux");
@@ -64,6 +70,7 @@ export function openEntity(e, { fly = true, focus = true } = {}) {
     <div class="cat">${KIND_LABELS[e.kind][0]}</div>
     <h2>${esc(e.label)}</h2>
     ${e.label !== e.name ? `<p class="jpname">${esc(e.name)} dans les textes</p>` : ""}
+    ${speakersFor(e).length ? `<div class="tools">${dialogueButtons(speakersFor(e))}</div>` : ""}
     <p class="count">${e.docs.length} textes en parlent${visible.length < docs.length ? `, dont ${visible.length} dans les catégories affichées` : ""}. Ils brillent sur la carte.</p>
     ${related.length ? `<h3>Liés à</h3>
     <p class="hint">Les noms cités dans les mêmes textes, par affinité : d'abord ceux qui reviennent surtout avec celui-ci, pas seulement les plus fréquents. Le chiffre : textes en commun.</p>
@@ -75,6 +82,7 @@ export function openEntity(e, { fly = true, focus = true } = {}) {
     <ol class="results">${visible.map(d => docRow(d, mark(esc(d.name), names), mark(esc(snippet(d.text, folded)), names))).join("")}</ol>
   </article>`;
   panel.querySelector(".to-index").addEventListener("click", showIndex);
+  bindDialogueButtons();
   bindPanelTop();
   bindEntityButtons();
   panel.querySelectorAll("button[data-i]").forEach(b => b.addEventListener("click", () => select(+b.dataset.i)));

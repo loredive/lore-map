@@ -3,6 +3,7 @@ import { S, $, canvas, panel, tip, status, input, mode, esc, colorOf, announce }
 import { buildGrid, buildSprites, computeHulls, resize, draw, toWorld, nearest, flyTo, zoomAt, setHover, starsNear, viewCenter } from "./render.js";
 import { buildViewSwitch } from "./views.js";
 import { prepareSky } from "./sky.js";
+import { buildDialogues } from "./dialogue-ui.js";
 import { buildIndex, runSearch, renderResults } from "./search-ui.js";
 import { select, openCluster, closePanel, openFromHash, cancelPath } from "./panel.js";
 import { record, current } from "./nav.js";
@@ -44,6 +45,7 @@ async function load() {
   buildGrid();
   computeHulls();
   prepareSky();
+  buildDialogues();
   buildSprites();
   buildLegend();
   buildViewSwitch();

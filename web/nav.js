@@ -18,6 +18,7 @@ function hashOf(e) {
     case "cluster": return "#groupe=" + encodeURIComponent(e.label);
     case "entity": return "#entite=" + encodeURIComponent(e.name);
     case "path": return "#chemin=" + encodeURIComponent(S.docs[e.a].name) + "&" + encodeURIComponent(S.docs[e.b].name);
+    case "dialogue": return "#dialogue=" + encodeURIComponent(e.speaker);
     default: return location.pathname + location.search;      // résultats, index, aide, rien
   }
 }
@@ -60,6 +61,7 @@ export function backLabel() {
     case "index": return "Retour aux personnages et lieux";
     case "help": return "Retour à l'aide";
     case "path": return "Retour au chemin";
+    case "dialogue": return `Retour au dialogue de ${e.speaker}`;
     default: return null;                       // avant : le panneau fermé, « Fermer » suffit
   }
 }

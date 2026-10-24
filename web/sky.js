@@ -103,6 +103,17 @@ export function drawConstellations(toScreen, sel) {
   ctx.restore();
 }
 
+// Le fil d'un dialogue : ses passages reliés dans l'ordre, en pointillé doré
+export function drawThread(toScreen, R) {
+  const pts = S.thread.map(i => toScreen(S.docs[i].x, S.docs[i].y));
+  ctx.save();
+  ctx.strokeStyle = "#f0dc9f"; ctx.globalAlpha = 0.55; ctx.lineWidth = 1.1; ctx.setLineDash([2, 5]);
+  ctx.beginPath(); pts.forEach(([x, y], k) => (k ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.stroke();
+  ctx.setLineDash([]); ctx.globalAlpha = 0.9; ctx.fillStyle = "#f0dc9f";
+  for (const [x, y] of [pts[0], pts[pts.length - 1]]) { ctx.beginPath(); ctx.arc(x, y, Math.max(2.5, R * 0.35), 0, Math.PI * 2); ctx.fill(); }
+  ctx.restore();
+}
+
 // Style d'un nom de groupe : grands groupes en capitales espacées (convention des atlas) ;
 // opacité croissante avec la taille du groupe à l'écran, pour que les petits apparaissent en zoomant.
 export function labelStyle(c, size, toScreenRadius) {

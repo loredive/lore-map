@@ -39,7 +39,8 @@ export const S = {
   hidden: new Set(),     // catégories masquées
   pathFrom: -1,          // texte de départ d'un chemin en attente de son arrivée
   path: null, pathSet: null,   // chemin d'échos affiché (indices) et le même en Set
-  echoAdj: null,         // graphe des échos, construit au premier chemin
+  echoAdj: null,
+  dialogues: new Map(), thread: null,   // passages de chaque PNJ ; fil du dialogue ouvert         // graphe des échos, construit au premier chemin
   bm25: null, emb: null, extractor: null, semanticState: "off",
   grid: null, sprites: {}, dust: [],
 };
@@ -54,7 +55,7 @@ export function esc(s) {
 export function fold(s) { return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").trim(); }
 
 // Ce qu'affiche le panneau (groupe, entité, chemin) : un seul à la fois.
-export function resetContext() { S.cluster = S.entity = S.lit = S.path = S.pathSet = null; }
+export function resetContext() { S.cluster = S.entity = S.lit = S.path = S.pathSet = S.thread = null; }
 
 export function clusterById(id) { return S.clusters.find(c => c.id === id); }
 

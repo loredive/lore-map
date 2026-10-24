@@ -156,6 +156,15 @@ elle revient le plus, puis les noms propres fréquents que la liste ne couvre pa
 - « Carte : principale · autre agencement », en bas à droite, passe de la carte t-SNE à la carte UMAP
   (la méthode est indiquée dans l'infobulle) : mêmes textes, mêmes
   groupes, autre façon d'aplatir. Ce qui reste proche dans les deux vues l'est vraiment.
+- **Recherche précise** : `"Destined Death"` pour une expression exacte, `Ranni + Blaidd` (ou
+  `+Blaidd`) pour exiger un terme, `-Malenia` pour l'exclure, `dans:armes` pour une catégorie.
+  Un nom connu (personnage, lieu…) désigne les textes qui le mentionnent, alias compris ; un autre
+  mot, les textes qui le contiennent. La tête des résultats dit comment la requête a été comprise ;
+  le reste de la requête classe les textes retenus, par mots-clés puis par sens.
+- **Dialogues** : tout ce que dit un personnage, passage après passage, depuis la fiche d'un passage
+  (« Lire tout le dialogue »), la fiche du personnage ou l'index (`#dialogue=Ranni the Witch`). Sur la
+  carte, un fil pointillé relie les passages dans l'ordre : on voit le dialogue passer d'un groupe
+  à l'autre.
 - La légende masque ou réaffiche une catégorie.
 - Clavier : `/` pour chercher, Entrée pour aller au premier résultat, `Échap` pour fermer.
   Tab jusqu'à la carte affiche un viseur : flèches pour se déplacer, `+`/`-` pour zoomer, `0` pour
@@ -211,12 +220,14 @@ web/app.js        point d'entrée : chargement, souris, clavier, légende
 web/state.js      état partagé, constantes, petits utilitaires
 web/render.js     canvas : étoiles, contours, noms des groupes, chemins, caméra
 web/views.js      bascule entre projections
-web/search.js     BM25, similarité int8, fusion RRF (fonctions pures)
+web/search.js     BM25, similarité int8, fusion RRF, recherche précise (fonctions pures)
 web/search-ui.js  champ de recherche, modèle, liste des résultats
 web/panel.js      fiches d'un texte et d'un groupe, chemins, aide, liens (#…)
 web/nav.js        historique de navigation du panneau (Retour, bouton du navigateur)
 web/entities-ui.js  index et fiches des personnages, lieux…
 web/graph.js      graphe des échos, plus court chemin (fonctions pures)
+web/dialogue-ui.js  dialogue complet d'un personnage et son fil sur la carte
+web/sky.js        habillage du ciel : constellations, halos, nébuleuses, style des noms
 web/style.css
 ```
 

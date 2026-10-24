@@ -109,3 +109,38 @@ export const RRF_K = 60;          // valeur usuelle de la fusion RRF
 export function hybridRanking(lexical, queryVec, emb, dim) {
   return rrf([lexical, semanticRanking(queryVec, emb, dim)], RRF_K, [LEXICAL_WEIGHT, 1]);
 }
+
+// ------------------------------------------------------------------ recherche précise
+// "expression exacte", +terme ou A + B (exigés), -terme (exclu), dans:catégorie. Le reste (et les
+// expressions exactes) sert au classement ; une requête sans ces signes est rendue telle quelle.
+export function fold(s) { return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").trim(); }
+
+export function parseQuery(raw) {
+  const phrases = [], rawPhrases = [];
+  const rest = raw.replace(/"([^"]+)"/g, (_, p) => { phrases.push(fold(p)); rawPhrases.push(p.trim()); return " "; });
+  const free = [], must = [], mustNot = [], cats = [];
+  let requireNext = false;
+  for (const tok of rest.split(/\s+/).filter(Boolean)) {
+    if (/^dans:./i.test(tok)) cats.push(fold(tok.slice(5)));
+    else if (tok === "+") { if (free.length) must.push(fold(free.pop())); requireNext = true; }
+    else if (tok.length > 1 && tok[0] === "+") must.push(fold(tok.slice(1)));
+    else if (tok.length > 1 && tok[0] === "-") mustNot.push(fold(tok.slice(1)));
+    else if (requireNext) { must.push(fold(tok)); requireNext = false; }
+    else free.push(tok);
+  }
+  return { text: [...rawPhrases, ...free].join(" "), phrases, must, mustNot, cats };
+}
+
+export function hasConstraints(q) { return q.phrases.length + q.must.length + q.mustNot.length + q.cats.length > 0; }
+
+// Un texte satisfait-il les contraintes ? termDocs(t) rend l'ensemble des textes d'une entité connue
+// (« Godwyn » : ceux qui la mentionnent, alias compris) ou null pour un mot ordinaire, cherché dans
+// le nom et le texte (début de mot). folded : nom + texte repliés ; cat : nom de catégorie replié.
+export function satisfies(i, folded, cat, q, termDocs) {
+  const has = t => {
+    const docs = termDocs(t);
+    return docs ? docs.has(i) : new RegExp(`(^|[^a-z0-9])${t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`).test(folded);
+  };
+  return q.phrases.every(p => folded.includes(p)) && q.must.every(has) && !q.mustNot.some(has) &&
+    (!q.cats.length || q.cats.some(c => cat.startsWith(c)));
+}
