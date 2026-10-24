@@ -32,11 +32,22 @@ export async function runSearch() {
   mode.textContent = "Résultats par mots-clés et par sens";
 }
 
+// Vide la recherche et ignore une réponse « par sens » encore en route (elle écraserait ce qui
+// s'affiche entre-temps, comme un chemin tout juste tracé).
+export function resetSearch() {
+  searchSeq++;
+  clearTimeout(debounce);
+  input.value = "";
+  S.hits = null; S.results = []; S.query = "";
+}
+
 export function applyResults(ranked, q) {
-  S.cluster = S.entity = S.lit = null;
+  S.cluster = S.entity = S.lit = S.path = S.pathSet = null;   // un chemin en attente garde son départ
   S.results = ranked.map(([i]) => i);
   S.hits = new Map(S.results.slice(0, MAX_HITS_ON_MAP).map((i, r) => [i, r]));
   S.query = q;
+  // en attendant l'arrivée d'un chemin, les résultats remplacent la fiche : c'est là qu'on la choisit
+  if (S.pathFrom >= 0) S.selected = -1;
   if (S.selected < 0) renderResults();
   draw();
 }

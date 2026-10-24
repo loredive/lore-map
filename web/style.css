@@ -133,6 +133,31 @@ mark { background: none; color: var(--grace); }
 .card .help li::marker { color: var(--grace); }
 .echoes small { color: var(--faint); font-size: .8rem; }
 
+/* ---------- groupe d'un texte, chemin d'échos ---------- */
+.card .group { margin: .3rem 0 0; color: var(--faint); font-size: .9rem; }
+.glink {
+  padding: 0; border: 0; background: none; cursor: pointer; color: var(--moon);
+  font: italic 600 1rem var(--display); text-decoration: underline;
+  text-decoration-color: var(--rim); text-underline-offset: 3px;
+}
+.glink:hover, .glink:focus-visible { color: var(--grace); text-decoration-color: var(--grace); }
+.results.path .step {
+  flex: none; width: 1.3rem; text-align: right; color: var(--grace);
+  font: italic 600 1rem var(--display);
+}
+.pathbar {
+  position: fixed; z-index: 4; top: 112px; left: 50%; transform: translateX(-50%);
+  width: min(560px, calc(100vw - 32px)); padding: .5rem .9rem; text-align: center;
+  background: rgba(13, 18, 32, .94); border: 1px solid var(--grace); border-radius: 4px;
+  color: var(--parch); font-size: .92rem; line-height: 1.4;
+}
+.pathbar[hidden] { display: none; }
+.pathbar .from { color: var(--grace); font-style: italic; }
+.pathbar .cancel {
+  margin-left: .5rem; padding: 0; border: 0; background: none; cursor: pointer;
+  color: var(--moon); font: italic .92rem var(--body); text-decoration: underline; text-underline-offset: 3px;
+}
+
 /* ---------- projections ---------- */
 .views {
   position: fixed; z-index: 2; right: 24px; bottom: 12px;
@@ -178,6 +203,7 @@ body:has(#panel:not([hidden])) .views { right: calc(min(420px, 100vw) + 16px); }
   .masthead .links { flex-wrap: nowrap; gap: .9rem; margin-top: .3rem; }
   .views, body:has(#panel:not([hidden])) .views { top: 14px; right: 12px; bottom: auto; }
   .views .label { display: none; }
+  .pathbar { top: 150px; }
   .legend { left: 10px; bottom: 30px; }
   .legend .label, .legend .n { display: none; }
   .credit { left: 16px; bottom: 8px; font-size: .68rem; }

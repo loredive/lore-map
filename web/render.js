@@ -31,6 +31,74 @@ export function nearest(wx, wy, wr) {
   return best;
 }
 
+// ------------------------------------------------------------------ contours des groupes
+// Comme les frontières des constellations sur les atlas anciens : l'enveloppe convexe des
+// 90 % de textes les plus centraux du groupe (les isolés tireraient le contour), arrondie.
+function convexHull(pts) {
+  const p = [...pts].sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  if (p.length < 3) return p;
+  const cross = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+  const half = list => {
+    const h = [];
+    for (const q of list) {
+      while (h.length >= 2 && cross(h[h.length - 2], h[h.length - 1], q) <= 0) h.pop();
+      h.push(q);
+    }
+    return h.slice(0, -1);
+  };
+  return [...half(p), ...half([...p].reverse())];
+}
+// Trace autour d'un polygone convexe (coordonnées écran) une bande de rayon pad : côtés repoussés
+// vers l'extérieur et arcs autour des sommets. Contrairement à un lissage par coupe des coins,
+// la forme contient toujours tous les points.
+function roundedBuffer(poly, pad) {
+  let area = 0;
+  poly.forEach(([x0, y0], i) => { const [x1, y1] = poly[(i + 1) % poly.length]; area += x0 * y1 - x1 * y0; });
+  const sign = area > 0 ? 1 : -1;                     // sens de parcours à l'écran (y vers le bas)
+  const normal = (a, b) => {                          // normale extérieure du côté a -> b
+    const dx = b[0] - a[0], dy = b[1] - a[1], n = Math.hypot(dx, dy) || 1;
+    return [sign * dy / n, -sign * dx / n];
+  };
+  ctx.beginPath();
+  poly.forEach((v, i) => {
+    const prev = poly[(i - 1 + poly.length) % poly.length], next = poly[(i + 1) % poly.length];
+    const n1 = normal(prev, v), n2 = normal(v, next);
+    ctx.arc(v[0], v[1], pad, Math.atan2(n1[1], n1[0]), Math.atan2(n2[1], n2[0]), sign < 0);
+  });
+  ctx.closePath();
+}
+export function computeHulls() {
+  for (const c of S.clusters) {
+    c.hulls = S.views.map((_, k) => {
+      const pts = S.docs.filter(d => d.cluster === c.id).map(d => d.views[k]);
+      const cx = c.views[k].x, cy = c.views[k].y;   // médiane du groupe : les plus centraux d'abord
+      pts.sort((a, b) => ((a[0] - cx) ** 2 + (a[1] - cy) ** 2) - ((b[0] - cx) ** 2 + (b[1] - cy) ** 2));
+      // vue d'ensemble : le cœur du groupe ; groupe ouvert : tous ses textes, aucun hors du trait
+      const core = convexHull(pts.slice(0, Math.max(3, Math.ceil(pts.length * 0.9))));
+      return { core, full: convexHull(pts) };
+    });
+  }
+}
+function drawHulls(sel) {
+  ctx.save();
+  ctx.lineJoin = "round";
+  for (const c of S.clusters) {
+    const h = c.hulls?.[S.view];
+    const on = S.cluster === c || S.hoverLabel === c;
+    const hull = on ? h?.full : h?.core;
+    if (!hull || hull.length < 3 || c.views[S.view].cohesion < MIN_COHESION) continue;
+    if (sel && !on) continue;
+    // marge de quelques pixels autour des étoiles, quel que soit le zoom
+    roundedBuffer(hull.map(([x, y]) => toScreen(x, y)), 12);
+    ctx.setLineDash(on ? [2, 4] : [1.5, 3.5]);
+    ctx.lineWidth = on ? 1.2 : 1;
+    ctx.strokeStyle = on ? GRACE : "#a7b6d6";
+    ctx.globalAlpha = on ? 0.65 : 0.3;
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
 // ------------------------------------------------------------------ rendu
 function sprite(color) {
   const c = document.createElement("canvas");
@@ -93,12 +161,15 @@ export function render() {
   const sel = S.selected >= 0 ? S.docs[S.selected] : null;
   const echoSet = new Set(sel ? sel.echoes : []);
 
+  // 0. contours des groupes (le groupe ouvert seulement quand un texte est choisi)
+  if (!S.hits && !S.morphing && !S.path) drawHulls(sel);
+
   // 1. toutes les étoiles visibles
   for (const d of S.docs) {
     if (S.hidden.has(d.cat)) continue;
     const [sx, sy] = toScreen(d.x, d.y);
     if (sx < -pad || sy < -pad || sx > W + pad || sy > H + pad) continue;
-    const dim = (S.hits && !S.hits.has(d.i)) || (sel && d.i !== sel.i && !echoSet.has(d.i)) ||
+    const dim = (S.path && !S.pathSet.has(d.i)) || (S.hits && !S.hits.has(d.i)) || (sel && d.i !== sel.i && !echoSet.has(d.i)) ||
       (!sel && S.cluster && d.cluster !== S.cluster.id) || (!sel && S.lit && !S.lit.has(d.i));
     ctx.globalAlpha = dim ? 0.13 : 0.9;
     ctx.drawImage(S.sprites[d.cat], sx - R, sy - R, 2 * R, 2 * R);
@@ -127,8 +198,26 @@ export function render() {
     }
   }
 
+  // 2 ter. chemin d'échos entre deux textes : une constellation tracée, étape par étape
+  if (S.path) {
+    const pts = S.path.map(i => toScreen(S.docs[i].x, S.docs[i].y));
+    ctx.save();
+    ctx.strokeStyle = GRACE; ctx.lineWidth = 1.4; ctx.globalAlpha = 0.85;
+    ctx.beginPath(); pts.forEach(([x, y], k) => (k ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.stroke();
+    ctx.font = `italic 600 13px "Cormorant Garamond", Georgia, serif`;
+    ctx.textAlign = "left"; ctx.textBaseline = "bottom";
+    pts.forEach(([x, y], k) => {
+      ctx.globalAlpha = 1;
+      const big = k === 0 || k === pts.length - 1 ? 2.1 : 1.5;
+      ctx.drawImage(S.sprites.grace, x - R * big, y - R * big, 2 * R * big, 2 * R * big);
+      ctx.lineWidth = 3; ctx.strokeStyle = "rgba(14,19,34,.85)"; ctx.strokeText(String(k + 1), x + R * 0.9, y - R * 0.6);
+      ctx.fillStyle = GRACE; ctx.fillText(String(k + 1), x + R * 0.9, y - R * 0.6);
+    });
+    ctx.restore();
+  }
+
   // 3. constellation : le texte choisi relié à ses échos
-  if (sel) {
+  if (sel && !S.path) {
     const [x0, y0] = toScreen(sel.x, sel.y);
     ctx.strokeStyle = GRACE;
     ctx.lineWidth = 1;
@@ -148,7 +237,7 @@ export function render() {
 
   // 4. noms des constellations (clusters), les plus grandes d'abord, sans chevauchement
   S.labelBoxes = [];
-  if (!S.hits && !sel && !S.morphing) drawClusterLabels();
+  if (!S.hits && !sel && !S.morphing && !S.path) drawClusterLabels();
 
   // 5. étoile survolée
   if (S.hover >= 0) {
@@ -176,7 +265,10 @@ function drawClusterLabels() {
     if (sx < -100 || sy < -30 || sx > S.W + 100 || sy > S.H + 30) continue;
     ctx.font = `italic 600 ${size}px "Cormorant Garamond", Georgia, serif`;
     const w = ctx.measureText(c.label).width;
-    const box = [sx - w / 2 - 6, sy - size * 0.6 - 3, sx + w / 2 + 6, sy + size * 0.6 + 3];
+    if (w + 16 > S.W) continue;
+    // un nom qui déborderait de l'écran est rentré vers l'intérieur plutôt que coupé
+    const lx = Math.min(Math.max(sx, w / 2 + 8), S.W - w / 2 - 8);
+    const box = [lx - w / 2 - 6, sy - size * 0.6 - 3, lx + w / 2 + 6, sy + size * 0.6 + 3];
     if (placed.some(b => box[0] < b[2] && box[2] > b[0] && box[1] < b[3] && box[3] > b[1])) continue;
     placed.push(box);
     S.labelBoxes.push([...box, c]);
@@ -184,9 +276,9 @@ function drawClusterLabels() {
     ctx.globalAlpha = on ? 1 : 0.85;
     ctx.lineWidth = 4;
     ctx.strokeStyle = "rgba(14,19,34,.8)";
-    ctx.strokeText(c.label, sx, sy);
+    ctx.strokeText(c.label, lx, sy);
     ctx.fillStyle = on ? GRACE : "#c3cde6";
-    ctx.fillText(c.label, sx, sy);
+    ctx.fillText(c.label, lx, sy);
   }
 }
 

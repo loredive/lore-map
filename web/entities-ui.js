@@ -17,7 +17,7 @@ export function bindEntityButtons() {
 }
 
 export function showIndex() {
-  S.cluster = S.entity = S.lit = null;
+  S.cluster = S.entity = S.lit = S.path = S.pathSet = null;
   S.selected = -1;
   panel.hidden = false;
   panel.dataset.view = "index";
@@ -37,7 +37,7 @@ export function showIndex() {
 
 export function openEntity(e, { fly = true } = {}) {
   S.entity = e;
-  S.cluster = null;
+  S.cluster = S.path = S.pathSet = null;
   S.selected = -1;
   S.lit = new Set(e.docs);
   const docs = e.docs.map(i => S.docs[i]);

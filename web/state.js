@@ -36,6 +36,9 @@ export const S = {
   hits: null,            // Map index -> rang, résultats affichés sur la carte
   results: [],           // liste ordonnée d'indices
   hidden: new Set(),     // catégories masquées
+  pathFrom: -1,          // texte de départ d'un chemin en attente de son arrivée
+  path: null, pathSet: null,   // chemin d'échos affiché (indices) et le même en Set
+  echoAdj: null,         // graphe des échos, construit au premier chemin
   bm25: null, emb: null, extractor: null, semanticState: "off",
   grid: null, sprites: {}, dust: [],
 };

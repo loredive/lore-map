@@ -1,9 +1,9 @@
 // Point d'entrée : chargement des données, souris, clavier, légende.
 import { S, $, canvas, panel, tip, status, input, mode, esc, colorOf } from "./state.js";
-import { buildGrid, buildSprites, resize, draw, toWorld, nearest, flyTo, zoomAt } from "./render.js";
+import { buildGrid, buildSprites, computeHulls, resize, draw, toWorld, nearest, flyTo, zoomAt } from "./render.js";
 import { buildViewSwitch } from "./views.js";
 import { buildIndex, runSearch, renderResults } from "./search-ui.js";
-import { select, deselect, openCluster, closePanel, openFromHash } from "./panel.js";
+import { select, deselect, openCluster, closePanel, openFromHash, cancelPath } from "./panel.js";
 import { openEntity } from "./entities-ui.js";
 
 // ------------------------------------------------------------------ données
@@ -40,6 +40,7 @@ async function load() {
   S.entities.forEach(e => e.docs.forEach(i => S.docEntities[i].push(e)));
   buildIndex();
   buildGrid();
+  computeHulls();
   buildSprites();
   buildLegend();
   buildViewSwitch();
@@ -117,7 +118,8 @@ addEventListener("keydown", e => {
   const typing = document.activeElement === input;
   if (e.key === "/" && !typing) { e.preventDefault(); input.focus(); input.select(); return; }
   if (e.key === "Escape") {
-    if (S.selected >= 0) deselect();
+    if (S.pathFrom >= 0) { cancelPath(); draw(); }
+    else if (S.selected >= 0) deselect();
     else if (!panel.hidden && panel.dataset.view !== "results") closePanel();
     else if (input.value) { input.value = ""; runSearch(); }
     return;
