@@ -89,6 +89,22 @@ def item_docs(data):
     return docs
 
 
+# Libellés d'interlocuteurs du dump qui ne sont pas des noms : traduits pour la page
+SPEAKER_NAMES = {
+    "Narator": "Narrateur",
+    "Stage Directions": "Didascalies",
+    "Ghost": "Fantôme",
+    "End of Game Dialog + Extra Morgott": "Fin du jeu (et Morgott)",
+    "Unknown NPC 2029": "PNJ inconnu",
+}
+
+
+def speaker_name(raw):
+    name = re.sub(r"\s+dialog$", "", raw.strip(), flags=re.I)
+    name = re.sub(r"\s*\(cut npc\)$", " (PNJ coupé)", name, flags=re.I)
+    return SPEAKER_NAMES.get(name, name)
+
+
 LINE_RE = re.compile(r"\[(\d+)\]\s*(.*?)(?=<br/><br/>\s*\[\d+\]|$)", re.S)
 
 
@@ -96,7 +112,8 @@ def dialog_docs(data, max_chars=550):
     """Découpe chaque dialogue de PNJ en passages de quelques répliques consécutives."""
     docs, seen = [], set()      # certains dialogues (didascalies) répètent les mêmes passages
     for rec in data.get("dialog", {}).values():
-        npc = re.sub(r"\s+dialog$", "", rec.get("name_en", "").strip(), flags=re.I)
+        raw = re.sub(r"\s+dialog$", "", rec.get("name_en", "").strip(), flags=re.I)
+        npc = speaker_name(raw)
         lines = [(int(i), clean(t)) for i, t in LINE_RE.findall(rec.get("info_en", ""))]
         lines = [(i, t) for i, t in lines if t and not any(j in t for j in JUNK)]
         chunk, last_id, part = [], None, 1
@@ -106,8 +123,10 @@ def dialog_docs(data, max_chars=550):
             text = "\n".join(chunk).strip()
             if len(text) >= 40 and text not in seen:
                 seen.add(text)
-                docs.append({"name": f"{npc} — passage {part}", "cat": DIALOG_LABEL,
-                             "text": text, "jp": "", "jp_name": ""})
+                # le nom affiché est nettoyé, mais les embeddings gardent celui du dump :
+                # corriger un libellé ne doit pas déplacer les textes sur la carte
+                docs.append({"name": f"{npc} — passage {part}", "embed_name": f"{raw} — passage {part}",
+                             "cat": DIALOG_LABEL, "text": text, "jp": "", "jp_name": ""})
                 part += 1
             chunk = []
 
@@ -125,7 +144,7 @@ def dialog_docs(data, max_chars=550):
 
 # ---------------------------------------------------------------- embeddings
 def embed(docs, embedder):
-    texts = [f"{d['name']}. {d['text']}" for d in docs]
+    texts = [f"{d.get('embed_name', d['name'])}. {d['text']}" for d in docs]
     if embedder == "e5":
         from sentence_transformers import SentenceTransformer
         model = SentenceTransformer(MODEL_NAME)

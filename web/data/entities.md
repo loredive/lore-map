@@ -144,8 +144,8 @@ Pour chaque entrée de entities.json : nombre de textes qui la mentionnent et gr
 
 - Ash of War (95 textes)
 - Academy of Raya (48 textes)
-- Physick (31 textes)
 - Flask of Wondrous (31 textes)
+- Physick (31 textes)
 - Twin Maiden (28 textes)
 - Husks (28 textes)
 - Grafted (21 textes)

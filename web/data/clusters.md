@@ -664,22 +664,22 @@ Mots clés : Brother, Master, Order
 
 ## Cluster 33 — Godrick et les fantômes (30 textes)
 
-Mots clés : Ghost, Rays, Bathed
+Mots clés : Rays, Bathed, Grafted
 
 - **Godrick the Grafted — passage 4** (Dialogues) : and the Lands Between are shrouded by Death's dark fate. To our home, bathed in rays of gold. And grace will surely guide us safe. To our home, bathed in rays of gold. But the flames will also burn th
 - **Godrick the Grafted — passage 3** (Dialogues) : The Rune of Death is unbound. Black flames have devoured the Erdtree, One day, we'll return together. To our home, bathed in rays of gold. There is only one tree, and only its branches. That bathe in 
-- **Ghost — passage 15** (Dialogues) : One day, we'll return together. To our home, bathed in rays of gold. There is only one tree, and only its branches. That bathe in true rays of gold. Not the fool Omen King. Nor the rank malformed twin
-- **Ghost — passage 14** (Dialogues) : ... Behold. The Erdtree yet stands. Tall and unwavering, mindless of the scorch of the flame of ruin. Hahah, Hahah... Then, we are yet Golden Ones. He is returned! The Lord has returned at long last. 
+- **Fantôme — passage 15** (Dialogues) : One day, we'll return together. To our home, bathed in rays of gold. There is only one tree, and only its branches. That bathe in true rays of gold. Not the fool Omen King. Nor the rank malformed twin
+- **Fantôme — passage 14** (Dialogues) : ... Behold. The Erdtree yet stands. Tall and unwavering, mindless of the scorch of the flame of ruin. Hahah, Hahah... Then, we are yet Golden Ones. He is returned! The Lord has returned at long last. 
 - **Godrick the Grafted — passage 8** (Dialogues) : He he he he he... Lowly Tarnished... Thou'rt unfit even to graft... My sincerest gratitude. I thought I'd never wrench that thing open. Great Godfrey, didst thou witness? You're the finest customer a 
-- **Ghost — passage 16** (Dialogues) : Erdtree, O Golden Circle. Grant us the droplets of life, Structure us. Reveal our path. We are your guardians. We swat at flies, snuff out flame, Repel the Omen, and undo Tarnish. Blessed we, at your 
+- **Fantôme — passage 16** (Dialogues) : Erdtree, O Golden Circle. Grant us the droplets of life, Structure us. Reveal our path. We are your guardians. We swat at flies, snuff out flame, Repel the Omen, and undo Tarnish. Blessed we, at your 
 - **Godrick the Grafted — passage 9** (Dialogues) : This is how you die, you disgusting Tarnished. Don't worry, I've got big plans for you. After you snuff it...
 - **Godrick the Grafted — passage 7** (Dialogues) : Well well well? I should have known, you scheming little thief. The gods demand vengeance. Vengeance!
 - **Godrick the Grafted — passage 10** (Dialogues) : <screaming> (explained above) Unleash it upon them! A cursed blessing to all! (scream of pain)
 - **Godrick the Grafted — passage 2** (Dialogues) : <panting> Ahh, truest of dragons. Lend me thy strength... Nnngh! <panting> Forefathers, one and all... Great King Godfrey... Bear witness!
-- **Ghost — passage 2** (Dialogues) : The demi-humans wax wroth, now their mother's been taken... Where are you, Lord Kenneth? The knight...bedeviled by blood. ... Please, help me. I'm of noble blood. If those hideous mongrels eat me, I'l
-- **Ghost — passage 22** (Dialogues) : Blessed Erdtree... O hallowed Runes... <Invigorating shouts for repeated rapier thrusts. Sharply enunciated, suggesting proper training.>
+- **Fantôme — passage 2** (Dialogues) : The demi-humans wax wroth, now their mother's been taken... Where are you, Lord Kenneth? The knight...bedeviled by blood. ... Please, help me. I'm of noble blood. If those hideous mongrels eat me, I'l
+- **Fantôme — passage 22** (Dialogues) : Blessed Erdtree... O hallowed Runes... <Invigorating shouts for repeated rapier thrusts. Sharply enunciated, suggesting proper training.>
 - **Godrick the Grafted — passage 5** (Dialogues) : Well, if you really are that gullible... Ngh! then stay away from the Volcano Manor! Bye now! Take care!
-- **Ghost — passage 7** (Dialogues) : ... Eek... I hear a festive melody... No, no, don't skin me... My hide is filthy, I swear... ... Ohh, Erdtree, great Erdtree. The Golden Order itself, unwavering, stretched to the sky. Confer your gui
+- **Fantôme — passage 7** (Dialogues) : ... Eek... I hear a festive melody... No, no, don't skin me... My hide is filthy, I swear... ... Ohh, Erdtree, great Erdtree. The Golden Order itself, unwavering, stretched to the sky. Confer your gui
 - **Godrick the Grafted — passage 1** (Dialogues) : Mighty dragon, thou'rt a trueborn heir. Lend me thy strength, o kindred. Deliver me unto greater heights. ...Well. A lowly Tarnished, playing as a lord. I command thee, kneel! I am the lord of all tha
 
 ## Cluster 34 — Latenna et les médaillons (20 textes)
@@ -866,21 +866,21 @@ Mots clés : Reader, Enia, Finger
 
 Mots clés : Elden, Ring, Tarnished
 
-- **End of Game Dialog + Extra Morgott — passage 1** (Dialogues) : Now wilt ye serve, each and all. Well, thou art of passing skill. Warrior blood must truly run in thy veins, Tarnished. The Elden Lord is crowned. The new Elden Lord, steward of a fracturing world. Fo
-- **Narator — passage 4** (Dialogues) : Elden Ring, O Elden Ring. Its gold commanded the very stars, giving life its fullest brilliance. Shattered, by someone, or something. Fractured, by someone, or something. Godrick, the feeble. Malenia,
-- **Narator — passage 1** (Dialogues) : Brave Tarnished. Mighty warriors, who fought at my side. Await the summons. It will call to thee one day. Heed the fading grace. Listen to the Fingers. Gold commandeth the very stars, giving life its 
-- **End of Game Dialog + Extra Morgott — passage 2** (Dialogues) : Of how a Tarnished, of no renown, became Elden Lord. The fallen leaves tell a story. Hrghraah! The thrones...stained by my curse... Such shame I cannot bear. Thy part in this shall not be forgiven. Of
+- **Fin du jeu (et Morgott) — passage 1** (Dialogues) : Now wilt ye serve, each and all. Well, thou art of passing skill. Warrior blood must truly run in thy veins, Tarnished. The Elden Lord is crowned. The new Elden Lord, steward of a fracturing world. Fo
+- **Narrateur — passage 4** (Dialogues) : Elden Ring, O Elden Ring. Its gold commanded the very stars, giving life its fullest brilliance. Shattered, by someone, or something. Fractured, by someone, or something. Godrick, the feeble. Malenia,
+- **Narrateur — passage 1** (Dialogues) : Brave Tarnished. Mighty warriors, who fought at my side. Await the summons. It will call to thee one day. Heed the fading grace. Listen to the Fingers. Gold commandeth the very stars, giving life its 
+- **Fin du jeu (et Morgott) — passage 2** (Dialogues) : Of how a Tarnished, of no renown, became Elden Lord. The fallen leaves tell a story. Hrghraah! The thrones...stained by my curse... Such shame I cannot bear. Thy part in this shall not be forgiven. Of
 - **Godfrey, First Elden Lord — passage 3** (Dialogues) : And one other. Whom grace would again bless. A Tarnished of no renown. Cross the fog, to the Lands Between. to stand before the Elden Ring. And become the Elden Lord.
 - **Margit, the Fell Omen — passage 1** (Dialogues) : Foul Tarnished, In search of the Elden Ring. Emboldened by the flame of ambition. Hrah! Someone must extinguish thy flame. Let it be Margit the Fell!
-- **Narator — passage 2** (Dialogues) : Long ago, ye Tarnished lost something most dear. The Elden Ring. O Elden Ring. Its gold commanded the very stars, giving life its fullest brilliance. Though shattered, it yet guides thy kin. Though fr
+- **Narrateur — passage 2** (Dialogues) : Long ago, ye Tarnished lost something most dear. The Elden Ring. O Elden Ring. Its gold commanded the very stars, giving life its fullest brilliance. Though shattered, it yet guides thy kin. Though fr
 - **Margit, the Fell Omen — passage 2** (Dialogues) : Well, thou art of passing skill. Warrior blood must truly run in thy veins, Tarnished. As I thought, thou'rt of passing valour... but the dark of night is yet to lift. The hands of the Fell Omen shall
 - **Margit, the Fell Omen — passage 3** (Dialogues) : I see thee, little Tarnished. Smould'ring with that wretched flame of ambition. Tremble now, with fear. For the hands of the Fell Omen will soon be upon thee. To put out thy little flame. Hrghraah! Th
 - **Godfrey, First Elden Lord — passage 4** (Dialogues) : Tarnished Warrior. 'Twas nobly fought. Dearest Marika... I am returned. A crown is warranted with strength! O Marika! I will take thee in mine arms once more! Brave Tarnished... Thy strength befits a 
 - **Godfrey, First Elden Lord — passage 1** (Dialogues) : It's been a long while, Morgott. Long and hard didst thou fight. Tarnished Warrior. Spurned by the grace of gold. Be assured, the Elden Ring resteth close at hand. Alas, I am returned. To be granted a
 - **Morgott, the Omen King — passage 1** (Dialogues) : Foul Tarnished. Graceless Tarnished. What is thy business with these thrones? Ahh... Godrick the Golden. The twin prodigies, Miquella and Malenia. General Radahn. Praetor Rykard. Lunar Princess Ranni.
 - **Margit, the Fell Omen — passage 4** (Dialogues) : No one will be Elden Lord again. Not even I.
-- **Narator — passage 3** (Dialogues) : Across the Sea of Fog, to the Lands Between. To face the Elden Ring. To stand before the Elden Ring. Face the Elden Ring. And reclaim what was thine.
-- **End of Game Dialog + Extra Morgott — passage 3** (Dialogues) : None may claim the title of Elden Lord. Thy deeds shall be met with failure, just as I. Our seed will look back upon us, and recall. An Age of Fracture. Our seed will look back upon us, and recall. Th
+- **Narrateur — passage 3** (Dialogues) : Across the Sea of Fog, to the Lands Between. To face the Elden Ring. To stand before the Elden Ring. Face the Elden Ring. And reclaim what was thine.
+- **Fin du jeu (et Morgott) — passage 3** (Dialogues) : None may claim the title of Elden Lord. Thy deeds shall be met with failure, just as I. Our seed will look back upon us, and recall. An Age of Fracture. Our seed will look back upon us, and recall. Th
 
 ## Cluster 44 — Les Nox de la Cité éternelle (28 textes)
 
