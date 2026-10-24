@@ -82,10 +82,29 @@ export function topK(scores, k) {
 }
 
 // Reciprocal Rank Fusion : robuste quand les deux échelles de scores n'ont rien à voir.
-export function rrf(lists, k = 60) {
+// weights : poids de chaque liste (1 par défaut).
+export function rrf(lists, k = 60, weights = lists.map(() => 1)) {
   const fused = new Map();
-  for (const list of lists) {
-    list.forEach(([i], rank) => fused.set(i, (fused.get(i) || 0) + 1 / (k + rank + 1)));
-  }
+  lists.forEach((list, li) => {
+    list.forEach(([i], rank) => fused.set(i, (fused.get(i) || 0) + weights[li] / (k + rank + 1)));
+  });
   return [...fused.entries()].sort((a, b) => b[1] - a[1]);
+}
+
+// La recherche de la page, en une seule définition pour la page et pour l'évaluation (eval/).
+export const POOL = 300;   // candidats gardés par chaque méthode avant la fusion
+
+// Le nom compte double : un texte qui porte le mot cherché dans son nom passe devant.
+export function corpusText(d) { return `${d.name} ${d.name} ${d.text}`; }
+
+export function lexicalRanking(bm25, query) { return bm25.search(query).slice(0, POOL); }
+
+export function semanticRanking(queryVec, emb, dim) { return topK(semanticScores(queryVec, emb, dim), POOL); }
+
+// Les mots-clés comptent moitié moins que le sens : sur eval/queries.json (30 requêtes),
+// poids égaux 80 % de réussite@10 et MRR 0,585 ; mots-clés à 0,5 : 83 % et 0,601.
+export const LEXICAL_WEIGHT = 0.5;
+
+export function hybridRanking(lexical, queryVec, emb, dim) {
+  return rrf([lexical, semanticRanking(queryVec, emb, dim)], 60, [LEXICAL_WEIGHT, 1]);
 }

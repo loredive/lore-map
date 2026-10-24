@@ -1,0 +1,302 @@
+{
+ "k": 10,
+ "min_hit_rate": 0.8,
+ "note": "Une requête réussit si au moins un texte attendu est dans les k premiers résultats. « expect_prefix » accepte tout texte dont le nom commence ainsi (passages d'un PNJ).",
+ "queries": [
+  {
+   "query": "qui a assassiné Godwyn",
+   "expect": [
+    "Black Knife",
+    "Black Knife Tiche",
+    "Sorcerer Rogier — passage 7"
+   ],
+   "expect_prefix": []
+  },
+  {
+   "query": "le cheval spectral",
+   "expect": [
+    "Spectral Steed Whistle",
+    "About Horseback Riding"
+   ],
+   "expect_prefix": []
+  },
+  {
+   "query": "les fioles qui rendent la vie",
+   "expect": [
+    "Flask of Crimson Tears",
+    "Flask of Crimson Tears +1",
+    "Flask of Crimson Tears +2",
+    "Flask of Crimson Tears +3",
+    "Sacred Flasks"
+   ],
+   "expect_prefix": []
+  },
+  {
+   "query": "la flamme de la frénésie",
+   "expect": [
+    "The Flame of Frenzy",
+    "Note: The Lord of Frenzied Flame",
+    "Frenzied Burst",
+    "Inescapable Frenzy",
+    "Unendurable Frenzy",
+    "Frenzyflame Stone"
+   ],
+   "expect_prefix": []
+  },
+  {
+   "query": "le dragon de foudre lié à Godwyn",
+   "expect": [
+    "Remembrance of the Lichdragon",
+    "Death Lightning",
+    "Fortissax's Lightning Spear",
+    "Lightning Spear",
+    "Honed Bolt"
+   ],
+   "expect_prefix": []
+  },
+  {
+   "query": "l'anneau destiné à l'époux de Ranni",
+   "expect": [
+    "Dark Moon Ring"
+   ],
+   "expect_prefix": []
+  },
+  {
+   "query": "invoquer d'autres joueurs",
+   "expect": [
+    "About Summoning Other Players",
+    "Tarnished's Furled Finger",
+    "Small Golden Effigy",
+    "About Cooperative Multiplayer",
+    "Seeing Summon Signs",
+    "Summoning Pools"
+   ],
+   "expect_prefix": []
+  },
+  {
+   "query": "la lame de la Mort destinée",
+   "expect": [
+    "Maliketh's Black Blade",
+    "Remembrance of the Black Blade",
+    "Black Blade",
+    "Blasphemous Claw"
+   ],
+   "expect_prefix": []
+  },
+  {
+   "query": "l'aiguille d'or de Millicent",
+   "expect": [
+    "Unalloyed Gold Needle",
+    "Miquella's Needle"
+   ],
+   "expect_prefix": []
+  },
+  {
+   "query": "améliorer ses armes",
+   "expect": [
+    "About Strengthening Armaments",
+    "Smithing Stone",
+    "Somber Smithing Stone"
+   ],
+   "expect_prefix": []
+  },
+  {
+   "query": "viande séchée",
+   "expect": [
+    "Immunizing Cured Meat",
+    "Invigorating Cured Meat",
+    "Clarifying Cured Meat",
+    "Dappled Cured Meat"
+   ],
+   "expect_prefix": []
+  },
+  {
+   "query": "le marchand qui piège les coffres",
+   "expect": [
+    "Patches — passage 7",
+    "Patches — passage 8",
+    "Patches — passage 10"
+   ],
+   "expect_prefix": []
+  },
+  {
+   "query": "se rebeller contre l'Erdtree",
+   "expect": [],
+   "expect_prefix": [
+    "Tanith, Volcano Manor Proprietress — "
+   ]
+  },
+  {
+   "query": "la reine de la Pleine Lune",
+   "expect": [
+    "Remembrance of the Full Moon Queen",
+    "Queen's Crescent Crown",
+    "Queen's Robe",
+    "Carian Regal Scepter"
+   ],
+   "expect_prefix": [
+    "Rennala, Queen of the Full Moon — "
+   ]
+  },
+  {
+   "query": "Radagon a quitté Rennala",
+   "expect": [
+    "Miriel, Pastor of Vows — passage 12",
+    "Queen's Robe",
+    "Queen's Crescent Crown",
+    "Queen's Bracelets",
+    "Queen's Leggings",
+    "Sir Gideon Ofnir, the All-Knowing — passage 10"
+   ],
+   "expect_prefix": []
+  },
+  {
+   "query": "la jarre guerrière",
+   "expect": [
+    "Warrior Jar Shard",
+    "Shard of Alexander",
+    "Alexander's Innards"
+   ],
+   "expect_prefix": [
+    "Alexander, Warrior Jar — "
+   ]
+  },
+  {
+   "query": "les Empyréens choisis par les Doigts",
+   "expect": [
+    "Ranni the Witch — passage 5",
+    "Ranni the Witch — passage 21"
+   ],
+   "expect_prefix": []
+  },
+  {
+   "query": "sorts de pierre étincelante de l'académie",
+   "expect": [
+    "Glintstone Pebble",
+    "Great Glintstone Shard",
+    "Academy Scroll",
+    "Glintstone Stars",
+    "Glintstone Cometshard",
+    "Comet",
+    "Swift Glintstone Shard"
+   ],
+   "expect_prefix": []
+  },
+  {
+   "query": "le masque blanc qui recrute pour Mohg",
+   "expect": [],
+   "expect_prefix": [
+    "White Mask Varré — "
+   ]
+  },
+  {
+   "query": "les chevaliers du creuset de Godfrey",
+   "expect": [
+    "Crucible Tree Armor",
+    "Crucible Axe Armor",
+    "Crucible Axe Helm",
+    "Crucible Tree Helm",
+    "Crucible Greaves",
+    "Crucible Gauntlets"
+   ],
+   "expect_prefix": []
+  },
+  {
+   "query": "Ranni",
+   "expect": [],
+   "expect_prefix": [
+    "Ranni the Witch — "
+   ]
+  },
+  {
+   "query": "Godrick the Grafted",
+   "expect": [
+    "Remembrance of the Grafted",
+    "Godrick's Great Rune"
+   ],
+   "expect_prefix": [
+    "Godrick the Grafted — "
+   ]
+  },
+  {
+   "query": "Malenia",
+   "expect": [
+    "Malenia's Winged Helm",
+    "Malenia's Armor",
+    "Remembrance of the Rot Goddess",
+    "Malenia's Great Rune"
+   ],
+   "expect_prefix": [
+    "Malenia, Blade of Miquella — "
+   ]
+  },
+  {
+   "query": "Black Knife assassins",
+   "expect": [
+    "Black Knife",
+    "Black Knife Armor",
+    "Black Knife Hood",
+    "Black Knife Tiche",
+    "Black Knifeprint"
+   ],
+   "expect_prefix": []
+  },
+  {
+   "query": "Crimson Tears flask",
+   "expect": [
+    "Flask of Crimson Tears",
+    "Flask of Crimson Tears +1",
+    "Flask of Crimson Tears +2",
+    "Flask of Crimson Tears +3",
+    "Sacred Flasks"
+   ],
+   "expect_prefix": []
+  },
+  {
+   "query": "Rennala",
+   "expect": [
+    "Remembrance of the Full Moon Queen",
+    "Queen's Robe",
+    "Rennala's Full Moon"
+   ],
+   "expect_prefix": [
+    "Rennala, Queen of the Full Moon — "
+   ]
+  },
+  {
+   "query": "Smithing Stone",
+   "expect": [
+    "Smithing Stone",
+    "Somber Smithing Stone",
+    "About Strengthening Armaments"
+   ],
+   "expect_prefix": []
+  },
+  {
+   "query": "Patches",
+   "expect": [
+    "Patches' Bell Bearing"
+   ],
+   "expect_prefix": [
+    "Patches — "
+   ]
+  },
+  {
+   "query": "Varre",
+   "expect": [],
+   "expect_prefix": [
+    "White Mask Varré — "
+   ]
+  },
+  {
+   "query": "Dung Eater",
+   "expect": [
+    "Seedbed Curse",
+    "Dung Eater Puppet"
+   ],
+   "expect_prefix": [
+    "Dung Eater — "
+   ]
+  }
+ ]
+}

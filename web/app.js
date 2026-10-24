@@ -1,4 +1,4 @@
-import { BM25, semanticScores, topK, rrf, tokenize } from "./search.js";
+import { BM25, tokenize, corpusText, lexicalRanking, hybridRanking } from "./search.js";
 
 const TRANSFORMERS_URL = "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3";
 const CAT_COLORS = {
@@ -73,7 +73,7 @@ async function load() {
   S.entities = (lore.entities || []).sort((a, b) => b.docs.length - a.docs.length);
   S.docEntities = S.docs.map(() => []);
   S.entities.forEach(e => e.docs.forEach(i => S.docEntities[i].push(e)));
-  S.bm25 = new BM25(S.docs.map(d => `${d.name} ${d.name} ${d.text}`));
+  S.bm25 = new BM25(S.docs.map(corpusText));
   buildGrid();
   buildSprites();
   buildLegend();
@@ -504,14 +504,13 @@ async function runSearch() {
     draw();
     return;
   }
-  const lexical = S.bm25.search(q).slice(0, 300);
+  const lexical = lexicalRanking(S.bm25, q);
   applyResults(lexical, q);                       // réponse immédiate
   if (!S.meta.semantic) return;
 
   const qv = await embedQuery(q);
   if (!qv || seq !== searchSeq) return;
-  const semantic = topK(semanticScores(qv, S.emb, S.meta.dim), 300);
-  applyResults(rrf([lexical, semantic]), q);
+  applyResults(hybridRanking(lexical, qv, S.emb, S.meta.dim), q);
   mode.textContent = "Résultats par mots-clés et par sens";
 }
 

@@ -35,7 +35,7 @@ Quelques minutes sur CPU, moins d'une sur GPU. Le script télécharge
 
 Avec ces données, la recherche devient hybride : mots-clés (BM25) et sens (le même modèle e5,
 chargé dans le navigateur par transformers.js au premier usage, ~120 Mo mis en cache), fusionnés
-par Reciprocal Rank Fusion. On peut alors chercher en français (« la mère de Miquella ») dans des
+par Reciprocal Rank Fusion. On peut alors chercher en français (« qui a assassiné Godwyn ») dans des
 textes anglais.
 
 Options : `--embedder tfidf` (sans réseau ni GPU, pas de recherche par sens),
