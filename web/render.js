@@ -1,5 +1,6 @@
 // Rendu du ciel sur le canvas : grille de sélection, étoiles, noms des groupes, caméra.
 import { S, $, canvas, ctx, panel, tip, GRACE, MIN_COHESION, reducedMotion, colorOf } from "./state.js";
+import { STYLE, drawNebulae, drawConstellations, labelStyle, muteColor } from "./sky.js";
 
 // Grille spatiale pour retrouver vite l'étoile sous le curseur
 const CELL = 0.02;
@@ -134,6 +135,7 @@ function sprite(color) {
 }
 export function buildSprites() {
   S.cats.forEach((c, i) => { S.sprites[i] = sprite(colorOf(i)); });
+  S.spritesMuted = S.cats.map((c, i) => sprite(muteColor(colorOf(i))));
   S.sprites.grace = sprite(GRACE);
   // Poussière d'étoiles fixe en arrière-plan, pour la profondeur
   let seed = 7;
@@ -180,19 +182,31 @@ export function render() {
   const sel = S.selected >= 0 ? S.docs[S.selected] : null;
   const echoSet = new Set(sel ? sel.echoes : []);
 
-  // 0. contours des groupes (le groupe ouvert seulement quand un texte est choisi)
+  // 0. nébuleuses (style c), contours des groupes, lignes de constellation (styles b et c)
+  if (STYLE.nebula && !S.morphing) drawNebulae(toScreen);
   if (!S.hits && !S.morphing && !S.path) drawHulls(sel);
+  if (STYLE.lines && !S.morphing) drawConstellations(toScreen, sel);
 
-  // 1. toutes les étoiles visibles
+  // 1. toutes les étoiles visibles ; de loin et sans rien d'ouvert, couleurs atténuées (style c)
+  const quiet = !sel && !S.hits && !S.lit && !S.cluster && !S.path;
+  const sprites = STYLE.muted && quiet && S.cam.s < 2.5 ? S.spritesMuted : S.sprites;
+  // halos additifs (style c) : les amas denses s'illuminent au lieu de se brouiller
+  if (STYLE.glow) ctx.globalCompositeOperation = "lighter";
+  // en additif, l'éclat suit la densité à l'écran : sur un petit écran vu de loin, les halos se
+  // superposent tant qu'ils brûleraient en blanc
+  const density = Math.min(1, (S.base / 380) * Math.sqrt(S.cam.s));
+  const [on, off] = STYLE.glow ? [Math.max(0.16, 0.55 * density), 0.06] : [0.9, 0.13];
   for (const d of S.docs) {
     if (S.hidden.has(d.cat)) continue;
     const [sx, sy] = toScreen(d.x, d.y);
     if (sx < -pad || sy < -pad || sx > W + pad || sy > H + pad) continue;
     const dim = (S.path && !S.pathSet.has(d.i)) || (S.hits && !S.hits.has(d.i)) || (sel && d.i !== sel.i && !echoSet.has(d.i)) ||
       (!sel && S.cluster && d.cluster !== S.cluster.id) || (!sel && S.lit && !S.lit.has(d.i));
-    ctx.globalAlpha = dim ? 0.13 : 0.9;
-    ctx.drawImage(S.sprites[d.cat], sx - R, sy - R, 2 * R, 2 * R);
+    const rr = (STYLE.sizes ? R * d.w : R) * (STYLE.glow ? 0.6 + 0.4 * density : 1);   // « carrefours » du sens plus gros
+    ctx.globalAlpha = dim ? off : on;
+    ctx.drawImage(sprites[d.cat], sx - rr, sy - rr, 2 * rr, 2 * rr);
   }
+  ctx.globalCompositeOperation = "source-over";
 
   // 2. résultats de recherche : étoiles dorées, plus vives pour les premiers rangs
   if (S.hits && !sel) {
@@ -294,13 +308,17 @@ function drawClusterLabels() {
     const size = Math.max(12, Math.min(25, 9 + Math.sqrt(c.n) * 0.95)) * Math.min(1.25, 0.85 + S.cam.s * 0.08);
     const [sx, sy] = toScreen(c.x, c.y);
     if (sx < -100 || sy < -30 || sx > S.W + 100 || sy > S.H + 30) continue;
+    const st = labelStyle(c, size, r => r * S.cam.s * S.base);
+    if (st.alpha < 0.05) continue;                // trop petit à ce zoom : il apparaîtra en zoomant
     let fs = size;
-    ctx.font = `italic 600 ${fs}px "Cormorant Garamond", Georgia, serif`;
-    let w = ctx.measureText(c.label).width;
+    ctx.font = st.font;
+    ctx.letterSpacing = st.spacing;
+    let w = ctx.measureText(st.text).width;
     if (w + 16 > S.W) {                       // plus large que l'écran (mobile) : en plus petit
-      fs = size * (S.W - 16) / w;
-      ctx.font = `italic 600 ${fs}px "Cormorant Garamond", Georgia, serif`;
-      w = ctx.measureText(c.label).width;
+      const px = parseFloat(st.font.match(/([\d.]+)px/)[1]);   // la taille réelle (capitales : 78 %)
+      fs = fs * (S.W - 16) / w;
+      ctx.font = st.font.replace(/[\d.]+px/, `${Math.floor(px * (S.W - 16) / w)}px`);
+      w = ctx.measureText(st.text).width;
     }
     // un nom qui déborderait de l'écran est rentré vers l'intérieur plutôt que coupé
     const lx = Math.min(Math.max(sx, w / 2 + 8), S.W - w / 2 - 8);
@@ -309,13 +327,14 @@ function drawClusterLabels() {
     placed.push(box);
     S.labelBoxes.push([...box, c]);
     const on = S.cluster === c || S.hoverLabel === c;
-    ctx.globalAlpha = on ? 1 : 0.85;
+    ctx.globalAlpha = on ? 1 : 0.85 * st.alpha;
     ctx.lineWidth = 4;
     ctx.strokeStyle = "rgba(14,19,34,.8)";
-    ctx.strokeText(c.label, lx, sy);
+    ctx.strokeText(st.text, lx, sy);
     ctx.fillStyle = on ? GRACE : "#c3cde6";
-    ctx.fillText(c.label, lx, sy);
+    ctx.fillText(st.text, lx, sy);
   }
+  ctx.letterSpacing = "0px";
 }
 
 // ------------------------------------------------------------------ caméra
