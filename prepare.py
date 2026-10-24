@@ -21,6 +21,8 @@ from pathlib import Path
 
 import numpy as np
 
+import layouts
+from entities import KINDS, candidate_names, find_mentions, load_entities
 from labels import load_titles, match_titles, save_titles
 
 MODEL_NAME = "intfloat/multilingual-e5-small"      # mêmes poids que Xenova/multilingual-e5-small (navigateur)
@@ -141,19 +143,6 @@ def embed(docs, embedder):
     return normalize(emb).astype(np.float32)
 
 
-def reduce_2d(emb, reducer):
-    if reducer == "umap":
-        try:
-            import umap
-            return umap.UMAP(n_neighbors=15, min_dist=0.08, metric="cosine",
-                             random_state=42).fit_transform(emb)
-        except ImportError:
-            print("umap-learn absent -> repli sur t-SNE")
-    from sklearn.manifold import TSNE
-    return TSNE(n_components=2, perplexity=30, init="pca", metric="cosine",
-                random_state=42).fit_transform(emb)
-
-
 def neighbors(emb, k=8, block=2048):
     """Les k voisins les plus proches de chaque texte (les « échos »)."""
     out = np.empty((len(emb), k), dtype=np.int32)
@@ -245,28 +234,59 @@ def resolve_titles(docs, labels, names, central, path, refresh):
     return titles, stale
 
 
+def resolve_entities(docs, labels, titles, names, path):
+    """Textes qui mentionnent chaque entité de entities.json, et entities.md pour compléter la liste."""
+    entities = load_entities(path)
+    found = find_mentions(entities, docs)
+    lines = ["# Personnages, lieux, factions et notions\n",
+             "Pour chaque entrée de entities.json : nombre de textes qui la mentionnent et groupes "
+             "où elle apparaît le plus. Puis les noms propres fréquents pas encore couverts.\n"]
+    for kind in KINDS:
+        lines.append(f"## {kind.capitalize()}s\n")
+        for e in (e for e in entities if e["kind"] == kind):
+            idx = found[e["name"]]
+            groups = {}
+            for i in idx:
+                if labels[i] >= 0:
+                    groups[labels[i]] = groups.get(labels[i], 0) + 1
+            top = sorted(groups.items(), key=lambda g: -g[1])[:3]
+            where = ", ".join(f"{titles[c]['title'] if c in titles else names[c]} ({k})" for c, k in top)
+            lines.append(f"- **{e.get('label', e['name'])}** : {len(idx)} textes — {where}")
+        lines.append("")
+    lines.append("## Candidats\n")
+    lines += [f"- {w} ({n} textes)" for w, n in candidate_names(entities, docs)]
+    (OUT / "entities.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    print(f"{len(entities)} entités dans {path.name}")
+    return [{"name": e["name"], "label": e.get("label", e["name"]), "kind": e["kind"],
+             "aliases": e.get("aliases", []), "docs": found[e["name"]]}
+            for e in entities if found[e["name"]]]
+
+
 # ---------------------------------------------------------------- export
-def export(docs, emb, xy, labels, names, titles, nbrs, embedder):
+def export(docs, emb, views, labels, names, titles, entities, nbrs, embedder):
+    """views : [(nom, xy)] ; la première est la carte principale, sur laquelle les groupes
+    ont été calculés, les suivantes lui sont alignées."""
     OUT.mkdir(parents=True, exist_ok=True)
-    xy = xy - xy.mean(axis=0)
-    xy = xy / np.abs(xy).max()
     cats = sorted({d["cat"] for d in docs})
+    coords = np.hstack([xy for _, xy in views]).astype(float).round(4)   # float64 : pas de 0.11249999…
     rows = [[d["name"], cats.index(d["cat"]), d["text"], d["jp"], d["jp_name"],
-             round(float(x), 4), round(float(y), 4), int(l), nb.tolist()]
-            for d, (x, y), l, nb in zip(docs, xy, labels, nbrs)]
+             coords[i].tolist(), int(labels[i]), nbrs[i].tolist()] for i, d in enumerate(docs)]
+    cohesions = [layouts.cohesion(xy, labels) for _, xy in views]
     clusters = []
     for c, keywords in names.items():
         m = labels == c
         t = titles.get(c, {})
+        # position du nom et cohésion du groupe dans chaque vue
+        at = [{"x": round(float(np.median(xy[m, 0])), 4), "y": round(float(np.median(xy[m, 1])), 4),
+               "cohesion": round(coh[int(c)], 3)} for (_, xy), coh in zip(views, cohesions)]
         clusters.append({"id": int(c), "label": t.get("title") or keywords,
                          "description": t.get("description", ""), "keywords": keywords,
-                         "n": int(m.sum()),
-                         "x": round(float(np.median(xy[m, 0])), 4),
-                         "y": round(float(np.median(xy[m, 1])), 4)})
-    fields = ["name", "cat", "text", "jp", "jpName", "x", "y", "cluster", "echoes"]
+                         "n": int(m.sum()), "views": at})
+    fields = ["name", "cat", "text", "jp", "jpName", "xy", "cluster", "echoes"]
     with open(OUT / "lore.json", "w", encoding="utf-8") as f:
-        json.dump({"fields": fields, "categories": cats, "clusters": clusters,
-                   "docs": rows}, f, ensure_ascii=False, separators=(",", ":"))
+        json.dump({"fields": fields, "views": [n for n, _ in views], "categories": cats,
+                   "clusters": clusters, "entities": entities, "docs": rows},
+                  f, ensure_ascii=False, separators=(",", ":"))
 
     semantic = embedder == "e5"
     meta = {"n": len(docs), "dim": int(emb.shape[1]), "semantic": semantic,
@@ -284,11 +304,16 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--source", required=True, help="elden_ring_text.json")
     p.add_argument("--embedder", choices=["e5", "tfidf"], default="e5")
-    p.add_argument("--reducer", choices=["umap", "tsne"], default="umap")
+    p.add_argument("--reducer", choices=["tsne", "umap"], default="tsne",
+                   help="carte principale, sur laquelle les groupes sont calculés")
+    p.add_argument("--alt-reducer", choices=["umap", "tsne", "none"], default="umap",
+                   help="vue alternative proposée dans la page, alignée sur la carte principale")
     p.add_argument("--min-cluster", type=int, default=15)
     p.add_argument("--min-samples", type=int, default=5)
     p.add_argument("--labels", type=Path, default=Path(__file__).parent / "labels.json",
                    help="titres des clusters (optionnel)")
+    p.add_argument("--entities", type=Path, default=Path(__file__).parent / "entities.json",
+                   help="personnages, lieux, factions et notions (optionnel)")
     p.add_argument("--refresh-labels", action="store_true",
                    help="réécrit labels.json avec les textes centraux actuels de chaque titre")
     a = p.parse_args()
@@ -300,14 +325,21 @@ def main():
 
     emb = embed(docs, a.embedder)
     print("Projection 2D…")
-    xy = reduce_2d(emb, a.reducer)
+    xy = layouts.normalize(layouts.reduce_2d(emb, a.reducer))
+    views = [(layouts.NAMES[a.reducer], xy)]
+    if a.alt_reducer not in ("none", a.reducer):
+        # pas de normalize() ici : Procrustes règle déjà l'échelle sur la carte principale,
+        # et quelques textes isolés écraseraient sinon le reste de la vue
+        alt = layouts.align_to(layouts.reduce_2d(emb, a.alt_reducer), xy)
+        views.append((layouts.NAMES[a.alt_reducer], alt))
     labels = cluster(xy, a.min_cluster, a.min_samples)
     names = label_clusters(docs, labels)
     print(f"{len(names)} clusters, {(labels == -1).mean():.0%} de points hors cluster")
     central = central_texts(emb, labels, names)
     titles, stale = resolve_titles(docs, labels, names, central, a.labels, a.refresh_labels)
     write_cluster_digest(docs, labels, names, central, titles, stale)
-    export(docs, emb, xy, labels, names, titles, neighbors(emb), a.embedder)
+    entities = resolve_entities(docs, labels, titles, names, a.entities)
+    export(docs, emb, views, labels, names, titles, entities, neighbors(emb), a.embedder)
 
 
 if __name__ == "__main__":

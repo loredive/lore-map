@@ -16,7 +16,10 @@
   <header class="masthead">
     <h1>La carte du lore</h1>
     <p>Chaque étoile est un texte d'Elden Ring. Plus deux textes parlent des mêmes choses, plus ils sont proches.</p>
-    <button type="button" id="help" class="help-btn">Comment lire cette carte</button>
+    <nav class="links">
+      <button type="button" id="help" class="help-btn">Comment lire cette carte</button>
+      <button type="button" id="index" class="help-btn">Personnages et lieux</button>
+    </nav>
   </header>
 
   <form class="seek" role="search" onsubmit="return false">
@@ -26,6 +29,9 @@
   </form>
 
   <nav class="legend" id="legend" aria-label="Afficher ou masquer une catégorie"></nav>
+
+  <div id="views" class="views" role="group" aria-label="Choisir la projection" hidden
+       title="Deux façons d'aplatir les mêmes textes sur une carte : seules les proximités ont un sens, pas les positions."></div>
 
   <aside id="panel" aria-live="polite" hidden></aside>
 

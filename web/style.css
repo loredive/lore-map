@@ -133,6 +133,22 @@ mark { background: none; color: var(--grace); }
 .card .help li::marker { color: var(--grace); }
 .echoes small { color: var(--faint); font-size: .8rem; }
 
+/* ---------- projections ---------- */
+.views {
+  position: fixed; z-index: 2; right: 24px; bottom: 12px;
+  display: flex; align-items: baseline; gap: .15rem; font-size: .85rem;
+}
+.views[hidden] { display: none; }
+.views .label { margin-right: .35rem; color: var(--faint); }
+.views button {
+  padding: .15rem .45rem; border: 0; border-radius: 4px; background: none; cursor: pointer;
+  color: var(--faint); font: .88rem var(--body);
+}
+.views button:hover { color: var(--parch); }
+.views button[aria-pressed="true"] { color: var(--grace); text-decoration: underline; text-underline-offset: 3px; }
+/* le panneau ouvert ne doit pas cacher le sélecteur */
+body:has(#panel:not([hidden])) .views { right: calc(min(420px, 100vw) + 16px); }
+
 /* ---------- divers ---------- */
 #tip {
   position: fixed; z-index: 5; max-width: 300px; padding: .45rem .7rem; pointer-events: none;
@@ -158,6 +174,10 @@ mark { background: none; color: var(--grace); }
   .masthead p { display: none; }
   .seek { top: 72px; }
   .help-btn { font-size: .82rem; margin-top: .3rem; }
+  .masthead { max-width: none; right: 16px; }
+  .masthead .links { flex-wrap: nowrap; gap: .9rem; margin-top: .3rem; }
+  .views, body:has(#panel:not([hidden])) .views { top: 14px; right: 12px; bottom: auto; }
+  .views .label { display: none; }
   .legend { left: 10px; bottom: 30px; }
   .legend .label, .legend .n { display: none; }
   .credit { left: 16px; bottom: 8px; font-size: .68rem; }
@@ -170,3 +190,20 @@ mark { background: none; color: var(--grace); }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
 }
+
+/* ---------- personnages et lieux ---------- */
+.masthead .links { display: flex; flex-wrap: wrap; gap: .1rem 1rem; margin-top: .45rem; }
+.masthead .links .help-btn { margin: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: .35rem .4rem; margin: .4rem 0 .2rem; }
+.chip {
+  padding: .12rem .6rem .16rem; border: 1px solid var(--rim); border-radius: 999px;
+  background: none; color: var(--parch); font: .92rem/1.35 var(--body); cursor: pointer;
+}
+.chip:hover, .chip:focus-visible { border-color: var(--grace); color: var(--grace); }
+.chip .n { color: var(--faint); font-size: .78rem; }
+.entity-link {
+  display: block; width: 100%; margin: 0 0 .8rem; padding: .55rem .7rem; text-align: left;
+  border: 1px solid var(--rim); border-radius: 4px; background: rgba(217, 196, 142, .05);
+  color: var(--grace); font: italic 600 1.05rem/1.3 var(--display); cursor: pointer;
+}
+.entity-link:hover, .entity-link:focus-visible { border-color: var(--grace); }

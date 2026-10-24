@@ -14,6 +14,8 @@ const CAT_COLORS = {
 const GRACE = "#f0dc9f";
 const MAX_HITS_ON_MAP = 150;
 const MAX_RESULTS = 40;
+const MIN_COHESION = 0.6;   // en dessous, un groupe est trop éparpillé dans cette vue pour y porter un nom
+const MORPH_MS = 1100;
 const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const $ = s => document.querySelector(s);
@@ -25,7 +27,11 @@ const S = {
   cam: { x: 0, y: 0, s: 1 },
   W: 0, H: 0, dpr: 1, base: 1,
   hover: -1, selected: -1,
+  views: [], view: 0, morphing: false,   // projections disponibles, vue affichée, transition en cours
   cluster: null,         // groupe ouvert dans le panneau
+  entities: [], docEntities: [],   // personnages, lieux… et, par texte, ceux qu'il mentionne
+  entity: null,          // entité ouverte dans le panneau (exclusif avec cluster)
+  lit: null,             // Set des textes de l'entité ouverte, dorés sur la carte
   hoverLabel: null,      // groupe dont le nom est survolé
   labelBoxes: [],        // [x0, y0, x1, y1, cluster] des noms de groupes dessinés
   hits: null,            // Map index -> rang, résultats affichés sur la carte
@@ -52,14 +58,26 @@ async function load() {
   S.cats = lore.categories;
   S.clusters = lore.clusters.sort((a, b) => b.n - a.n);
   S.meta = meta;
-  S.docs = lore.docs.map((r, i) => ({
-    i, name: r[F.name], cat: r[F.cat], text: r[F.text], jp: r[F.jp], jpName: r[F.jpName],
-    x: r[F.x], y: r[F.y], cluster: r[F.cluster], echoes: r[F.echoes],
-  }));
+  // chaque texte a une position par vue ([x1, y1, x2, y2…]) ; la première est la carte principale
+  S.views = lore.views || ["Carte"];
+  S.docs = lore.docs.map((r, i) => {
+    const xy = F.xy !== undefined ? r[F.xy] : [r[F.x], r[F.y]];
+    const views = S.views.map((_, k) => [xy[2 * k], xy[2 * k + 1]]);
+    return { i, name: r[F.name], cat: r[F.cat], text: r[F.text], jp: r[F.jp], jpName: r[F.jpName],
+             views, x: views[0][0], y: views[0][1], cluster: r[F.cluster], echoes: r[F.echoes] };
+  });
+  for (const c of S.clusters) {
+    c.views = c.views || [{ x: c.x, y: c.y, cohesion: 1 }];
+    Object.assign(c, { x: c.views[0].x, y: c.views[0].y });
+  }
+  S.entities = (lore.entities || []).sort((a, b) => b.docs.length - a.docs.length);
+  S.docEntities = S.docs.map(() => []);
+  S.entities.forEach(e => e.docs.forEach(i => S.docEntities[i].push(e)));
   S.bm25 = new BM25(S.docs.map(d => `${d.name} ${d.name} ${d.text}`));
   buildGrid();
   buildSprites();
   buildLegend();
+  buildViewSwitch();
   status.textContent = "";
   mode.textContent = meta.semantic ? "Recherche par mots-clés et par sens" : "Recherche par mots-clés";
   resize();
@@ -78,6 +96,7 @@ function buildGrid() {
   }
 }
 function nearest(wx, wy, wr) {
+  if (S.morphing) return -1;               // la grille ne suit pas les étoiles en mouvement
   let best = -1, bd = wr * wr;
   const r = Math.ceil(wr / CELL);
   const cx = Math.floor(wx / CELL), cy = Math.floor(wy / CELL);
@@ -165,7 +184,7 @@ function render() {
     const [sx, sy] = toScreen(d.x, d.y);
     if (sx < -pad || sy < -pad || sx > W + pad || sy > H + pad) continue;
     const dim = (S.hits && !S.hits.has(d.i)) || (sel && d.i !== sel.i && !echoSet.has(d.i)) ||
-      (!sel && S.cluster && d.cluster !== S.cluster.id);
+      (!sel && S.cluster && d.cluster !== S.cluster.id) || (!sel && S.lit && !S.lit.has(d.i));
     ctx.globalAlpha = dim ? 0.13 : 0.9;
     ctx.drawImage(S.sprites[d.cat], sx - R, sy - R, 2 * R, 2 * R);
   }
@@ -179,6 +198,17 @@ function render() {
       const k = rank < 10 ? 1.9 : rank < 40 ? 1.45 : 1.15;
       ctx.globalAlpha = rank < 40 ? 1 : 0.75;
       ctx.drawImage(S.sprites.grace, sx - R * k, sy - R * k, 2 * R * k, 2 * R * k);
+    }
+  }
+
+  // 2 bis. textes d'une entité ouverte : étoiles dorées
+  if (S.lit && !sel) {
+    ctx.globalAlpha = 0.95;
+    for (const i of S.lit) {
+      const d = S.docs[i];
+      if (S.hidden.has(d.cat)) continue;
+      const [sx, sy] = toScreen(d.x, d.y);
+      ctx.drawImage(S.sprites.grace, sx - R * 1.5, sy - R * 1.5, 3 * R, 3 * R);
     }
   }
 
@@ -203,7 +233,7 @@ function render() {
 
   // 4. noms des constellations (clusters), les plus grandes d'abord, sans chevauchement
   S.labelBoxes = [];
-  if (!S.hits && !sel) drawClusterLabels();
+  if (!S.hits && !sel && !S.morphing) drawClusterLabels();
 
   // 5. étoile survolée
   if (S.hover >= 0) {
@@ -225,6 +255,7 @@ function drawClusterLabels() {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   for (const c of S.clusters) {
+    if (c.views[S.view].cohesion < MIN_COHESION) continue;
     const size = Math.max(12, Math.min(25, 9 + Math.sqrt(c.n) * 0.95)) * Math.min(1.25, 0.85 + S.cam.s * 0.08);
     const [sx, sy] = toScreen(c.x, c.y);
     if (sx < -100 || sy < -30 || sx > S.W + 100 || sy > S.H + 30) continue;
@@ -325,7 +356,7 @@ canvas.addEventListener("pointerup", e => {
     if (i >= 0) select(i);
     else if (label) openCluster(label);
     else if (S.selected >= 0) deselect();
-    else if (S.cluster || panel.dataset.view === "help") closePanel();
+    else if (!panel.hidden && panel.dataset.view !== "results") closePanel();
   }
   drag = null;
 });
@@ -343,7 +374,7 @@ addEventListener("keydown", e => {
   if (e.key === "/" && !typing) { e.preventDefault(); input.focus(); input.select(); return; }
   if (e.key === "Escape") {
     if (S.selected >= 0) deselect();
-    else if (S.cluster || panel.dataset.view === "help") closePanel();
+    else if (!panel.hidden && panel.dataset.view !== "results") closePanel();
     else if (input.value) { input.value = ""; runSearch(); }
     return;
   }
@@ -408,10 +439,55 @@ function buildLegend() {
       b.setAttribute("aria-pressed", String(on));
       if (S.results.length && S.selected < 0) renderResults();
       else if (S.cluster && S.selected < 0) openCluster(S.cluster, { fly: false });
+      else if (S.entity && S.selected < 0) openEntity(S.entity, { fly: false });
       draw();
     });
     nav.append(b);
   });
+}
+
+// ------------------------------------------------------------------ vues (projections)
+// Les mêmes textes et les mêmes groupes, aplatis autrement : passer d'une vue à l'autre
+// fait glisser les étoiles, ce qui montre que seules les proximités ont un sens.
+function buildViewSwitch() {
+  const box = $("#views");
+  if (S.views.length < 2) return;
+  box.hidden = false;
+  box.innerHTML = `<span class="label">Projection</span>${S.views.map((v, k) =>
+    `<button type="button" data-v="${k}" aria-pressed="${k === S.view}">${esc(v)}</button>`).join("")}`;
+  box.querySelectorAll("button").forEach(b => b.addEventListener("click", () => setView(+b.dataset.v)));
+}
+
+let morph = 0;
+function setView(k) {
+  if (k === S.view) return;
+  S.view = k;
+  $("#views").querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(+b.dataset.v === k)));
+  const from = S.docs.map(d => [d.x, d.y]), cfrom = S.clusters.map(c => [c.x, c.y]);
+  const place = e => {
+    S.docs.forEach((d, i) => {
+      d.x = from[i][0] + (d.views[k][0] - from[i][0]) * e;
+      d.y = from[i][1] + (d.views[k][1] - from[i][1]) * e;
+    });
+    S.clusters.forEach((c, i) => {
+      c.x = cfrom[i][0] + (c.views[k].x - cfrom[i][0]) * e;
+      c.y = cfrom[i][1] + (c.views[k].y - cfrom[i][1]) * e;
+    });
+  };
+  const done = () => { S.morphing = false; buildGrid(); draw(); };
+  cancelAnimationFrame(morph);
+  setHover(-1);
+  if (reducedMotion) { place(1); done(); return; }
+  S.morphing = true;
+  const t0 = performance.now();
+  const ease = t => t < .5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
+  const step = now => {
+    const t = Math.min(1, (now - t0) / MORPH_MS);
+    place(ease(t));
+    render();
+    if (t < 1) morph = requestAnimationFrame(step); else done();
+  };
+  morph = requestAnimationFrame(step);
 }
 
 // ------------------------------------------------------------------ recherche
@@ -423,7 +499,7 @@ async function runSearch() {
   const seq = ++searchSeq;
   if (q.length < 2) {
     S.hits = null; S.results = [];
-    if (S.selected < 0 && !S.cluster && panel.dataset.view !== "help") panel.hidden = true;
+    if (S.selected < 0 && panel.dataset.view === "results") panel.hidden = true;
     mode.textContent = S.meta?.semantic ? "Recherche par mots-clés et par sens" : "Recherche par mots-clés";
     draw();
     return;
@@ -440,7 +516,7 @@ async function runSearch() {
 }
 
 function applyResults(ranked, q) {
-  S.cluster = null;
+  S.cluster = S.entity = S.lit = null;
   S.results = ranked.map(([i]) => i);
   S.hits = new Map(S.results.slice(0, MAX_HITS_ON_MAP).map((i, r) => [i, r]));
   S.query = q;
@@ -482,7 +558,12 @@ function renderResults() {
     return;
   }
   const more = visible.length > shown.length ? `, les ${shown.length} premiers ci-dessous` : "";
-  panel.innerHTML = `<p class="count">${visible.length} textes trouvés${more}. Les plus pertinents brillent sur la carte.</p>
+  // une recherche qui nomme une entité connue mène à sa fiche
+  const q = fold(S.query || "");
+  const known = S.entities.find(e => [e.name, e.label, ...e.aliases].some(n => fold(n) === q));
+  panel.innerHTML = `${known ? `<button type="button" class="entity-link" data-e="${S.entities.indexOf(known)}">
+      Fiche « ${esc(known.label)} » : ${known.docs.length} textes qui en parlent</button>` : ""}
+    <p class="count">${visible.length} textes trouvés${more}. Les plus pertinents brillent sur la carte.</p>
     <ol class="results">${shown.map(i => {
       const d = S.docs[i];
       return `<li><button type="button" data-i="${i}">
@@ -491,8 +572,11 @@ function renderResults() {
     }).join("")}</ol>`;
   panel.querySelectorAll("button[data-i]").forEach(b =>
     b.addEventListener("click", () => select(+b.dataset.i)));
+  bindEntityButtons();
   panel.scrollTop = 0;
 }
+
+function fold(s) { return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").trim(); }
 
 function snippet(text, terms, len = 150) {
   const flat = text.replace(/\s+/g, " ");
@@ -517,7 +601,10 @@ function select(i, { fly = true } = {}) {
   const terms = tokenize(S.query || "");
   panel.hidden = false;
   panel.dataset.view = "doc";
-  const back = S.results.length ? "Retour aux résultats" : S.cluster ? `Retour au groupe « ${S.cluster.label} »` : "";
+  const back = S.results.length ? "Retour aux résultats"
+    : S.cluster ? `Retour au groupe « ${S.cluster.label} »`
+    : S.entity ? `Retour à « ${S.entity.label} »` : "";
+  const mentions = S.docEntities[i];
   panel.innerHTML = `<article class="card">
     ${back ? `<button type="button" class="back">${esc(back)}</button>` : ""}
     <div class="cat"><span class="dot" style="--c:${colorOf(d.cat)}"></span>${esc(S.cats[d.cat])}</div>
@@ -529,6 +616,9 @@ function select(i, { fly = true } = {}) {
       ${d.jp ? `<button type="button" class="tjp" aria-expanded="false">Voir le texte japonais</button>` : ""}
       <button type="button" class="tlink">Copier le lien vers ce texte</button>
     </div>
+    ${mentions.length ? `<h3>Mentionne</h3>
+    <p class="hint">Personnages, lieux et notions cités : chacun ouvre les autres textes qui en parlent.</p>
+    ${entityChips(mentions)}` : ""}
     <h3>Échos</h3>
     <p class="hint">Les textes les plus proches par le sens, reliés à celui-ci sur la carte.</p>
     <ol class="echoes">${d.echoes.map(e => {
@@ -547,6 +637,7 @@ function select(i, { fly = true } = {}) {
     navigator.clipboard?.writeText(location.href).then(() => { ev.target.textContent = "Lien copié"; });
   });
   panel.querySelectorAll(".echoes button").forEach(b => b.addEventListener("click", () => select(+b.dataset.i)));
+  bindEntityButtons();
   panel.scrollTop = 0;
   history.replaceState(null, "", "#" + encodeURIComponent(d.name));
   if (fly) focusDoc(d, Math.max(S.cam.s, 4));
@@ -558,6 +649,7 @@ function deselect() {
   history.replaceState(null, "", location.pathname + location.search);
   if (S.results.length) renderResults();
   else if (S.cluster) openCluster(S.cluster, { fly: false });
+  else if (S.entity) openEntity(S.entity, { fly: false });
   else panel.hidden = true;
   draw();
 }
@@ -565,6 +657,7 @@ function deselect() {
 // ------------------------------------------------------------------ fiche d'un groupe
 function openCluster(c, { fly = true } = {}) {
   S.cluster = c;
+  S.entity = S.lit = null;
   S.selected = -1;
   const members = S.docs.filter(d => d.cluster === c.id);
   // les textes du cœur du groupe d'abord
@@ -598,14 +691,93 @@ function openCluster(c, { fly = true } = {}) {
 }
 
 function closePanel() {
-  S.cluster = null;
+  S.cluster = S.entity = S.lit = null;
   panel.hidden = true;
   panel.dataset.view = "";
+  history.replaceState(null, "", location.pathname + location.search);
   draw();
 }
 
-function showHelp() {
+// ------------------------------------------------------------------ personnages, lieux…
+const KIND_LABELS = { personnage: ["Personnage", "Personnages"], lieu: ["Lieu", "Lieux"],
+                      faction: ["Faction", "Factions"], notion: ["Notion", "Notions"] };
+
+function entityChips(list) {
+  return `<div class="chips">${list.map(e => `<button type="button" class="chip" data-e="${S.entities.indexOf(e)}">
+    ${esc(e.label)} <span class="n">${e.docs.length}</span></button>`).join("")}</div>`;
+}
+function bindEntityButtons() {
+  panel.querySelectorAll("button[data-e]").forEach(b =>
+    b.addEventListener("click", () => openEntity(S.entities[+b.dataset.e])));
+}
+
+function showIndex() {
+  S.cluster = S.entity = S.lit = null;
+  S.selected = -1;
+  panel.hidden = false;
+  panel.dataset.view = "index";
+  panel.innerHTML = `<article class="card">
+    <h2>Personnages et lieux</h2>
+    <p class="hint">Le chiffre indique combien de textes en parlent. Chacun ouvre ces textes et les fait briller sur la carte.</p>
+    ${Object.entries(KIND_LABELS).map(([k, [, plural]]) => {
+      const list = S.entities.filter(e => e.kind === k);
+      return list.length ? `<h3>${plural}</h3>${entityChips(list)}` : "";
+    }).join("")}
+  </article>`;
+  bindEntityButtons();
+  panel.scrollTop = 0;
+  history.replaceState(null, "", location.pathname + location.search);
+  draw();
+}
+
+function openEntity(e, { fly = true } = {}) {
+  S.entity = e;
   S.cluster = null;
+  S.selected = -1;
+  S.lit = new Set(e.docs);
+  const docs = e.docs.map(i => S.docs[i]);
+  const visible = docs.filter(d => !S.hidden.has(d.cat));
+  // snippet() cherche dans le texte replié (minuscules, sans accents), mark() surligne les noms tels quels
+  const names = [e.name, ...e.aliases], folded = names.map(fold);
+  // les groupes où l'entité revient le plus : là où son histoire se raconte
+  const counts = new Map();
+  for (const d of docs) if (d.cluster >= 0) counts.set(d.cluster, (counts.get(d.cluster) || 0) + 1);
+  const groups = [...counts].sort((a, b) => b[1] - a[1]).slice(0, 5)
+    .map(([id, n]) => [S.clusters.find(c => c.id === id), n]).filter(([c]) => c);
+  panel.hidden = false;
+  panel.dataset.view = "entity";
+  panel.innerHTML = `<article class="card">
+    <button type="button" class="back">Tous les personnages et lieux</button>
+    <div class="cat">${KIND_LABELS[e.kind][0]}</div>
+    <h2>${esc(e.label)}</h2>
+    ${e.label !== e.name ? `<p class="jpname">${esc(e.name)} dans les textes</p>` : ""}
+    <p class="count">${e.docs.length} textes en parlent${visible.length < docs.length ? `, dont ${visible.length} dans les catégories affichées` : ""}. Ils brillent sur la carte.</p>
+    ${groups.length ? `<h3>Surtout dans</h3><div class="chips">${groups.map(([c, n]) =>
+      `<button type="button" class="chip" data-c="${c.id}">${esc(c.label)} <span class="n">${n}</span></button>`).join("")}</div>` : ""}
+    <h3>Les textes</h3>
+    <ol class="results">${visible.map(d => `<li><button type="button" data-i="${d.i}">
+        <span class="head"><span class="dot" style="--c:${colorOf(d.cat)}"></span><span class="name">${mark(esc(d.name), names)}</span></span>
+        <span class="snip">${mark(esc(snippet(d.text, folded)), names)}</span></button></li>`).join("")}</ol>
+  </article>`;
+  panel.querySelector(".back").addEventListener("click", showIndex);
+  panel.querySelectorAll("button[data-i]").forEach(b => b.addEventListener("click", () => select(+b.dataset.i)));
+  panel.querySelectorAll("button[data-c]").forEach(b =>
+    b.addEventListener("click", () => openCluster(S.clusters.find(c => c.id === +b.dataset.c))));
+  panel.scrollTop = 0;
+  history.replaceState(null, "", "#entite=" + encodeURIComponent(e.name));
+  if (fly && docs.length) {
+    const xs = docs.map(d => d.x).sort((a, b) => a - b), ys = docs.map(d => d.y).sort((a, b) => a - b);
+    const at = (a, q) => a[Math.min(a.length - 1, Math.floor(a.length * q))];
+    const center = { x: at(xs, 0.5), y: at(ys, 0.5) };
+    const r = Math.max(at(xs, 0.9) - at(xs, 0.1), at(ys, 0.9) - at(ys, 0.1)) / 2 || 0.1;
+    focusDoc(center, Math.max(0.8, Math.min(12, 0.8 / r)));
+  }
+  draw();
+}
+$("#index").addEventListener("click", showIndex);
+
+function showHelp() {
+  S.cluster = S.entity = S.lit = null;
   if (S.selected >= 0) { S.selected = -1; history.replaceState(null, "", location.pathname + location.search); }
   panel.hidden = false;
   panel.dataset.view = "help";
@@ -626,9 +798,17 @@ $("#help").addEventListener("click", showHelp);
 function openFromHash() {
   const name = decodeURIComponent(location.hash.slice(1));
   if (!name) return;
+  if (name.startsWith("entite=")) {
+    const e = S.entities.find(x => x.name === name.slice(7));
+    if (e) openEntity(e);
+    return;
+  }
   const d = S.docs.find(x => x.name === name);
   if (d) select(d.i);
 }
+
+// lien collé dans la barre d'adresse sans recharger la page (replaceState ne déclenche pas l'événement)
+addEventListener("hashchange", () => { if (S.docs.length) openFromHash(); });
 
 function esc(s) {
   return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));

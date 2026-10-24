@@ -1,0 +1,690 @@
+[
+ {
+  "name": "Marika",
+  "kind": "personnage",
+  "aliases": [
+   "Queen Marika"
+  ]
+ },
+ {
+  "name": "Radagon",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Godfrey",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Hoarah Loux",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Godwyn",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Morgott",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Mohg",
+  "kind": "personnage",
+  "aliases": [
+   "Lord of Blood"
+  ]
+ },
+ {
+  "name": "Godrick",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Rykard",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Radahn",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Rennala",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Ranni",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Malenia",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Miquella",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Maliketh",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Melina",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Fortissax",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Astel",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Blaidd",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Iji",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Sellen",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Seluvis",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Rogier",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Fia",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Nepheli",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Gideon",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Gurranq",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "D",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Millicent",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Gowry",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Alexander",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Patches",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Varré",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Tanith",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Rya",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Irina",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Diallos",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Boc",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Yura",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Lusat",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Azur",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Goldmask",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Corhyn",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Hewg",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Enia",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Loretta",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Vyke",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Jerren",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Kalé",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Latenna",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Shabriri",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Torrent",
+  "kind": "personnage",
+  "aliases": [],
+  "exclude": [
+   "Crystal Torrent"
+  ]
+ },
+ {
+  "name": "Lanya",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Gransax",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Bernahl",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Ensha",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Lands Between",
+  "kind": "lieu",
+  "aliases": [],
+  "label": "Entre-terre"
+ },
+ {
+  "name": "Leyndell",
+  "kind": "lieu",
+  "aliases": [
+   "Royal Capital"
+  ]
+ },
+ {
+  "name": "Limgrave",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Liurnia",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Caelid",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Altus Plateau",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Mt. Gelmir",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Stormveil",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Raya Lucaria",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Volcano Manor",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Haligtree",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Nokron",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Ainsel",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Farum Azula",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Mountaintops of the Giants",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Mohgwyn",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Caria",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Roundtable Hold",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Sellia",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Dominula",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Morne",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Redmane Castle",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Church of Vows",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Eternal City",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Land of Reeds",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Aeonia",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Wandering Mausoleum",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Mistwood",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Grand Lift",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Two Fingers",
+  "kind": "faction",
+  "aliases": [],
+  "label": "Deux Doigts"
+ },
+ {
+  "name": "Three Fingers",
+  "kind": "faction",
+  "aliases": [],
+  "label": "Trois Doigts"
+ },
+ {
+  "name": "Greater Will",
+  "kind": "faction",
+  "aliases": [],
+  "label": "Volonté supérieure"
+ },
+ {
+  "name": "Carian",
+  "kind": "faction",
+  "aliases": [],
+  "label": "Cariens"
+ },
+ {
+  "name": "Fire Monks",
+  "kind": "faction",
+  "aliases": []
+ },
+ {
+  "name": "Albinaurics",
+  "kind": "faction",
+  "aliases": [
+   "Albinauric"
+  ]
+ },
+ {
+  "name": "Crucible Knights",
+  "kind": "faction",
+  "aliases": []
+ },
+ {
+  "name": "Tree Sentinels",
+  "kind": "faction",
+  "aliases": []
+ },
+ {
+  "name": "Black Knives",
+  "kind": "faction",
+  "aliases": [
+   "Black Knife"
+  ]
+ },
+ {
+  "name": "Godskin",
+  "kind": "faction",
+  "aliases": []
+ },
+ {
+  "name": "Omen",
+  "kind": "faction",
+  "aliases": []
+ },
+ {
+  "name": "Those Who Live in Death",
+  "kind": "faction",
+  "aliases": [],
+  "label": "Ceux qui vivent dans la Mort"
+ },
+ {
+  "name": "Nox",
+  "kind": "faction",
+  "aliases": []
+ },
+ {
+  "name": "Cleanrot Knights",
+  "kind": "faction",
+  "aliases": []
+ },
+ {
+  "name": "Bloody Fingers",
+  "kind": "faction",
+  "aliases": [
+   "Bloody Finger"
+  ]
+ },
+ {
+  "name": "Redmanes",
+  "kind": "faction",
+  "aliases": [
+   "Redmane"
+  ]
+ },
+ {
+  "name": "Misbegotten",
+  "kind": "faction",
+  "aliases": []
+ },
+ {
+  "name": "Crystalians",
+  "kind": "faction",
+  "aliases": [
+   "Crystalian"
+  ]
+ },
+ {
+  "name": "Fire Giants",
+  "kind": "faction",
+  "aliases": [],
+  "label": "Géants de feu"
+ },
+ {
+  "name": "Ancient Dragons",
+  "kind": "faction",
+  "aliases": [
+   "ancient dragons",
+   "ancient dragon"
+  ],
+  "label": "Dragons anciens"
+ },
+ {
+  "name": "Night's Cavalry",
+  "kind": "faction",
+  "aliases": []
+ },
+ {
+  "name": "Bloodhound Knights",
+  "kind": "faction",
+  "aliases": []
+ },
+ {
+  "name": "House Hoslow",
+  "kind": "faction",
+  "aliases": []
+ },
+ {
+  "name": "Erdtree",
+  "kind": "notion",
+  "aliases": []
+ },
+ {
+  "name": "Elden Ring",
+  "kind": "notion",
+  "aliases": []
+ },
+ {
+  "name": "Golden Order",
+  "kind": "notion",
+  "aliases": [],
+  "label": "Ordre d'or"
+ },
+ {
+  "name": "Shattering",
+  "kind": "notion",
+  "aliases": [],
+  "label": "La Fracture"
+ },
+ {
+  "name": "Destined Death",
+  "kind": "notion",
+  "aliases": [],
+  "label": "Mort destinée"
+ },
+ {
+  "name": "Rune of Death",
+  "kind": "notion",
+  "aliases": [],
+  "label": "Rune de la Mort"
+ },
+ {
+  "name": "Great Rune",
+  "kind": "notion",
+  "aliases": [
+   "Great Runes"
+  ],
+  "label": "Grandes Runes"
+ },
+ {
+  "name": "Elden Lord",
+  "kind": "notion",
+  "aliases": [],
+  "label": "Seigneur d'Elden"
+ },
+ {
+  "name": "Empyrean",
+  "kind": "notion",
+  "aliases": []
+ },
+ {
+  "name": "Frenzied Flame",
+  "kind": "notion",
+  "aliases": [
+   "frenzied flame",
+   "flame of frenzy"
+  ],
+  "label": "Flamme de frénésie"
+ },
+ {
+  "name": "Scarlet Rot",
+  "kind": "notion",
+  "aliases": [
+   "scarlet rot"
+  ],
+  "label": "Pourriture écarlate"
+ },
+ {
+  "name": "Dragon Communion",
+  "kind": "notion",
+  "aliases": [],
+  "label": "Communion draconique"
+ },
+ {
+  "name": "Flame of Ruin",
+  "kind": "notion",
+  "aliases": [
+   "flame of ruin"
+  ],
+  "label": "Flamme de ruine"
+ },
+ {
+  "name": "Primeval Current",
+  "kind": "notion",
+  "aliases": [
+   "primeval current"
+  ],
+  "label": "Courant primordial"
+ },
+ {
+  "name": "Full Moon",
+  "kind": "notion",
+  "aliases": [],
+  "label": "Pleine Lune"
+ },
+ {
+  "name": "Dark Moon",
+  "kind": "notion",
+  "aliases": [],
+  "label": "Lune noire"
+ },
+ {
+  "name": "Minor Erdtrees",
+  "kind": "notion",
+  "aliases": [
+   "Minor Erdtree"
+  ],
+  "label": "Erdtrees mineurs"
+ },
+ {
+  "name": "Night of the Black Knives",
+  "kind": "notion",
+  "aliases": [],
+  "label": "Nuit des Black Knives"
+ }
+]
