@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La carte du lore</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Noto+Serif+JP:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="sky" aria-label="Carte des textes d'Elden Ring : chaque étoile est un texte, les textes proches parlent des mêmes choses"></canvas>
+
+  <header class="masthead">
+    <h1>La carte du lore</h1>
+    <p>Chaque étoile est un texte d'Elden Ring. Plus deux textes parlent des mêmes choses, plus ils sont proches.</p>
+    <button type="button" id="help" class="help-btn">Comment lire cette carte</button>
+  </header>
+
+  <form class="seek" role="search" onsubmit="return false">
+    <label for="q" class="visually-hidden">Chercher dans les textes</label>
+    <input id="q" type="search" placeholder="Chercher un nom, un lieu, un thème…" autocomplete="off" spellcheck="false">
+    <span id="mode" aria-live="polite"></span>
+  </form>
+
+  <nav class="legend" id="legend" aria-label="Afficher ou masquer une catégorie"></nav>
+
+  <aside id="panel" aria-live="polite" hidden></aside>
+
+  <div id="tip" role="tooltip" hidden></div>
+  <div id="status" role="status">Chargement des textes…</div>
+
+  <p class="credit">Textes d'Elden Ring © FromSoftware / Bandai Namco, extraits par la communauté. Projet de fan non commercial.</p>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
