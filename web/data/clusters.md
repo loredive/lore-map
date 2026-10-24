@@ -1,8 +1,10 @@
 # Clusters
 
-Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus proches du centroïde (embeddings).
+Pour chaque cluster : titre actuel, mots clés c-TF-IDF, taille, et les textes les plus proches du centroïde (embeddings). Un titre suit son groupe tant qu'on y retrouve au moins la moitié de ses « members ».
 
-## Cluster 0 — Bearing, Bell, Husks (28 textes)
+## Cluster 0 — Les clochettes des défunts (28 textes)
+
+Mots clés : Bearing, Bell, Husks
 
 - **D's Bell Bearing** (Objets) : D's bell bearing, found upon his perished flesh. Offer to the Twin Maiden Husks at the Roundtable Hold to gain access to new items.
 - **Patches' Bell Bearing** (Objets) : Patches' bell bearing, found upon his perished flesh. Offer to the Twin Maiden Husks at the Roundtable Hold to gain access to new items.
@@ -20,7 +22,9 @@ Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus pro
 - **Gostoc's Bell Bearing** (Objets) : Gatekeeper Gostoc's bell bearing, found upon his perished flesh. Offer to the Twin Maiden Husks at the Roundtable Hold to gain access to new items.
 - **Isolated Merchant's Bell Bearing** (Objets) : An isolated merchant's bell bearing, found upon his perished flesh. Offer to the Twin Maiden Husks at the Roundtable Hold to gain access to new items.
 
-## Cluster 1 — Multiple, Short, Stage (37 textes)
+## Cluster 1 — Didascalies : cris et râles (37 textes)
+
+Mots clés : Multiple, Short, Stage
 
 - **Stage Directions — passage 1** (Dialogues) : A spirited warcry. Several variations (long and short). “Rargh!” or “Graaaah”, etc. Grunt of determination when taking a hit. Multiple variations. Grunts such as "Hngh!" or "Ungh" . “Mnn...ngh!” “Grr.
 - **Stage Directions — passage 51** (Dialogues) : A spirited warcry. Several variations (long and short). “Rargh!” or “Graaaah”, etc. Grunt of determination when taking a hit. Multiple variations. Grunts such as "Hngh!" or "Ungh" . “Mnn...ngh!” “Grr.
@@ -38,7 +42,9 @@ Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus pro
 - **Stage Directions — passage 39** (Dialogues) : “Urrrrrrrgh”, “Ughhhhhhaaaargh”, etc. Falling from a great height to one's death. Multiple variations. Sound as if trying to cough something up. Death by poisoning. Multiple variations. Short laugh. T
 - **Stage Directions — passage 19** (Dialogues) : “Urrrrrrrgh”, “Ughhhhhhaaaargh”, etc. Falling from a great height to one's death. Multiple variations. Sound as if trying to cough something up. Death by poisoning. Multiple variations. Short laugh. T
 
-## Cluster 2 — Flask, Tear, Crystal (57 textes)
+## Cluster 2 — Larmes de cristal (57 textes)
+
+Mots clés : Flask, Tear, Crystal
 
 - **Holy-Shrouding Cracked Tear** (Objets) : A crystal tear formed slowly over the ages where the Erdtree's bounty falls to the ground. Can be mixed in the Flask of Wondrous Physick. The resulting concoction temporarily boosts the power of one's
 - **Crimson Crystal Tear** (Objets) : A crystal tear formed slowly over the ages where the Erdtree's bounty falls to the ground. Can be mixed in the Flask of Wondrous Physick. The resulting concoction restores half of one's maximum HP.
@@ -56,7 +62,9 @@ Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus pro
 - **Cerulean Hidden Tear** (Objets) : A crystal tear formed slowly over the ages where the Erdtree's bounty falls to the ground. Can be mixed in the Flask of Wondrous Physick. The resulting concoction eliminates all FP consumption. Howeve
 - **Greenspill Crystal Tear** (Objets) : A crystal tear formed slowly over the ages where the Erdtree's bounty falls to the ground. Can be mixed in the Flask of Wondrous Physick. The resulting concoction temporarily raises one's maximum stam
 
-## Cluster 3 — Master, Hewg, Corhyn (60 textes)
+## Cluster 3 — Maîtres et disciples de la Table ronde (60 textes)
+
+Mots clés : Master, Hewg, Corhyn
 
 - **Heartbroken Maiden — passage 10** (Dialogues) : A pleasure to see you. Thank goodness you're safe. I'm still looking for my own purpose. It's not easy, by any means, but it's what I must do. If I do have a talent for spirit tuning, and goodness kno
 - **Heartbroken Maiden — passage 7** (Dialogues) : You're telling me I possess some kind of gift? I don't believe you. But... If I do have this talent, and goodness knows it would be my first... I suppose I should try to hone it. Shouldn't I? I'll ask
@@ -74,7 +82,9 @@ Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus pro
 - **Brother Corhyn — passage 15** (Dialogues) : I've…been gripped by a terrifying thought. The rhythms and calculus of the master's finger... betray a suspicion of the holism of the Golden Order. A conceit, I am afraid, that cannot be overlooked. O
 - **Smithing Master Hewg — passage 3** (Dialogues) : Now, look at you. Those eyes tell a story. Of a challenger, who's felled his mark. Of a challenger, who's felled her mark. Fine and well. Now, lay out your arms. Your divinity, have mercy, and grant m
 
-## Cluster 4 — Spirits, Ashen, Summon (72 textes)
+## Cluster 4 — Cendres d'esprits (72 textes)
+
+Mots clés : Spirits, Ashen, Summon
 
 - **Crystalian Ashes** (Objets) : Ashen remains in which spirits yet dwell. Use to summon the spirit of a Crystalian. Spirit that wields round crystalline blades, both big and small. Its sturdy body, itself hewn from crystal long ago,
 - **Radahn Soldier Ashes** (Objets) : Ashen remains in which spirits yet dwell. Use to summon the spirits of two of Radahn's soldiers. Both spirits wield fiery weapons to perform powerful skills. Such is their valor that they will immedia
@@ -92,7 +102,9 @@ Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus pro
 - **Putrid Corpse Ashes** (Objets) : Ashen remains in which spirits yet dwell. Use to summon the spirits of four putrid corpses. These spirits appear some distance from the summoner. Though their movements are dull and confused, their lo
 - **Page Ashes** (Objets) : Ashen remains in which spirits yet dwell. Use to summon the spirit of a page. Spirit of a page who traveled at the side of the noble he served. Uses a piercing sword and crossbow to defend his master.
 
-## Cluster 5 — Jar, Warrior, I'm (76 textes)
+## Cluster 5 — Alexander, la jarre guerrière (76 textes)
+
+Mots clés : Jar, Warrior, I'm
 
 - **Jar-Bairn — passage 15** (Dialogues) : Wow, coz, are these... Wow, coz, are these... Insides? From Uncle Alexander? ... Thank you, coz. Thank you, coz. I'm a warrior jar, so I need to be strong. I can really have them, right? I understand.
 - **Alexander, Warrior Jar — passage 32** (Dialogues) : My thanks! A thousand thanks! Just give me a good smack from the rear, with something nice and big. And I'll pop clean out. I'm sure! Don't worry about my wound sustained at the festival. I'm stuck ba
@@ -110,7 +122,9 @@ Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus pro
 - **Alexander, Warrior Jar — passage 30** (Dialogues) : By the gods you are a man of vision! By the gods you are a woman of vision! This will have me as slippery as a toad. I have a good feeling about this, my friend. Right! Give me a good smack from behin
 - **Alexander, Warrior Jar — passage 27** (Dialogues) : You are ready then, I take it? Then let us begin! I am the great jar warrior, Iron Fist Alexander! Lend me strength, O warriors within! Let us become one champion, together!
 
-## Cluster 6 — Meat, Dried, Medicinal (31 textes)
+## Cluster 6 — Viandes séchées et foies (31 textes)
+
+Mots clés : Meat, Dried, Medicinal
 
 - **Invigorating Cured Meat** (Objets) : Cured strip of meat, dried out after pickling in a red medicinal solution. Craftable item. Temporarily boosts robustness. Higher robustness helps to mitigate the buildup of frost and blood loss.
 - **Dappled Cured Meat** (Objets) : Cured strip of meat, dried out after pickling in a dappled medicinal solution. Craftable item. Temporarily boosts immunity, robustness, and focus.
@@ -128,7 +142,9 @@ Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus pro
 - **Lightningproof Dried Liver** (Objets) : Cured animal liver, dried out after pickling in an yellow medicinal solution. Craftable item. Temporarily boosts lightning damage negation, improving damage mitigation against attacks imbued with ligh
 - **Beast Liver** (Objets) : The fresh liver of a beast; a luscious fruit of life. Material used for crafting items. Found by hunting herbivorous beasts. Dried liver boosts damage negation.
 
-## Cluster 7 — Multiplayer, World, Finger (38 textes)
+## Cluster 7 — Jeu en ligne et doigts (38 textes)
+
+Mots clés : Multiplayer, World, Finger
 
 - **Duelist's Furled Finger** (Objets) : Item for online play. (Can also be used from the Multiplayer menu.) Creates a summon sign for competitive multiplayer. Arrive as an adversary (Duelist) with the objective of defeating the Host of Fing
 - **Furlcalling Finger Remedy** (Objets) : Item for online play. (Can also be used from the Multiplayer menu.) Craftable item. Reveals cooperative and competitive multiplayer signs. Co-op summoning signs will be shown in gold, while hostile su
@@ -146,7 +162,9 @@ Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus pro
 - **Leaving Hostile Signs** (Écrans de chargement) : With a Duelist's Furled Finger, you can leave a red summon sign. This sign will appear in other players' worlds and allow them to summon you as a duelist adversary for competitive multiplayer.
 - **Cooperator's Objective (Furled Finger)** (Écrans de chargement) : During cooperative multiplayer, a Furled Finger's objective is to help the Host of Fingers defeat the boss of the area. A Furled Finger will return to their own world when they die or the boss is defe
 
-## Cluster 8 — Loux, Nepheli, Eater (35 textes)
+## Cluster 8 — Nepheli, Guilbert et le Dung Eater (35 textes)
+
+Mots clés : Loux, Nepheli, Eater
 
 - **Nepheli Loux, Warrior — passage 12** (Dialogues) : What do you intend? Such conduct ill befits a warrior. I see. You are but a simple villain. Let the scars remind you; this lesson comes from Nepheli Loux! You wouldn't even register as a threat to fat
 - **Guilbert the Redeemer (cut npc) — passage 8** (Dialogues) : Not too sharp, are you? If you want to die, ask someone else. Let it be known. Wherever vengeance must be had, a Redeemer there will be... Oh, my Lord. Good God of Vengeance! Till grudges soak the lan
@@ -164,7 +182,9 @@ Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus pro
 - **Dung Eater — passage 3** (Dialogues) : ... Let me out! Let me out of here! Must eat more! Defile more! Everything that matters to you! For generations to come! I am the Dung Eater! A scourge upon the living! Who are you? I've been here lon
 - **Nepheli Loux, Warrior — passage 8** (Dialogues) : I...can no longer trust in father... To think he'd order his men to enact such tragedy... Where is the justice he purports, in that? He once told me that if he became Elden Lord, he would never allow 
 
-## Cluster 9 — Patches, Heh, Emporium (30 textes)
+## Cluster 9 — Les ruses de Patches (30 textes)
+
+Mots clés : Patches, Heh, Emporium
 
 - **Patches — passage 3** (Dialogues) : A true man of reason. Just what I like about you. A true lady of reason. Just what I like about you. I'm Patches. Patches the Untethered. Tarnished, like you, only, free-spirited. Nomadic, you might s
 - **Patches — passage 10** (Dialogues) : Ah, oh... How in blazes... You're alive. You had me proper scared. Poofing away in a flash like that. Who on earth spends their time booby-trapping treasure chests? No way I could've known, but still,
@@ -182,7 +202,9 @@ Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus pro
 - **Patches — passage 29** (Dialogues) : Forgot something on your shopping list? No trouble to me.
 - **Patches — passage 1** (Dialogues) : Well, well, well? Thought you'd just help yourself to a man's personal belongings? You scheming little thief. The gods demand repentance! Cough up your coin, all of it! Wait, wait, please! I surrender
 
-## Cluster 10 — Manor, Volcano, Tanith (47 textes)
+## Cluster 10 — Le Manoir du Volcan (47 textes)
+
+Mots clés : Manor, Volcano, Tanith
 
 - **Rya the Scout — passage 14** (Dialogues) : Hello again. Brave Tarnished. It is a shame that I did not beckon you here with my own hand, but I am pleased that we meet again, here at the Volcano Manor. Under Lady Tanith's guidance, may you tread
 - **Rya the Scout — passage 7** (Dialogues) : Give me your hand. I will pray. That you follow the same path as Lady Tanith. Hello... Hello... Right over here... But I hardly hold him in high regard. He seems to bear animosity toward the Volcano M
@@ -200,7 +222,9 @@ Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus pro
 - **Tanith, Volcano Manor Proprietress — passage 4** (Dialogues) : Your decision is most welcome. Now you belong to the Volcano Manor family. The drawing room lies down the hall. Make yourself comfortable. I am Tanith, the proprietress of this house. An honour to hav
 - **Tanith, Volcano Manor Proprietress — passage 9** (Dialogues) : She said that, to you? I should have known something was wrong. The signs were clear enough. Well. Zorayas has placed her trust in you. All the more reason I must tell you. That some things are better
 
-## Cluster 11 — Sellen, Apprentice, Sorceress (29 textes)
+## Cluster 11 — Les leçons de Sellen (29 textes)
+
+Mots clés : Sellen, Apprentice, Sorceress
 
 - **Sorceress Sellen — passage 21** (Dialogues) : Oh, one last thing. If you fail to claim your throne, you can always pay me a visit. Oh, don't fret. Even my dullest pupils will always have a place here. What is it? My apprentice. Ahh, I am glad to 
 - **Sorceress Sellen — passage 23** (Dialogues) : You wish to resume the lesson? Good. Indeed, it is better to finish what one starts, is it not? With the body of Master Azur returned, the academy can restore the primeval current. So that we, fallen 
@@ -218,7 +242,9 @@ Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus pro
 - **Preceptor Seluvis — passage 8** (Dialogues) : Well, well. You're asking me about that, are you? The task was left to you and the mongrel, was it not? Not only are you incompetent, but shameless to boot. Well...there's no helping it. Now's as good
 - **Sorceress Sellen — passage 25** (Dialogues) : What's the meaning of this? How unfortunate. That we should part ways in this manner... Ngh! Why, you. Are you mad? My death would only be temporary. Your savagery achieves nothing. Agh! Why, you. Are
 
-## Cluster 12 — Glintstone, Academy, Sorcery (60 textes)
+## Cluster 12 — Sorts de Raya Lucaria (60 textes)
+
+Mots clés : Glintstone, Academy, Sorcery
 
 - **Academy Scroll** (Objets) : Scroll of the Academy of Raya Lucaria, the glintstone sorcerers' place of study. Can be given to a learned sorcerer to gain access to the following sorceries: - Great Glintstone Shard - Swift Glintsto
 - **Glintstone Stars** (Objets) : One of the glintstone sorceries of the Academy of Raya Lucaria. Fires three magic shooting stars that pursue the target. This sorcery can be cast while in motion. Charging enhances potency. A sorcery 
@@ -236,7 +262,9 @@ Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus pro
 - **Sorcerer Thops — passage 3** (Dialogues) : Apologies, friend. I'm afraid my meagre sorceries are no match for your generosity. Oh, right. I can tell you what I know about this place. That should help a bit. You've seen that structure to the no
 - **Starlight** (Objets) : One of the glintstone sorceries of the Academy of Raya Lucaria. Creates a small, floating star light that illuminates surroundings. This sorcery can be cast while in motion. Granted to sorcerers who d
 
-## Cluster 13 — Talisman, Depicting, Ancient (62 textes)
+## Cluster 13 — Talismans (62 textes)
+
+Mots clés : Talisman, Depicting, Ancient
 
 - **Spelldrake Talisman** (Talismans) : Talisman depicting a blue ancient dragon. Boosts magic damage negation. The ancient dragons, who ruled in the prehistoric era before the Erdtree, would protect their lord as a wall of living rock. And
 - **Flamedrake Talisman +1** (Talismans) : Talisman depicting a duo of red ancient dragons. Greatly boosts fire damage negation. The ancient dragons, who ruled in the prehistoric era before the Erdtree, would protect their lord as a wall of li
@@ -254,7 +282,9 @@ Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus pro
 - **Haligdrake Talisman +2** (Talismans) : Talisman depicting a trio of golden ancient dragons. Vastly boosts holy damage negation. The ancient dragons, who ruled in the prehistoric era before the Erdtree, would protect their lord as a wall of
 - **Boltdrake Talisman** (Talismans) : Talisman depicting a yellow ancient dragon. Boosts lightning damage negation. The ancient dragons, who ruled in the prehistoric era before the Erdtree, would protect their lord as a wall of living roc
 
-## Cluster 14 — Jump, Sites, Critical (49 textes)
+## Cluster 14 — Conseils de jeu (49 textes)
+
+Mots clés : Jump, Sites, Critical
 
 - **Guarding** (Écrans de chargement) : Use an armament in your left hand or both hands to guard against incoming attacks. Shields are particularly effective for guarding. Guarding consumes stamina. If your stamina runs out, your stance wil
 - **About Guarding** (Objets) : Use an armament in your left hand or both hands to guard against incoming attacks. Guarding is especially effective when done with a shield. Guarding consumes stamina. If your stamina runs out, your s
@@ -272,7 +302,9 @@ Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus pro
 - **Fast Travel to Sites of Grace** (Écrans de chargement) : Through your map, you can instantly travel to any sites of grace that you've discovered. However, there are some dungeons and other areas where this cannot be done.
 - **About Death** (Objets) : Upon dying, you will be revived at the last site of grace that you visited. You will drop any runes in your possession at the site of your death. If you die again before reclaiming those runes, they w
 
-## Cluster 15 — Ranni, Blaidd, Iji (94 textes)
+## Cluster 15 — Ranni, Blaidd et Iji (94 textes)
+
+Mots clés : Ranni, Blaidd, Iji
 
 - **Ranni the Witch — passage 24** (Dialogues) : Ach, this form hath loosened my tongue. I've let slip too much. Forget what thou'st heard. Forget. O Shadow, thou'rt the last. Tell the Two Fingers, That Ranni the Witch cometh, to rend thy flesh. Wit
 - **Ranni the Witch — passage 12** (Dialogues) : Good, then I ask we proceed with haste. There is, in my service, a half-wolven warrior by the name of Blaidd. I would have thee join him in searching for the hidden treasure of Nokron, the Eternal Cit
@@ -290,7 +322,9 @@ Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus pro
 - **Ranni the Witch — passage 28** (Dialogues) : Well, this is a most unpleasant awakening. The depths of wickedness never fail to surprise me. I am saddened. That thou wouldst succumb to such depravity. Led astray by Seluvis, with devious tonic in 
 - **Smithing Master Iji — passage 14** (Dialogues) : Ah, you've finally come. Blaidd told me everything. You've defeated General Radahn, unlocking the stars. The General was blighted by scarlet rot and driven to madness, but not long ago he was hailed a
 
-## Cluster 16 — Preceptor, Seluvis, Puppet (28 textes)
+## Cluster 16 — Seluvis et ses marionnettes (28 textes)
+
+Mots clés : Preceptor, Seluvis, Puppet
 
 - **Preceptor Seluvis — passage 3** (Dialogues) : Good, good. Now I shall hand over the potion in question. Find Nepheli, and ensure she drinks it. I expect glad tidings. And soon. I see... What a wretched bunch you Tarnished are. Do you understand? 
 - **Preceptor Seluvis — passage 14** (Dialogues) : Good, good. As a man of abundant charity, I accept your apology. And well, you finally realised, did you? All you really wanted was a puppet to cherish. To fill that hole deep in your heart. Oh I can 
@@ -308,7 +342,9 @@ Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus pro
 - **Preceptor Seluvis — passage 15** (Dialogues) : What's that? You want another puppet? Quite the keen paramour, aren't we. Well, aren't you a woman of many passions. But, I'm afraid each and every one is like a child to me. I can hardly just give th
 - **Preceptor Seluvis — passage 18** (Dialogues) : Very good. A wise choice, indeed. You passed my little test with flying colours. I was merely gauging your loyalty to Lady Ranni. Well done, I'm very proud of you. Let's both do our utmost in service 
 
-## Cluster 17 — Usable, Unique, Slash (250 textes)
+## Cluster 17 — Cendres de guerre et compétences (250 textes)
+
+Mots clés : Usable, Unique, Slash
 
 - **Ash of War: Lightning Slash** (Cendres de guerre) : This Ash of War grants an armament the Lightning affinity and the following skill: "Lightning Slash: Call down a bolt of lightning into armament, then swing it down to create an explosive shock. The a
 - **Ash of War: Torch Attack** (Cendres de guerre) : This Ash of War grants an armament the Skill: Torch Attack.
@@ -326,7 +362,9 @@ Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus pro
 - **Ash of War: Vacuum Slice** (Cendres de guerre) : This Ash of War grants an armament the Quality affinity and the following skill: "Vacuum Slice: Lost skill of ancient heroes. Hold the armament aloft to surround it with a shearing vacuum, then launch
 - **Ash of War: Sword Dance** (Cendres de guerre) : This Ash of War grants an armament the Keen affinity and the following skill: "Sword Dance: Quickly close in to perform a series of spinning upward slashes. Follow up with an additional input to finis
 
-## Cluster 18 — Carian, Royal, Family (29 textes)
+## Cluster 18 — Sorts de la famille royale carienne (29 textes)
+
+Mots clés : Carian, Royal, Family
 
 - **Carian Phalanx** (Objets) : One of the sorceries of the Carian royal family. Creates a defensive arch of numerous magic glintblades overhead, which automatically attack nearby foes. This sorcery can be used cast while in motion.
 - **Glintblade Phalanx** (Objets) : One of the sorceries of the Carian royal family. Creates a defensive arch of magic glintblades overhead, which automatically attack nearby foes. This sorcery can be cast while in motion. Bestowed upon
@@ -344,7 +382,9 @@ Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus pro
 - **Carian Knight's Shield** (Armes) : A teardrop-shaped, medium-sized shield embedded with blue glintstones. Carried by knights who served the Carian royal family. Excels when facing magic or holy attacks. Just who were these knights prep
 - **Royal House Scroll** (Objets) : Sorcery scroll of the Carian royal family, the heads of the Academy of Raya Lucaria. Can be given to a learned sorcerer to gain access to the following sorceries: - Glintblade Phalanx - Carian Slicer
 
-## Cluster 19 — Rennala, Moon, Queen (29 textes)
+## Cluster 19 — Rennala, reine de la Pleine Lune (29 textes)
+
+Mots clés : Rennala, Moon, Queen
 
 - **Queen's Robe** (Armures) : Robe indicating the highest order of sorcerer. Worn by Rennala, Queen of the Full Moon. When Rennala, head of both the Academy of Raya Lucaria and the Carian royal family, lost her husband Radagon, he
 - **Queen's Crescent Crown** (Armures) : A tall crown depicting the moon. Worn by Rennala, Queen of the Full Moon. Increases intelligence. When Rennala, head of both the Academy of Raya Lucaria and the Carian royal family, lost her husband R
@@ -362,7 +402,9 @@ Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus pro
 - **Frozen Armament** (Objets) : Sorcery said to have been used by the old snow witch. Enchants armament held in the right hand with frost. This sorcery can be cast while in motion. The snowy crone taught the young Ranni to fear the 
 - **Snow Witch Robe** (Armures) : Witch's robe in the color of snow. Once worn by the snowy crone who the young Ranni encountered deep in the woods. She was a witch, and well versed in cold sorceries. It is said that the doll that hou
 
-## Cluster 20 — Death, Beast, Companion (68 textes)
+## Cluster 20 — Ceux qui vivent dans la Mort (68 textes)
+
+Mots clés : Death, Beast, Companion
 
 - **Fia, Deathbed Companion — passage 11** (Dialogues) : You are an odd one. I am the guardian of Those Who Live in Death. They call me a foul and rotten witch. Yet you still wish to be held by me? I will soon lay with Godwyn. And it will surely stir within
 - **D, Hunter of the Dead — passage 2** (Dialogues) : The village here has been touched by Death. Turn back, while you still can. Another fool who won't listen to reason, eh? But with a prowess for weeding Deathroot. ... How would you like to earn the st
@@ -380,7 +422,9 @@ Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus pro
 - **Fia, Deathbed Companion — passage 15** (Dialogues) : ...! This...is the other hallowbrand. How did you... Oh, my utmost thanks. With this, Godwyn can take his rightful place as First of the Dead. And claim a second, illustrious life. You are my-- our tr
 - **Fia, Deathbed Companion — passage 6** (Dialogues) : My dear... Have you ever heard of black knifeprints? Dear Rogier likes to talk of them when abed. And the ancient plot, in which the first of the Demigods was slain. The black knives wielded by the as
 
-## Cluster 21 — Maliketh, Blade, Black (25 textes)
+## Cluster 21 — Maliketh, sceaux et prothèses (25 textes)
+
+Mots clés : Maliketh, Blade, Black
 
 - **Maliketh's Armor** (Armures) : Beast's armor made of black iron and decorated with gold. Worn by Maliketh the Black Blade. Maliketh, Queen Marika's loyal half-brother, bore a blade imbued with Destined Death, and there was not one 
 - **Maliketh's Helm** (Armures) : Beast's helm made of black iron and decorated with gold. Worn by Maliketh the Black Blade. Maliketh, Queen Marika's loyal half-brother, bore a blade imbued with Destined Death, and there was not one d
@@ -398,7 +442,9 @@ Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus pro
 - **Winged Sword Insignia** (Talismans) : A talisman depicting a raised prosthetic blade. An honor bestowed upon the knights who fought alongside Malenia the Severed. Raises attack power with successive attacks. The wings symbolize Malenia an
 - **One-Eyed Shield** (Armes) : Tricksome shield made from white stone depicting a malformed one-eyed god. The barrel of a firearm pokes through the open mouth. Once worshipped by the giants, this evil deity is believed to have been
 
-## Cluster 22 — Remembrance, Great, Rykard (31 textes)
+## Cluster 22 — Remembrances et Grandes Runes (31 textes)
+
+Mots clés : Remembrance, Great, Rykard
 
 - **Remembrance of the Blasphemous** (Objets) : Remembrance of Rykard, Lord of Blasphemy, hewn into the Erdtree. The power of its namesake can be unlocked by the Finger Reader. Alternatively, it can be used to gain a great bounty of runes. Rykard t
 - **Remembrance of the Grafted** (Objets) : Remembrance of Godrick, the Grafted, hewn into the Erdtree. The power of its namesake can be unlocked by the Finger Reader. Alternatively, it can be used to gain a great bounty of runes. A feeble man 
@@ -416,7 +462,9 @@ Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus pro
 - **Remembrance of the Naturalborn** (Objets) : Remembrance of Astel, Naturalborn of the Void, hewn into the Erdtree. The power of its namesake can be unlocked by the Finger Reader. Alternatively, it can be used to gain a great bounty of runes. A m
 - **Radahn's Great Rune** (Objets) : A Great Rune of the shardbearer Radahn. Its blessing raises maximum HP, FP and Stamina. Radahn was amongst the children of Rennala and Radagon, who became demigod stepchildren after Radagon's union wi
 
-## Cluster 23 — Mask, White, Maidenless (33 textes)
+## Cluster 23 — Varré, le Masque blanc (33 textes)
+
+Mots clés : Mask, White, Maidenless
 
 - **White Mask Varré — passage 2** (Dialogues) : Oh, can't seem to wrap your head around your predicament? It's no surprise. You poor have-nots are a stubborn lot. Fine, then. If you must have a go at it, maidenless as you are, you'll require an edu
 - **White Mask Varré — passage 6** (Dialogues) : Luckily for you, however, there is one shining ray of hope for even the maidenless. Me. Varré. Take care to listen. Are you familiar with grace? The golden light that gives life to you Tarnished. You 
@@ -434,7 +482,9 @@ Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus pro
 - **White Mask Varré — passage 7** (Dialogues) : Grace's guidance will reveal the path forward, most certainly. To Castle Stormveil, over on the cliff. The home of the decrepit demigod, Godrick the Grafted. It's time you set off, I should think. To 
 - **White Mask Varré — passage 21** (Dialogues) : Please, answer me...Luminary...Mohg. ... A-ahh... Bless the Mohgwyn Dynasty, with love! <groan> ...
 
-## Cluster 24 — Elden, Passage, Lord (235 textes)
+## Cluster 24 — La quête du Seigneur d'Elden (235 textes)
+
+Mots clés : Elden, Passage, Lord
 
 - **Godrick the Grafted — passage 4** (Dialogues) : and the Lands Between are shrouded by Death's dark fate. To our home, bathed in rays of gold. And grace will surely guide us safe. To our home, bathed in rays of gold. But the flames will also burn th
 - **Finger Reader Enia — passage 6** (Dialogues) : Now, go forth. Let the words of the Fingers guide you. I had my doubts, but...my, look at you. Only once before have I seen two Great Runes together. Look there. The Fingers shudder with exuberance. "
@@ -452,7 +502,9 @@ Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus pro
 - **Finger Reader Enia — passage 1** (Dialogues) : Are you that new Tarnished? You've done well. I am Enia, the Finger Reader. I interpret the words of the Fingers, envoys to the Greater Will. Look there. The Fingers tremble. To welcome you, shardbear
 - **Melina — passage 18** (Dialogues) : So I'd like you to undertake a new journey, with me. To the flame of ruin, far above the clouds, upon the snowy mountaintops of the giants. Then I can set the Erdtree aflame. And guide you. Down the p
 
-## Cluster 25 — Merchant, Irina, Morne (53 textes)
+## Cluster 25 — Irina, Kalé et la frénésie (53 textes)
+
+Mots clés : Merchant, Irina, Morne
 
 - **Irina of Morne — passage 2** (Dialogues) : I understand. I fear some of the castle's servants are still prowling nearby. Do take care on the road. I pray your journey comes to fruition. And if you happen to change your mind... Please come to s
 - **Irina of Morne — passage 13** (Dialogues) : Ah, so you're here as well, are you? ...I realised as we've talked. I'll be a Maiden, and you... Surely, a Lord. Go to the door ahead, after divesting yourself of your possessions. It will surely open
@@ -470,7 +522,9 @@ Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus pro
 - **Merchant Kalé — passage 9** (Dialogues) : Have you seen a crow around here by any chance? You know, a burial crow, with a letter fastened to its claw? Well, if you do set eyes upon it, I'll buy that letter from you, no question. I'd give you 
 - **Irina of Morne — passage 9** (Dialogues) : You are most kind, indeed. May the blessing of the Fingers be upon you. You are most kind, indeed. May the blessing of the Fingers be upon you. I wonder, what are Shabriri grapes? Delectably tender an
 
-## Cluster 26 — Staff, Glintstone, Sorceries (25 textes)
+## Cluster 26 — Bâtons de sorcellerie (25 textes)
+
+Mots clés : Staff, Glintstone, Sorceries
 
 - **Glintstone Staff** (Armes) : Staff with a glintstone embedded at the tip. A catalyst for casting sorceries. Sorceries must be memorized first at a site of lost grace, and a staff must be equipped to cast them.
 - **Carian Glintstone Staff** (Armes) : Staff embedded with a blue glintstone. One of two types of Carian staff. Given to sorcerers that they might enact the role of knight. Enhances Carian sword sorceries.
@@ -488,7 +542,9 @@ Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus pro
 - **Rotten Crystal Staff** (Armes) : Staff fashioned from pure crystal; a deed impossible for a human. It festers with scarlet rot. Enhances Crystalian sorceries.
 - **Gelmir Glintstone Staff** (Armes) : Staff with a forked tip, embedded with red glintstones. Enhances lava sorceries. The Man-Serpents of Mt. Gelmir draw from faith in addition to intelligence to enhance the potency of their sorcery.
 
-## Cluster 27 — Shield, Wooden, Metal (76 textes)
+## Cluster 27 — Boucliers et blasons (76 textes)
+
+Mots clés : Shield, Wooden, Metal
 
 - **Heavy Erdtree Greatshield** (Armes) : Shield used by Tree Sentinels. Treated with gold, featuring a delicate design.
 - **Erdtree Greatshield** (Armes) : Weighty greatshield forged of gold carried by the order of Tree Sentinels, heavily equipped knights. Blessed by an old incantation of protection. The living rampart of the Erdtree, the Tree Sentinels 
@@ -506,7 +562,9 @@ Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus pro
 - **Riveted Wooden Shield** (Armes) : Small wooden roundshield that has been reinforced with metal. It is light and easy to handle, but cannot offer the damage negation of a true metal shield. The design riveted to the center represents b
 - **Heater Shield** (Armes) : A medium-sized metal shield, comparatively easy to handle. Metal shields reliably negate physical damage when guarding, a trait which made them highly trusted on the battlefield.
 
-## Cluster 28 — Flame, Monks, Giants (58 textes)
+## Cluster 28 — Incantations de flamme (58 textes)
+
+Mots clés : Flame, Monks, Giants
 
 - **O, Flame!** (Objets) : Incantation of the Fire Monks. Momentarily sparks roaring flame from the caster's hand. Charging enhances potency. The Giants' Flame still smolders upon the distant northern mountaintop, and the Fire 
 - **Whirl, O Flame!** (Objets) : Superior incantation of the Fire Monks. Creates a spiraling stream of fire that burns the area before the caster. Charging enhances potency and reach. Fire beguiles those who gaze into it. And so the 
@@ -524,7 +582,9 @@ Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus pro
 - **Fire Prelate Armor** (Armures) : Black iron armor adorned with a red cloth. Attire of the Fire Prelates, commanders of the Fire Monks. The weighty frames of the Prelates symbolized the onus of their grave vows as guardians of the fla
 - **Blackflame Monk Gauntlets** (Armures) : Black iron gauntlets featuring a flame motif. Attire of the Blackflame Monks. The Blackflame Monks, enthralled by the god-slaying black flame, became traitors, abandoning their posts as guardians. The
 
-## Cluster 29 — Worn, Gauntlets, Knight (320 textes)
+## Cluster 29 — Armures et tenues (320 textes)
+
+Mots clés : Worn, Gauntlets, Knight
 
 - **Haligtree Greaves** (Armures) : Greaves worn by soldiers sworn to the Haligtree. Rust-worn and stained through unending conflict.
 - **Radahn Soldier Greaves** (Armures) : Greaves worn by soldiers who fought by General Radahn's side. Rust-worn and stained through unending conflict.
@@ -542,7 +602,9 @@ Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus pro
 - **Mausoleum Greaves** (Armures) : Greaves worn by headless soldiers who endlessly guard the Wandering Mausoleum. Rust-worn and stained through unending conflict.
 - **Foot Soldier Gauntlets** (Armures) : Metal gauntlets covered in nicks and dents. Widely issued to foot soldiers in a lord's army.
 
-## Cluster 30 — Blade, Wielded, Sword (209 textes)
+## Cluster 30 — Armes de corps à corps (209 textes)
+
+Mots clés : Blade, Wielded, Sword
 
 - **Greatsword** (Armes) : A coarse iron lump of an ultra greatsword. Mows down foes by utilizing its incredible weight. Though handling it likely requires the wielder to have surpassed the realm of the merely human, it is prec
 - **Shotel** (Armes) : Curved sword with a severely hooked blade. Its attacks can slip through an enemy's guard. Made to hunt down humans, this weapon requires high dexterity to wield effectively.
@@ -560,7 +622,9 @@ Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus pro
 - **Longsword** (Armes) : A straight sword with a double-edged blade. In addition to its reliable standard damage, this weapon also boasts powerful piercing attacks. A superbly balanced armament.
 - **Scythe** (Armes) : Large scythe featuring a long, slender blade. Designed to reap, this weapon is capable of rapidly inflicting blood loss while also slipping through an enemy's guard. In the hands of a highly dexterous
 
-## Cluster 31 — Material, Crafting, Boluses (51 textes)
+## Cluster 31 — Matériaux d'artisanat (51 textes)
+
+Mots clés : Material, Crafting, Boluses
 
 - **Herba** (Objets) : Evergreen leaves that give off a faint light. Material used for crafting items. This very common medicinal plant can be found in thickets and elsewhere.
 - **Poisonbloom** (Objets) : Flower that grows in toxic terrain. Material used for crafting items. Dripping with a deep-green poisonous liquid.
@@ -578,7 +642,9 @@ Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus pro
 - **Eye of Yelough** (Objets) : A shrub fruit bursting with ripened pulp. Material used for crafting items. Grown in lands afflicted by frenzy, it's used for its pain-relieving properties... Though it's also known to be a dangerous 
 - **Clarifying Boluses** (Objets) : Yellow boluses made of cave moss. Craftable item. Alleviates madness buildup. Madness accumulates slowly, inflicting heavy damage and reducing FP once the threshold is reached. Take one of these in ti
 
-## Cluster 32 — Pot, Prepared, Throw (49 textes)
+## Cluster 32 — Pots à lancer (49 textes)
+
+Mots clés : Pot, Prepared, Throw
 
 - **Fire Pot** (Objets) : Craftable item prepared using a cracked pot. A cocktail of incendiary materials is sealed inside. Throw at enemies to inflict fire damage.
 - **Poison Pot** (Objets) : Craftable item prepared using a cracked pot. A cocktail of poisonous materials is sealed inside. Throw at enemies to cause buildup of poison.
@@ -596,7 +662,9 @@ Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus pro
 - **Roped Freezing Pot** (Objets) : Craftable with a cracked pot. Frost has been sealed inside. A short rope that aids throwing is attached. Thrown at rearward enemies using the rope, the pot explodes, causing frostbite buildup in enemi
 - **Cracked Pot** (Objets) : This empty pot somehow mends itself when broken. Essential vessel for crafting cracked pot items. The materials and magics sealed within deploy their effects when the pot is thrown.
 
-## Cluster 33 — Bolt, Stone, Bone (60 textes)
+## Cluster 33 — Carreaux, pierres et éclats (60 textes)
+
+Mots clés : Bolt, Stone, Bone
 
 - **Lightning Bolt** (Armes) : Bolt tipped with a shard of Gravel Stone. Deals powerful lightning damage. Used by worshippers of the ancient dragons.
 - **Firebone Bolt** (Armes) : Bolt carved from animal bone. The tip is set alight before firing. Deals fire damage. Craftable item.
@@ -614,7 +682,9 @@ Pour chaque cluster : mots clés c-TF-IDF, taille, et les 15 textes les plus pro
 - **Bloodbone Bolt** (Armes) : Bolt carved from animal bone. The tip is daubed with a blood tincture. Afflicts targets with blood loss. Craftable item.
 - **Flaming Bolt** (Armes) : Bolt with a fiercely burned tip. Deals powerful fire damage. Used by survivors of Radahn's army to stave off the scarlet rot.
 
-## Cluster 34 — Arrow, Whittled, Bones (33 textes)
+## Cluster 34 — Flèches en os (33 textes)
+
+Mots clés : Arrow, Whittled, Bones
 
 - **Magicbone Arrow (Fletched)** (Armes) : Arrow whittled from animal bones. The tip is daubed with a glintstone tincture. Deals magic damage. Craftable item. The fletching adds distance to the arrow's flight.
 - **Firebone Arrow (Fletched)** (Armes) : Arrow whittled from animal bones. The tip is set alight before firing. Deals fire damage. Craftable item. The fletching adds distance to the arrow's flight.

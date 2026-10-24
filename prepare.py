@@ -21,6 +21,8 @@ from pathlib import Path
 
 import numpy as np
 
+from labels import load_titles, match_titles, save_titles
+
 MODEL_NAME = "intfloat/multilingual-e5-small"      # mêmes poids que Xenova/multilingual-e5-small (navigateur)
 BROWSER_MODEL = "Xenova/multilingual-e5-small"
 OUT = Path(__file__).parent / "web" / "data"
@@ -187,32 +189,57 @@ def label_clusters(docs, labels, top=3):
             for j, c in enumerate(ids)}
 
 
-def load_titles(path):
-    """Titres écrits à la main (labels.json, optionnel) : {"<id>": {"title", "description"}}."""
-    if not path.exists():
-        return {}
-    titles = {int(k): v for k, v in json.loads(path.read_text(encoding="utf-8")).items()}
-    print(f"{len(titles)} titres lus dans {path.name}")
-    return titles
-
-
-def write_cluster_digest(docs, emb, labels, names, k=15, chars=200):
-    """clusters.md : pour chaque cluster, ses mots clés et les textes les plus proches du
-    centroïde, de quoi lui écrire un titre dans labels.json."""
-    lines = ["# Clusters\n",
-             ("Pour chaque cluster : mots clés c-TF-IDF, taille, et les "
-              f"{k} textes les plus proches du centroïde (embeddings).\n")]
-    for c, keywords in names.items():
+def central_texts(emb, labels, names, k=15):
+    """Les k textes les plus proches du centroïde (embeddings) de chaque cluster."""
+    out = {}
+    for c in names:
         idx = np.where(labels == c)[0]
-        centroid = emb[idx].mean(axis=0)
-        closest = idx[np.argsort(-(emb[idx] @ centroid))[:k]]
-        lines.append(f"## Cluster {c} — {keywords} ({len(idx)} textes)\n")
-        for i in closest:
+        out[c] = idx[np.argsort(-(emb[idx] @ emb[idx].mean(axis=0)))[:k]]
+    return out
+
+
+def write_cluster_digest(docs, labels, names, central, titles, stale, chars=200):
+    """clusters.md : pour chaque cluster, son titre (ou une entrée labels.json à compléter),
+    ses mots clés et ses textes les plus centraux ; puis les titres qui n'ont plus de cluster."""
+    lines = ["# Clusters\n",
+             ("Pour chaque cluster : titre actuel, mots clés c-TF-IDF, taille, et les textes "
+              "les plus proches du centroïde (embeddings). Un titre suit son groupe tant "
+              "qu'on y retrouve au moins la moitié de ses « members ».\n")]
+    for c, keywords in names.items():
+        title = titles[c]["title"] if c in titles else "(sans titre)"
+        lines.append(f"## Cluster {c} — {title} ({int((labels == c).sum())} textes)\n")
+        lines.append(f"Mots clés : {keywords}\n")
+        if c not in titles:
+            entry = {"title": "", "description": "",
+                     "members": [docs[i]["name"] for i in central[c]]}
+            lines += ["```json", json.dumps(entry, ensure_ascii=False) + ",", "```\n"]
+        for i in central[c]:
             text = re.sub(r"\s+", " ", docs[i]["text"])[:chars]
             lines.append(f"- **{docs[i]['name']}** ({docs[i]['cat']}) : {text}")
         lines.append("")
+    if stale:
+        lines.append("# Titres sans cluster\n")
+        lines.append("Leurs groupes se sont dispersés : à réattribuer ou à supprimer de labels.json.\n")
+        lines += [f"- {e['title']}" for e in stale]
+        lines.append("")
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "clusters.md").write_text("\n".join(lines), encoding="utf-8")
+
+
+def resolve_titles(docs, labels, names, central, path, refresh):
+    """Rattache les titres de labels.json aux clusters ; avec refresh, réécrit le fichier
+    en remplaçant les « members » des titres retrouvés par les textes centraux actuels."""
+    entries = load_titles(path)
+    members = {c: {docs[i]["name"] for i in np.where(labels == c)[0]} for c in names}
+    titles, stale = match_titles(entries, members)
+    print(f"{len(entries)} titres dans {path.name} : {len(titles)} rattachés, "
+          f"{len(stale)} sans cluster, {len(names) - len(titles)} clusters sans titre")
+    if refresh and entries:
+        for c, e in titles.items():
+            e["members"] = [docs[i]["name"] for i in central[c]]
+        save_titles(path, [titles[c] for c in names if c in titles] + stale)
+        print(f"{path.name} mis à jour")
+    return titles, stale
 
 
 # ---------------------------------------------------------------- export
@@ -227,7 +254,7 @@ def export(docs, emb, xy, labels, names, titles, nbrs, embedder):
     clusters = []
     for c, keywords in names.items():
         m = labels == c
-        t = titles.get(int(c), {})
+        t = titles.get(c, {})
         clusters.append({"id": int(c), "label": t.get("title") or keywords,
                          "description": t.get("description", ""), "keywords": keywords,
                          "n": int(m.sum()),
@@ -247,7 +274,7 @@ def export(docs, emb, xy, labels, names, titles, nbrs, embedder):
     with open(OUT / "meta.json", "w") as f:
         json.dump(meta, f)
     print(f"Exporté dans {OUT} : {len(docs)} textes, {len(clusters)} clusters "
-          f"({sum(int(c) in titles for c in names)} titrés), recherche sémantique {'activée' if semantic else 'désactivée'}")
+          f"({len(titles)} titrés), recherche sémantique {'activée' if semantic else 'désactivée'}")
 
 
 def main():
@@ -258,6 +285,8 @@ def main():
     p.add_argument("--min-cluster", type=int, default=25)
     p.add_argument("--labels", type=Path, default=Path(__file__).parent / "labels.json",
                    help="titres des clusters (optionnel)")
+    p.add_argument("--refresh-labels", action="store_true",
+                   help="réécrit labels.json avec les textes centraux actuels de chaque titre")
     a = p.parse_args()
 
     data = json.loads(Path(a.source).read_text(encoding="utf-8"))
@@ -271,8 +300,10 @@ def main():
     labels = cluster(xy, a.min_cluster)
     names = label_clusters(docs, labels)
     print(f"{len(names)} clusters, {(labels == -1).mean():.0%} de points hors cluster")
-    write_cluster_digest(docs, emb, labels, names)
-    export(docs, emb, xy, labels, names, load_titles(a.labels), neighbors(emb), a.embedder)
+    central = central_texts(emb, labels, names)
+    titles, stale = resolve_titles(docs, labels, names, central, a.labels, a.refresh_labels)
+    write_cluster_digest(docs, labels, names, central, titles, stale)
+    export(docs, emb, xy, labels, names, titles, neighbors(emb), a.embedder)
 
 
 if __name__ == "__main__":
