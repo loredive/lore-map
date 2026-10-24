@@ -131,6 +131,9 @@ elle revient le plus, puis les noms propres fréquents que la liste ne couvre pa
 ## Utiliser la carte
 
 - Molette ou pincement pour zoomer, glisser pour se déplacer, double-clic pour zoomer.
+- Au doigt, toucher un endroit où plusieurs étoiles se serrent zoome sur lui, puis propose la liste
+  de leurs noms (et du groupe, si un nom de groupe est dessous) : on choisit au lieu d'ouvrir une
+  voisine par erreur.
 - Cliquer une étoile ouvre sa fiche : texte complet, version japonaise, et ses **échos**,
   les textes les plus proches par le sens, reliés à elle sur la carte.
 - Cliquer le nom d'un groupe ouvre sa fiche : titre, description, mots clés et liste de ses textes.
@@ -141,7 +144,7 @@ elle revient le plus, puis les noms propres fréquents que la liste ne couvre pa
 - « Tracer un chemin vers un autre texte », sur la fiche d'un texte, puis un clic sur une étoile
   ou une recherche pour choisir l'arrivée : la carte trace le plus court chemin d'écho en écho entre
   les deux (de Ranni à l'icône de Radagon : 5 échos, en passant par Miriel qui parle de Rennala).
-- « Comment lire cette carte », sous le titre, rappelle comment lire la carte.
+- « Comment lire cette carte », sous le titre, rappelle comment lire la carte et ce qu'on peut y faire.
 - « Personnages et lieux » ouvre l'index des personnages, lieux, factions et notions. Chaque fiche
   liste les textes qui en parlent, les fait briller sur la carte et indique les groupes où ils se
   trouvent. La fiche d'un texte liste aussi ce qu'il mentionne, et chercher un nom connu
@@ -150,9 +153,15 @@ elle revient le plus, puis les noms propres fréquents que la liste ne couvre pa
   (la méthode est indiquée dans l'infobulle) : mêmes textes, mêmes
   groupes, autre façon d'aplatir. Ce qui reste proche dans les deux vues l'est vraiment.
 - La légende masque ou réaffiche une catégorie.
-- Clavier : `/` pour chercher, `Échap` pour fermer, `+`/`-` et flèches, `0` pour recentrer.
+- Clavier : `/` pour chercher, Entrée pour aller au premier résultat, `Échap` pour fermer.
+  Tab jusqu'à la carte affiche un viseur : flèches pour se déplacer, `+`/`-` pour zoomer, `0` pour
+  recentrer, Entrée pour ouvrir l'étoile visée.
+- « Retour » en haut du panneau, comme le bouton Retour du navigateur, revient à la fiche
+  précédente ; « Fermer » ferme le panneau (et Retour le rouvre).
+- La première liste de résultats vient des mots-clés ; celle « par sens » arrive ensuite. Si l'on a
+  déjà commencé à lire, elle ne remplace pas la liste sous les yeux : un bouton propose de l'afficher.
 - L'adresse de la page change avec le texte ou la fiche ouverte (`#entite=Godwyn`,
-  `#groupe=Pots à lancer`) : on peut copier un lien vers une fiche. Le lien d'un groupe passe par son
+  `#groupe=Pots à lancer`, `#chemin=<texte>&<texte>`) : on peut copier un lien vers une fiche. Le lien d'un groupe passe par son
   titre ; un groupe sans titre (nommé par ses mots clés) n'a pas de lien stable d'une génération à
   l'autre.
 
@@ -201,6 +210,7 @@ web/views.js      bascule entre projections
 web/search.js     BM25, similarité int8, fusion RRF (fonctions pures)
 web/search-ui.js  champ de recherche, modèle, liste des résultats
 web/panel.js      fiches d'un texte et d'un groupe, chemins, aide, liens (#…)
+web/nav.js        historique de navigation du panneau (Retour, bouton du navigateur)
 web/entities-ui.js  index et fiches des personnages, lieux…
 web/graph.js      graphe des échos, plus court chemin (fonctions pures)
 web/style.css

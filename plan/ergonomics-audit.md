@@ -1,6 +1,6 @@
 # Ergonomics and accessibility audit — La carte du lore
 
-Date: 2026-10-24 · Branch: `feature/pre-llm` (35caf0d) · Batch 1 fixed on `feature/ergonomics` (see Status).
+Date: 2026-10-24 · Branch: `feature/pre-llm` (35caf0d) · Batches 1 and 2 fixed on `feature/ergonomics` (see Status).
 
 Method: scripted browser measurements (Playwright, Chromium) at 375, 390, 768, 1280, 1400 and
 1920 px wide; task walkthroughs counting actions and dead ends; Nielsen's 10 heuristics;
@@ -18,7 +18,7 @@ WCAG 2.2 AA. Scripts: `scratchpad/audit/measure.py`, `tasks.py` (not committed).
 
 | # | Issue | Status | Measured after the fix |
 |---|---|---|---|
-| 2 | Keyboard use | ✅ batch 1 (stars still not reachable by keyboard → batch 2) | Tab from search to first result: 11 → 1; Enter → first result; focus on the card title; focus kept when results are replaced |
+| 2 | Keyboard use | ✅ batches 1 and 2 | Tab from search to first result: 11 → 1; Enter → first result; focus on the card title; focus kept when results are replaced |
 | 3 | Live region | ✅ batch 1 | characters read on each change: 4,400 → a short message; `<main>` added |
 | 4 | Tablet: title / search | ✅ batch 1 | no overlap at 761–1400 px (9 widths, both states) |
 | 6 | Search with a card open | ✅ batch 1 | results always shown, « Retour à … » back to the card, card restored when the search is cleared |
@@ -27,7 +27,11 @@ WCAG 2.2 AA. Scripts: `scratchpad/audit/measure.py`, `tasks.py` (not committed).
 | 10 | Jargon | ✅ batch 1 | « Carte : principale · autre agencement », method in the tooltip |
 | 12 | Projection loses the text | ✅ batch 1 | selected star recentred (490, 430) instead of under the search field |
 | 13 | Tablet: credit / switch | ✅ batch 1 | credit wraps, hidden when the panel is open below 1360 px |
-| 1, 5, 9, 11 | History, mobile taps, stable results, help | batch 2 | |
+| 1 | « Back » | ✅ batch 2 | panel history in step with the browser (nav.js): « Retour » from an echo goes to the text read before (was: jumped to the character card); browser Back goes to the previous card (was: left the page); Back from the first card closes the panel; « Fermer » button; `#chemin=` links |
+| 2 (rest) | Stars not reachable by keyboard | ✅ batch 2 | Tab reaches the map (first stop): a sight at the centre names the aimed star, arrows / + / − move, Enter opens |
+| 5 | Mobile taps | ✅ batch 2 | 20 random targets, 6 px finger error: right star 1–2/20 before → 17/20 (8/8 for stars not hidden under a group name), 3.1 taps on average; a crowded tap zooms ×4, then offers the names (and the group under the finger) |
+| 9 | Results reshuffling | ✅ batch 2 | once the list is touched (scroll, click, key), refined results wait behind a « afficher » button; otherwise replaced with a note |
+| 11 | Hidden features | ✅ batch 2 | help gains « Ce qu'on peut faire » (8 lines), the 4 original lines unchanged |
 | 14–18 | | later | |
 
 Also fixed along the way: the mobile legend overlapped the credit (pre-existing).

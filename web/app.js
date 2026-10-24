@@ -1,9 +1,10 @@
 // Point d'entrée : chargement des données, souris, clavier, légende.
-import { S, $, canvas, panel, tip, status, input, mode, esc, colorOf } from "./state.js";
-import { buildGrid, buildSprites, computeHulls, resize, draw, toWorld, nearest, flyTo, zoomAt, setHover } from "./render.js";
+import { S, $, canvas, panel, tip, status, input, mode, esc, colorOf, announce } from "./state.js";
+import { buildGrid, buildSprites, computeHulls, resize, draw, toWorld, nearest, flyTo, zoomAt, setHover, starsNear, viewCenter } from "./render.js";
 import { buildViewSwitch } from "./views.js";
 import { buildIndex, runSearch, renderResults } from "./search-ui.js";
-import { select, deselect, openCluster, closePanel, openFromHash, cancelPath } from "./panel.js";
+import { select, openCluster, closePanel, openFromHash, cancelPath } from "./panel.js";
+import { record, current } from "./nav.js";
 import { openEntity } from "./entities-ui.js";
 
 // ------------------------------------------------------------------ données
@@ -48,6 +49,7 @@ async function load() {
   mode.textContent = meta.semantic ? "Recherche par mots-clés et par sens" : "Recherche par mots-clés";
   resize();
   openFromHash();
+  if (!current()) record({ view: "none" });     // premier état : la carte seule, panneau fermé
 }
 
 
@@ -56,6 +58,7 @@ const pointers = new Map();
 let drag = null, pinch = null;
 
 canvas.addEventListener("pointerdown", e => {
+  closeChooser();
   canvas.setPointerCapture(e.pointerId);
   pointers.set(e.pointerId, [e.clientX, e.clientY]);
   if (pointers.size === 1) drag = { x: e.clientX, y: e.clientY, moved: 0 };
@@ -97,14 +100,71 @@ canvas.addEventListener("pointerup", e => {
     // une étoile tout près du curseur passe avant le nom de groupe dessiné par-dessus
     const near = pick(e.clientX, e.clientY, 5);
     const label = near < 0 ? labelAt(e.clientX, e.clientY) : null;
+    if (e.pointerType !== "mouse" && tapZoom(e.clientX, e.clientY, label)) { drag = null; return; }
     const i = near >= 0 ? near : label ? -1 : pick(e.clientX, e.clientY, e.pointerType === "mouse" ? 12 : 22);
     if (i >= 0) select(i);
     else if (label) openCluster(label);
-    else if (S.selected >= 0) deselect();
     else if (!panel.hidden && panel.dataset.view !== "results") closePanel();
   }
   drag = null;
 });
+// Au doigt, plusieurs étoiles tiennent souvent sous la pulpe (toutes, au zoom initial) : plutôt
+// qu'ouvrir l'une d'elles au hasard, on zoome s'il y en a beaucoup, et sinon on propose leurs noms.
+// Mesuré avec une erreur de doigt de 6 px : l'étoile la plus proche n'était la bonne que 2 fois sur 20.
+// Un nom de groupe sous le doigt, avec peu d'étoiles, devient le premier choix de la liste.
+const TAP_PX = 22, MAX_ZOOM = 80, CHOICES = 6, TAP_ZOOM = 4;   // ×4 : moins de touches qu'à ×2,5 (mesuré)
+const chooser = $("#chooser");
+function tapZoom(sx, sy, label) {
+  closeChooser();
+  const c = starsNear(sx, sy, TAP_PX);
+  if (label) {
+    if (c.length > CHOICES) return false;            // carte vue de loin : toucher un nom ouvre son groupe
+    openChooser(c.map(([i]) => i), sx, sy, label);
+    return true;
+  }
+  if (c.length <= 1) return false;                   // une seule étoile sous le doigt : elle s'ouvre
+  if (c.length > CHOICES && S.cam.s * TAP_ZOOM <= MAX_ZOOM) {
+    const [wx, wy] = toWorld(sx, sy);
+    flyTo(wx, wy, S.cam.s * TAP_ZOOM, 450);
+    return true;
+  }
+  openChooser(c.slice(0, CHOICES).map(([i]) => i), sx, sy);
+  return true;
+}
+function openChooser(list, sx, sy, group = null) {
+  chooser.innerHTML = `<p class="title">Plusieurs choses ici</p><ul>${group
+    ? `<li><button type="button" class="group" data-c="${group.id}">Groupe : ${esc(group.label)}</button></li>` : ""}${list.map(i => {
+    const d = S.docs[i];
+    return `<li><button type="button" data-i="${i}"><span class="dot" style="--c:${colorOf(d.cat)}"></span>${esc(d.name)}</button></li>`;
+  }).join("")}</ul>`;
+  chooser.hidden = false;
+  const w = chooser.offsetWidth, h = chooser.offsetHeight;
+  chooser.style.left = Math.max(8, Math.min(sx - w / 2, S.W - w - 8)) + "px";
+  chooser.style.top = (sy + 24 + h < S.H ? sy + 24 : Math.max(8, sy - h - 24)) + "px";
+  chooser.querySelectorAll("button[data-i]").forEach(b => b.addEventListener("click", () => { closeChooser(); select(+b.dataset.i); }));
+  chooser.querySelector("button[data-c]")?.addEventListener("click", () => { closeChooser(); openCluster(group); });
+  chooser.querySelector("button").focus({ preventScroll: true });
+}
+export function closeChooser() { chooser.hidden = true; }
+
+// Au clavier : la carte reçoit le focus, un viseur marque le centre ; l'étoile la plus proche du
+// viseur est nommée, Entrée l'ouvre.
+function aimAtCenter() {
+  const [cx, cy] = viewCenter();
+  const i = pick(cx, cy, 30);
+  setHover(i);
+  if (i >= 0) {
+    const d = S.docs[i];
+    tip.innerHTML = `<span class="name">${esc(d.name)}</span><span class="sub">${esc(S.cats[d.cat])} · Entrée pour ouvrir</span>`;
+    tip.hidden = false;
+    tip.style.left = Math.min(cx + 40, S.W - tip.offsetWidth - 8) + "px";
+    tip.style.top = Math.min(cy + 34, S.H - tip.offsetHeight - 8) + "px";
+  }
+  announce(i >= 0 ? `Visée : ${S.docs[i].name}` : "Aucune étoile au centre");
+}
+canvas.addEventListener("focus", () => { if (canvas.matches(":focus-visible")) { S.kbd = true; aimAtCenter(); draw(); } });
+canvas.addEventListener("blur", () => { S.kbd = false; setHover(-1); draw(); });
+
 canvas.addEventListener("pointercancel", e => { pointers.delete(e.pointerId); drag = pinch = null; });
 canvas.addEventListener("pointerleave", () => { S.hoverLabel = null; setHover(-1); });
 canvas.addEventListener("wheel", e => {
@@ -118,13 +178,15 @@ addEventListener("keydown", e => {
   const typing = document.activeElement === input;
   if (e.key === "/" && !typing) { e.preventDefault(); input.focus(); input.select(); return; }
   if (e.key === "Escape") {
-    if (S.pathFrom >= 0) { cancelPath(); draw(); }
-    else if (S.selected >= 0) deselect();
-    else if (!panel.hidden && panel.dataset.view !== "results") closePanel();
+    // Échap défait la dernière chose en cours : un chemin à choisir, une recherche, la fiche ouverte
+    if (!chooser.hidden) closeChooser();
+    else if (S.pathFrom >= 0) { cancelPath(); draw(); }
     else if (input.value) { input.value = ""; runSearch(); }
+    else if (!panel.hidden) closePanel();
     return;
   }
   if (typing || document.activeElement?.closest("#panel")) return;
+  if (e.key === "Enter" && document.activeElement === canvas && S.hover >= 0) { e.preventDefault(); select(S.hover); return; }
   const step = 80 / (S.cam.s * S.base);
   const keys = {
     "+": () => zoomAt(S.W / 2, S.H / 2, 1.3), "=": () => zoomAt(S.W / 2, S.H / 2, 1.3),
@@ -133,7 +195,11 @@ addEventListener("keydown", e => {
     ArrowUp: () => { S.cam.y += step; draw(); }, ArrowDown: () => { S.cam.y -= step; draw(); },
     "0": () => flyTo(0, 0, 1),
   };
-  if (keys[e.key]) { e.preventDefault(); keys[e.key](); }
+  if (keys[e.key]) {
+    e.preventDefault();
+    keys[e.key]();
+    if (S.kbd) setTimeout(aimAtCenter, e.key === "0" ? 700 : 0);   // « 0 » recentre en douceur
+  }
 });
 
 function pick(sx, sy, px) {

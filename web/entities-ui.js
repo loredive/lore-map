@@ -1,7 +1,8 @@
 // Personnages, lieux, factions et notions : index, fiches et pastilles.
-import { S, $, panel, esc, fold, clearHash, resetContext, clusterById, docRow, focusPanel } from "./state.js";
+import { S, $, panel, esc, fold, resetContext, clusterById, docRow, focusPanel } from "./state.js";
 import { draw, fitPoints } from "./render.js";
-import { select, openCluster, snippet, mark } from "./panel.js";
+import { select, openCluster, snippet, mark, panelTop, bindPanelTop } from "./panel.js";
+import { record } from "./nav.js";
 
 // ------------------------------------------------------------------ personnages, lieux…
 const KIND_LABELS = { personnage: ["Personnage", "Personnages"], lieu: ["Lieu", "Lieux"],
@@ -22,7 +23,8 @@ export function showIndex() {
   S.selected = -1;
   panel.hidden = false;
   panel.dataset.view = "index";
-  panel.innerHTML = `<article class="card">
+  record({ view: "index" });
+  panel.innerHTML = `${panelTop()}<article class="card">
     <h2>Personnages et lieux</h2>
     <p class="hint">Le chiffre indique combien de textes en parlent. Chacun ouvre ces textes et les fait briller sur la carte.</p>
     ${Object.entries(KIND_LABELS).map(([k, [, plural]]) => {
@@ -31,8 +33,8 @@ export function showIndex() {
     }).join("")}
   </article>`;
   bindEntityButtons();
+  bindPanelTop();
   panel.scrollTop = 0;
-  clearHash();
   focusPanel("Personnages et lieux");
   draw();
 }
@@ -56,8 +58,9 @@ export function openEntity(e, { fly = true, focus = true } = {}) {
   const shared = new Map(related);
   panel.hidden = false;
   panel.dataset.view = "entity";
-  panel.innerHTML = `<article class="card">
-    <button type="button" class="back">Tous les personnages et lieux</button>
+  record({ view: "entity", name: e.name });
+  panel.innerHTML = `${panelTop()}<article class="card">
+    <button type="button" class="to-index">Tous les personnages et lieux</button>
     <div class="cat">${KIND_LABELS[e.kind][0]}</div>
     <h2>${esc(e.label)}</h2>
     ${e.label !== e.name ? `<p class="jpname">${esc(e.name)} dans les textes</p>` : ""}
@@ -71,13 +74,13 @@ export function openEntity(e, { fly = true, focus = true } = {}) {
     <p class="hint">Ceux qui en parlent le plus d'abord ; ceux qui ne la nomment que dans leur titre en dernier.</p>
     <ol class="results">${visible.map(d => docRow(d, mark(esc(d.name), names), mark(esc(snippet(d.text, folded)), names))).join("")}</ol>
   </article>`;
-  panel.querySelector(".back").addEventListener("click", showIndex);
+  panel.querySelector(".to-index").addEventListener("click", showIndex);
+  bindPanelTop();
   bindEntityButtons();
   panel.querySelectorAll("button[data-i]").forEach(b => b.addEventListener("click", () => select(+b.dataset.i)));
   panel.querySelectorAll("button[data-c]").forEach(b =>
     b.addEventListener("click", () => openCluster(clusterById(+b.dataset.c))));
   panel.scrollTop = 0;
-  history.replaceState(null, "", "#entite=" + encodeURIComponent(e.name));
   if (focus) focusPanel(`${e.label} : ${e.docs.length} textes en parlent`);
   if (fly) fitPoints(docs);
   draw();

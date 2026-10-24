@@ -1,10 +1,22 @@
 // Le panneau de droite : fiche d'un texte, fiche d'un groupe, aide, liens (#…).
 import { tokenize } from "./search.js";
-import { S, $, panel, esc, colorOf, clearHash, resetContext, clusterById, docRow, focusPanel } from "./state.js";
+import { S, $, panel, input, esc, colorOf, resetContext, clusterById, docRow, focusPanel } from "./state.js";
 import { draw, focusDoc, fitPoints } from "./render.js";
 import { echoGraph, echoPath } from "./graph.js";
-import { renderResults, resetSearch } from "./search-ui.js";
-import { entityChips, bindEntityButtons, openEntity } from "./entities-ui.js";
+import { runSearch, resetSearch } from "./search-ui.js";
+import { entityChips, bindEntityButtons, openEntity, showIndex } from "./entities-ui.js";
+import { record, goBack, backLabel, setOpener, poppedHere } from "./nav.js";
+
+// En-tête commun du panneau : « Retour à … » (l'entrée précédente de l'historique) et « Fermer ».
+export function panelTop() {
+  const back = backLabel();
+  return `<div class="panel-top">${back ? `<button type="button" class="back">${esc(back)}</button>` : "<span></span>"}
+    <button type="button" class="close" aria-label="Fermer le panneau">Fermer</button></div>`;
+}
+export function bindPanelTop() {
+  panel.querySelector(".panel-top .back")?.addEventListener("click", goBack);
+  panel.querySelector(".panel-top .close").addEventListener("click", closePanel);
+}
 
 export function snippet(text, terms, len = 150) {
   const flat = text.replace(/\s+/g, " ");
@@ -26,19 +38,14 @@ export function mark(html, terms) {
 // ------------------------------------------------------------------ fiche d'un texte
 export function select(i, { fly = true } = {}) {
   if (S.pathFrom >= 0 && i !== S.pathFrom) { showPath(S.pathFrom, i); return; }
-  S.returnTo = -1;
   S.selected = i;
   const d = S.docs[i];
   const terms = tokenize(S.query || "");
   panel.hidden = false;
   panel.dataset.view = "doc";
-  const back = S.path ? "Retour au chemin"
-    : S.results.length ? "Retour aux résultats"
-    : S.cluster ? `Retour au groupe « ${S.cluster.label} »`
-    : S.entity ? `Retour à « ${S.entity.label} »` : "";
   const mentions = S.docEntities[i].filter(e => !e.broad);   // Erdtree, Entre-terre… : partout, donc sans intérêt ici
-  panel.innerHTML = `<article class="card">
-    ${back ? `<button type="button" class="back">${esc(back)}</button>` : ""}
+  record({ view: "doc", i });
+  panel.innerHTML = `${panelTop()}<article class="card">
     <div class="cat"><span class="dot" style="--c:${colorOf(d.cat)}"></span>${esc(S.cats[d.cat])}</div>
     <h2>${esc(d.name)}</h2>
     ${groupLine(d)}
@@ -60,7 +67,7 @@ export function select(i, { fly = true } = {}) {
       return `<li><button type="button" data-i="${e}"><span class="head"><span class="dot" style="--c:${colorOf(x.cat)}"></span><span class="name">${esc(x.name)}</span></span><small>${esc(S.cats[x.cat])}</small></button></li>`;
     }).join("")}</ol>
   </article>`;
-  panel.querySelector(".back")?.addEventListener("click", deselect);
+  bindPanelTop();
   panel.querySelector(".tjp")?.addEventListener("click", ev => {
     const jp = panel.querySelector(".jp"), open = jp.hidden;
     jp.hidden = !open;
@@ -75,22 +82,11 @@ export function select(i, { fly = true } = {}) {
   bindGroupButtons();
   bindEntityButtons();
   panel.scrollTop = 0;
-  history.replaceState(null, "", "#" + encodeURIComponent(d.name));
   focusPanel(`Texte : ${d.name}`);
   if (fly) focusDoc(d, Math.max(S.cam.s, 4));
   draw();
 }
 
-export function deselect() {
-  S.selected = -1;
-  clearHash();
-  if (S.path) showPathView();
-  else if (S.results.length) renderResults();
-  else if (S.cluster) openCluster(S.cluster, { fly: false });
-  else if (S.entity) openEntity(S.entity, { fly: false });
-  else panel.hidden = true;
-  draw();
-}
 
 // ------------------------------------------------------------------ fiche d'un groupe
 export function openCluster(c, { fly = true, focus = true } = {}) {
@@ -106,7 +102,8 @@ export function openCluster(c, { fly = true, focus = true } = {}) {
     ? `<p class="keywords"><span>Mots clés</span> ${esc(c.keywords)}</p>` : "";
   panel.hidden = false;
   panel.dataset.view = "cluster";
-  panel.innerHTML = `<article class="card">
+  record({ view: "cluster", id: c.id, label: c.label });
+  panel.innerHTML = `${panelTop()}<article class="card">
     <div class="cat">Groupe de textes</div>
     <h2>${esc(c.label)}</h2>
     ${c.description ? `<p class="text">${esc(c.description)}</p>` : ""}
@@ -116,8 +113,8 @@ export function openCluster(c, { fly = true, focus = true } = {}) {
   </article>`;
   panel.querySelectorAll("button[data-i]").forEach(b =>
     b.addEventListener("click", () => select(+b.dataset.i)));
+  bindPanelTop();
   panel.scrollTop = 0;
-  history.replaceState(null, "", "#groupe=" + encodeURIComponent(c.label));
   if (focus) focusPanel(`Groupe ${c.label} : ${c.n} textes`);
   if (fly) fitPoints(members);      // la plupart des étoiles du groupe à l'écran
   draw();
@@ -126,19 +123,21 @@ export function openCluster(c, { fly = true, focus = true } = {}) {
 export function closePanel() {
   resetContext();
   cancelPath();
+  S.selected = -1;
   panel.hidden = true;
   panel.dataset.view = "";
-  clearHash();
+  record({ view: "none" });       // fermer est une étape : Retour rouvre ce qu'on vient de fermer
   draw();
 }
 
 
 export function showHelp() {
   resetContext();
-  if (S.selected >= 0) { S.selected = -1; clearHash(); }
+  S.selected = -1;
   panel.hidden = false;
   panel.dataset.view = "help";
-  panel.innerHTML = `<article class="card">
+  record({ view: "help" });
+  panel.innerHTML = `${panelTop()}<article class="card">
     <h2>Comment lire cette carte</h2>
     <ul class="help">
       <li>Chaque point est un texte du jeu : objet, arme, armure, dialogue…</li>
@@ -146,7 +145,19 @@ export function showHelp() {
       <li>Les noms écrits sur la carte désignent des groupes de textes voisins.</li>
       <li>Cliquer un point pour le lire, ou un nom pour parcourir son groupe.</li>
     </ul>
+    <h3>Ce qu'on peut faire</h3>
+    <ul class="help">
+      <li><strong>Chercher</strong> en français ou en anglais : « qui a tué Godwyn », « Malenia ».</li>
+      <li><strong>Personnages et lieux</strong> : tous les textes qui parlent de Ranni, de Leyndell…, et les noms qui leur sont liés.</li>
+      <li><strong>Échos</strong> : sous chaque texte, ceux qui en sont le plus proches par le sens.</li>
+      <li><strong>Tracer un chemin</strong> entre deux textes, d'écho en écho, depuis la fiche d'un texte.</li>
+      <li><strong>Autre agencement</strong>, en bas à droite : la même carte disposée autrement ; ce qui reste proche l'est vraiment.</li>
+      <li><strong>Retour</strong> (ou le bouton du navigateur) revient à la fiche précédente ; Échap ferme.</li>
+      <li>Au doigt : toucher un endroit dense zoome, puis propose les textes qui s'y trouvent.</li>
+      <li>Au clavier : Tab jusqu'à la carte, flèches pour se déplacer, + et − pour zoomer, Entrée pour ouvrir l'étoile visée.</li>
+    </ul>
   </article>`;
+  bindPanelTop();
   panel.scrollTop = 0;
   focusPanel("Aide : comment lire cette carte");
   draw();
@@ -161,6 +172,12 @@ export function openFromHash() {
     if (c) openCluster(c);
     return;
   }
+  if (name.startsWith("chemin=")) {
+    const [a, b] = location.hash.slice(8).split("&").map(decodeURIComponent)
+      .map(n => S.docs.findIndex(x => x.name === n));
+    if (a >= 0 && b >= 0) showPath(a, b);
+    return;
+  }
   if (name.startsWith("entite=")) {
     const e = S.entities.find(x => x.name === name.slice(7));
     if (e) openEntity(e);
@@ -171,7 +188,20 @@ export function openFromHash() {
 }
 
 // lien collé dans la barre d'adresse sans recharger la page (replaceState ne déclenche pas l'événement)
-addEventListener("hashchange", () => { if (S.docs.length) openFromHash(); });
+addEventListener("hashchange", () => { if (S.docs.length && !poppedHere()) openFromHash(); });
+
+// Rouvre une entrée de l'historique (bouton Retour, « Retour à … »)
+setOpener(e => {
+  if (e.view !== "results" && !e.q && S.query) resetSearch();
+  if (e.view === "doc") select(e.i);
+  else if (e.view === "cluster") { const c = clusterById(e.id) || S.clusters.find(x => x.label === e.label); if (c) openCluster(c); }
+  else if (e.view === "entity") { const x = S.entities.find(y => y.name === e.name); if (x) openEntity(x); }
+  else if (e.view === "index") showIndex();
+  else if (e.view === "help") showHelp();
+  else if (e.view === "path") showPath(e.a, e.b);
+  else if (e.view === "results") { input.value = e.q; runSearch(); }
+  else closePanel();
+});
 
 
 // ------------------------------------------------------------------ groupe d'un texte
@@ -219,6 +249,7 @@ function showPath(a, b) {
   resetContext();
   S.selected = -1;
   S.path = path; S.pathSet = path ? new Set(path) : null;
+  record({ view: "path", a, b });
   showPathView({ from: a, to: b });
   if (path) fitPoints(path.map(i => S.docs[i]), 0);
 }
@@ -226,16 +257,16 @@ function showPath(a, b) {
 function showPathView({ from, to } = {}) {
   panel.hidden = false;
   panel.dataset.view = "path";
-  clearHash();
   if (!S.path) {
-    panel.innerHTML = `<article class="card"><h2>Chemin d'échos</h2>
+    panel.innerHTML = `${panelTop()}<article class="card"><h2>Chemin d'échos</h2>
       <p class="text">Aucun chemin d'échos ne relie « ${esc(S.docs[from].name)} » à « ${esc(S.docs[to].name)} ».</p></article>`;
+    bindPanelTop();
     draw();
     return;
   }
   const first = S.docs[S.path[0]], last = S.docs[S.path[S.path.length - 1]];
   const hops = S.path.length - 1;
-  panel.innerHTML = `<article class="card">
+  panel.innerHTML = `${panelTop()}<article class="card">
     <div class="cat">Chemin d'échos</div>
     <h2>${esc(first.name)} → ${esc(last.name)}</h2>
     <p class="count">${hops} ${hops > 1 ? "échos" : "écho"} : à chaque étape, le texte suivant est l'un des plus proches par le sens.</p>
@@ -245,6 +276,7 @@ function showPathView({ from, to } = {}) {
     }).join("")}</ol>
   </article>`;
   panel.querySelectorAll("button[data-i]").forEach(b => b.addEventListener("click", () => select(+b.dataset.i)));
+  bindPanelTop();
   panel.scrollTop = 0;
   focusPanel(`Chemin de ${hops} ${hops > 1 ? "échos" : "écho"}`);
   draw();

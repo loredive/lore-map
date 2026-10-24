@@ -26,6 +26,7 @@ export const S = {
   cam: { x: 0, y: 0, s: 1 },
   W: 0, H: 0, dpr: 1, base: 1,
   hover: -1, selected: -1,
+  kbd: false,            // la carte a le focus clavier : viseur au centre
   views: [], view: 0, morphing: false,   // projections disponibles, vue affichée, transition en cours
   cluster: null,         // groupe ouvert dans le panneau
   entities: [], docEntities: [],   // personnages, lieux… et, par texte, ceux qu'il mentionne
@@ -36,7 +37,6 @@ export const S = {
   hits: null,            // Map index -> rang, résultats affichés sur la carte
   results: [],           // liste ordonnée d'indices
   hidden: new Set(),     // catégories masquées
-  returnTo: -1,          // fiche ouverte quand une recherche a commencé : on peut y revenir
   pathFrom: -1,          // texte de départ d'un chemin en attente de son arrivée
   path: null, pathSet: null,   // chemin d'échos affiché (indices) et le même en Set
   echoAdj: null,         // graphe des échos, construit au premier chemin
@@ -78,4 +78,3 @@ export function focusPanel(msg) {
   if (msg) announce(msg);
 }
 
-export function clearHash() { history.replaceState(null, "", location.pathname + location.search); }

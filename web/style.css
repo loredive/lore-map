@@ -106,7 +106,21 @@ body {
 .results .name, .echoes .name { font: 600 1.08rem/1.25 var(--display); color: var(--parch); }
 .results .snip { display: block; margin: .15rem 0 0 1rem; color: var(--faint); font-size: .9rem; line-height: 1.4; }
 mark { background: none; color: var(--grace); }
+.count .refined { color: var(--dim); font-style: italic; }
+.refine {
+  display: block; margin: 0 0 .6rem; padding: .35rem .6rem; min-height: 28px; border: 1px solid var(--rim-strong);
+  border-radius: 4px; background: rgba(167, 182, 214, .06); color: var(--moon); font: italic .9rem var(--body); cursor: pointer;
+}
+.refine:hover, .refine:focus-visible { border-color: var(--grace); color: var(--parch); }
 
+.panel-top { display: flex; justify-content: space-between; align-items: center; gap: .8rem; margin: 0 0 .8rem -.4rem; }
+.panel-top .back, .panel-top .close, .card .to-index {
+  padding: .3rem .4rem; min-height: 28px; border: 0; border-radius: 4px; background: none; text-align: left;
+  color: var(--faint); font: .88rem var(--body); cursor: pointer;
+}
+.panel-top .close { flex: none; margin-left: auto; }
+.panel-top .back:hover, .panel-top .close:hover, .card .to-index:hover { color: var(--parch); }
+.card .to-index { margin: 0 0 .6rem -.4rem; }
 .card .back {
   margin: 0 0 1rem -.4rem; padding: .3rem .4rem; min-height: 28px; border: 0; border-radius: 4px;
   background: none; color: var(--faint); font: .88rem var(--body); cursor: pointer;
@@ -186,6 +200,20 @@ body:has(#panel:not([hidden])) .views { right: calc(min(420px, 100vw) + 16px); }
 }
 #tip .name { display: block; font: 600 1.02rem/1.2 var(--display); color: var(--parch); }
 #tip .sub { color: var(--faint); font-size: .8rem; }
+.chooser {
+  position: fixed; z-index: 6; width: min(300px, calc(100vw - 16px)); padding: .5rem .4rem .4rem;
+  background: rgba(13, 18, 32, .97); border: 1px solid var(--rim-strong); border-radius: 6px;
+}
+.chooser[hidden] { display: none; }
+.chooser .title { margin: 0 0 .2rem .4rem; color: var(--faint); font-size: .8rem; }
+.chooser ul { list-style: none; margin: 0; padding: 0; }
+.chooser button {
+  display: flex; align-items: center; gap: .5rem; width: 100%; min-height: 40px; padding: .3rem .4rem;
+  border: 0; border-radius: 4px; background: none; color: var(--parch); text-align: left;
+  font: 600 1rem/1.2 var(--display); cursor: pointer;
+}
+.chooser button:hover, .chooser button:focus-visible { background: rgba(217, 196, 142, .08); }
+.chooser button.group { color: var(--grace); font-style: italic; }
 
 #status {
   position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);

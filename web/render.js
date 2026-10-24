@@ -31,6 +31,25 @@ export function nearest(wx, wy, wr) {
   return best;
 }
 
+// Toutes les étoiles visibles à moins de px pixels de l'écran (sx, sy), les plus proches d'abord :
+// [[indice, distance en pixels]]
+export function starsNear(sx, sy, px) {
+  if (S.morphing) return [];
+  const k = S.cam.s * S.base, wr = px / k;
+  const wx = S.cam.x + (sx - S.W / 2) / k, wy = S.cam.y - (sy - S.H / 2) / k;
+  const r = Math.ceil(wr / CELL), cx = Math.floor(wx / CELL), cy = Math.floor(wy / CELL);
+  const out = [];
+  for (let i = cx - r; i <= cx + r; i++) for (let j = cy - r; j <= cy + r; j++) {
+    for (const n of S.grid.get(cellKey(i, j)) || []) {
+      const d = S.docs[n];
+      if (S.hidden.has(d.cat) || (S.hits && !S.hits.has(n))) continue;
+      const dist = Math.hypot(d.x - wx, d.y - wy) * k;
+      if (dist <= px) out.push([n, dist]);
+    }
+  }
+  return out.sort((a, b) => a[1] - b[1]);
+}
+
 // ------------------------------------------------------------------ contours des groupes
 // Comme les frontières des constellations sur les atlas anciens : l'enveloppe convexe des
 // 90 % de textes les plus centraux du groupe (les isolés tireraient le contour), arrondie.
@@ -239,6 +258,18 @@ export function render() {
   S.labelBoxes = [];
   if (!S.hits && !sel && !S.morphing && !S.path) drawClusterLabels();
 
+  // 4 bis. au clavier : un viseur au centre de la partie visible de la carte
+  if (S.kbd) {
+    const [cx, cy] = viewCenter();
+    ctx.save();
+    ctx.strokeStyle = GRACE; ctx.globalAlpha = 0.7; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(cx, cy, 30, 0, Math.PI * 2); ctx.stroke();
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      ctx.beginPath(); ctx.moveTo(cx + dx * 36, cy + dy * 36); ctx.lineTo(cx + dx * 44, cy + dy * 44); ctx.stroke();
+    }
+    ctx.restore();
+  }
+
   // 5. étoile survolée
   if (S.hover >= 0) {
     const d = S.docs[S.hover];
@@ -328,6 +359,12 @@ export function setHover(i) {
   if (i < 0) tip.hidden = true;
   canvas.classList.toggle("pointing", i >= 0);
   draw();
+}
+
+// Centre de la partie visible de la carte (à gauche du panneau ouvert, sur grand écran)
+export function viewCenter() {
+  const wide = innerWidth > 760 && !panel.hidden;
+  return [wide ? panel.getBoundingClientRect().left / 2 : S.W / 2, innerWidth <= 760 && !panel.hidden ? S.H * 0.22 : S.H / 2];
 }
 
 // Centre la vue sur un point en tenant compte du panneau ouvert à droite

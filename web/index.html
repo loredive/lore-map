@@ -11,7 +11,7 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <canvas id="sky" aria-label="Carte des textes d'Elden Ring : chaque étoile est un texte, les textes proches parlent des mêmes choses"></canvas>
+  <canvas id="sky" tabindex="0" aria-label="Carte des textes d'Elden Ring : chaque étoile est un texte, les textes proches parlent des mêmes choses. Flèches pour se déplacer, plus et moins pour zoomer, Entrée pour ouvrir l'étoile visée."></canvas>
 
   <header class="masthead">
     <h1>La carte du lore</h1>
@@ -46,6 +46,7 @@
        title="Deux façons de disposer les mêmes textes sur la carte : seules les proximités ont un sens, pas les positions."></div>
 
   <div id="tip" role="tooltip" hidden></div>
+  <div id="chooser" class="chooser" role="dialog" aria-label="Plusieurs textes ici" hidden></div>
   <div id="status" role="status">Chargement des textes…</div>
 
   <p class="credit">Textes d'Elden Ring © FromSoftware / Bandai Namco, extraits par la communauté. Projet de fan non commercial.</p>
