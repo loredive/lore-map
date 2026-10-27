@@ -283,6 +283,21 @@ function buildLegend() {
   const counts = new Map();
   for (const d of S.docs) counts.set(d.cat, (counts.get(d.cat) || 0) + 1);
   const nav = $("#legend");
+  // téléphone : la légende est repliée derrière ce bouton (style.css le cache sur grand écran)
+  const toggle = document.createElement("button");
+  toggle.type = "button";
+  toggle.className = "legend-toggle";
+  toggle.setAttribute("aria-expanded", "false");
+  const label = () => {
+    const off = S.hidden.size + (S.hideDlc ? 1 : 0);
+    toggle.textContent = off ? `Categories · ${off} hidden` : "Categories";
+  };
+  label();
+  toggle.addEventListener("click", () => {
+    const open = nav.classList.toggle("open");
+    toggle.setAttribute("aria-expanded", String(open));
+  });
+  nav.append(toggle);
   S.cats.forEach((c, i) => {
     const b = document.createElement("button");
     b.type = "button";
@@ -293,6 +308,7 @@ function buildLegend() {
       const on = S.hidden.has(i);
       on ? S.hidden.delete(i) : S.hidden.add(i);
       b.setAttribute("aria-pressed", String(on));
+      label();
       refreshVisible();
     });
     nav.append(b);
@@ -309,6 +325,7 @@ function buildLegend() {
     b.addEventListener("click", () => {
       S.hideDlc = !S.hideDlc;
       b.setAttribute("aria-pressed", String(!S.hideDlc));
+      label();
       refreshVisible();
     });
     nav.append(b);

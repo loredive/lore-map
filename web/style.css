@@ -89,6 +89,8 @@ body {
 .legend button[aria-pressed="false"] { color: var(--dim); text-decoration: line-through; }
 .legend button[aria-pressed="false"] .dot { opacity: .25; }
 .legend .n { color: var(--faint); font-size: .8rem; }
+.legend .legend-toggle { display: none; color: var(--moon); font-style: italic; text-decoration: underline; text-underline-offset: 3px; }
+.legend .legend-toggle[aria-expanded="true"] { text-decoration: none; }
 
 .dot {
   flex: none; width: 8px; height: 8px; border-radius: 50%;
@@ -311,8 +313,11 @@ body:has(#panel:not([hidden])) .views { right: calc(var(--panel-w) + 16px); }
   }
   .masthead, .seek, .views { z-index: 1; }
   .legend { left: 10px; bottom: 48px; }      /* au-dessus du crédit, qui tient sur deux lignes */
-  .legend .label, .legend .n { display: none; }
-  .legend button { min-width: 32px; min-height: 32px; justify-content: center; }   /* cibles tactiles */
+  /* repliée derrière « Categories » ; ouverte, la liste complète sur un fond qui la détache des étoiles */
+  .legend .legend-toggle { display: flex; }
+  .legend:not(.open) button:not(.legend-toggle) { display: none; }
+  .legend.open { padding: .4rem; border: 1px solid var(--rim); border-radius: 8px; background: rgba(16, 21, 37, .95); }
+  .legend button { min-height: 36px; }      /* cibles tactiles */
   .credit { left: 16px; bottom: 8px; font-size: .68rem; }
   #panel {
     top: auto; height: 56vh; width: 100vw; padding: 20px 16px 24px;
