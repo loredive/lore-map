@@ -1,0 +1,67 @@
+name: Tests and Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      # the tests don't need the embedding model, only these
+      - run: uv run --no-project --with pytest --with numpy --with scikit-learn --with pillow pytest
+      - run: node --test tests/*.test.mjs
+
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: true
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+
+      # Elden Ring icons come from the Fan API; cached so a deploy doesn't download them all again
+      - uses: actions/cache@v4
+        with:
+          path: |
+            web/img/elden-ring
+            .cache/fanapi
+          key: elden-ring-icons-${{ hashFiles('web/data/elden-ring/lore.json', 'images.py') }}
+          restore-keys: elden-ring-icons-
+      - name: Elden Ring icons
+        continue-on-error: true    # if the API is down, the page still works without icons
+        run: uv run --no-project --with pillow python images.py --game elden-ring
+
+      # Bloodborne icons come from the game files, so they are uploaded once to the "icons" release
+      - name: Bloodborne icons
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release download icons --pattern img-bloodborne.zip --dir /tmp; then
+            mkdir -p web/img/bloodborne && unzip -q -o /tmp/img-bloodborne.zip -d web/img/bloodborne
+          else
+            echo "No icons release, Bloodborne is deployed without icons"
+          fi
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web
+      - id: deployment
+        uses: actions/deploy-pages@v4
