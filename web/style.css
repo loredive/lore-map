@@ -517,6 +517,8 @@ body.sky-d[data-game="bloodborne"] {
 .chat-form button:hover, .chat-actions button:hover { background: rgba(217, 196, 142, .2); }
 .chat-settings { display: flex; flex-direction: column; gap: .8rem; margin-top: 1rem; }
 .chat-settings label { display: flex; flex-direction: column; gap: .3rem; color: var(--faint); font-size: .9rem; }
+.chat-settings .model-field { display: flex; flex-direction: column; gap: .4rem; }
+.chat-settings .model-hint { margin: 0; }
 .chat-settings label.check { flex-direction: row; align-items: center; gap: .5rem; color: var(--parch); }
 .chat-settings a { color: var(--moon); }
 .chat-actions { display: flex; gap: .6rem; }

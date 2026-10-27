@@ -10,11 +10,13 @@ export const PROVIDERS = {
   },
   openai: {
     label: "OpenAI", keyHint: "sk-…", keyUrl: "https://platform.openai.com/api-keys",
-    base: "https://api.openai.com/v1", models: [],
+    base: "https://api.openai.com/v1", models: ["gpt-6.1-sol", "gpt-6.1-terra"],
   },
   openrouter: {
     label: "OpenRouter (many models, some free)", keyHint: "sk-or-…", keyUrl: "https://openrouter.ai/keys",
-    base: "https://openrouter.ai/api/v1", models: [],
+    base: "https://openrouter.ai/api/v1",
+    models: ["anthropic/claude-opus-5.5", "openai/gpt-6.1-sol", "google/gemini-4-argon", "deepseek/deepseek-v4.1-flash"],
+    other: "Any model listed on openrouter.ai/models, including the free ones ending in :free.",
   },
 };
 

@@ -36,12 +36,16 @@ function saveSettings({ provider, model, key, remember }) {
 let memoryKey = "";   // si le stockage est bloqué
 const settings = () => { const s = loadSettings(); return { ...s, key: s.key || memoryKey }; };
 
+// une liste de modèles courants (le premier par défaut) et « Autre modèle… » pour taper un autre nom
+const OTHER = "__other";
 function modelField(provider, model) {
   const p = PROVIDERS[provider];
-  if (p.models.length) {
-    return `<select name="model">${p.models.map(m => `<option${m === model ? " selected" : ""}>${esc(m)}</option>`).join("")}</select>`;
-  }
-  return `<input name="model" required placeholder="Model name, as listed by ${esc(p.label.split(" ")[0])}" value="${esc(model)}" autocomplete="off" spellcheck="false">`;
+  const other = !!model && !p.models.includes(model);
+  return `<select name="model">${p.models.map(m => `<option${m === model ? " selected" : ""}>${esc(m)}</option>`).join("")}
+      <option value="${OTHER}"${other ? " selected" : ""}>Other model…</option></select>
+    <input name="modelOther" placeholder="Model name, as listed by ${esc(p.label.split(" ")[0])}" value="${other ? esc(model) : ""}"
+      autocomplete="off" spellcheck="false"${other ? " required" : " hidden"}>
+    ${p.other ? `<span class="hint model-hint"${other ? "" : " hidden"}>${esc(p.other)}</span>` : ""}`;
 }
 
 function showSettings(note = "") {
@@ -69,9 +73,18 @@ function showSettings(note = "") {
     form.key.placeholder = PROVIDERS[p].keyHint;
     panel.querySelector(".key-link").href = PROVIDERS[p].keyUrl;
   });
+  form.addEventListener("change", e => {
+    if (e.target.name !== "model") return;
+    const other = e.target.value === OTHER;
+    form.modelOther.hidden = !other;
+    form.modelOther.required = other;
+    panel.querySelector(".model-hint")?.toggleAttribute("hidden", !other);
+    if (other) form.modelOther.focus();
+  });
   form.addEventListener("submit", e => {
     e.preventDefault();
-    saveSettings({ provider: form.provider.value, model: form.model.value.trim(), key: form.key.value.trim(),
+    const model = form.model.value === OTHER ? form.modelOther.value.trim() : form.model.value;
+    saveSettings({ provider: form.provider.value, model, key: form.key.value.trim(),
       remember: form.remember.checked });
     showChat();
   });
