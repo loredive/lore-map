@@ -1,19 +1,32 @@
 // Personnages, lieux, factions et notions : index, fiches et pastilles.
-import { S, $, panel, esc, fold, resetContext, clusterById, docRow, focusPanel } from "./state.js";
-import { draw, fitPoints } from "./render.js";
+import { S, $, panel, esc, fold, resetContext, clusterById, docRow, focusPanel, isHidden } from "./state.js";
+import { draw, frameFrom } from "./render.js";
 import { select, openCluster, snippet, mark, panelTop, bindPanelTop } from "./panel.js";
 import { record } from "./nav.js";
 import { speakersFor, dialogueButtons, bindDialogueButtons } from "./dialogue-ui.js";
+import { mentionSpans } from "./mentions.js";
 
 // ------------------------------------------------------------------ personnages, lieux…
-const KIND_LABELS = { personnage: ["Personnage", "Personnages"], lieu: ["Lieu", "Lieux"],
-                      faction: ["Faction", "Factions"], notion: ["Notion", "Notions"] };
+export const KIND_LABELS = { personnage: ["Character", "Characters"], lieu: ["Place", "Places"],
+                      faction: ["Faction", "Factions"], notion: ["Concept", "Concepts"] };
 
 // count : le chiffre de la pastille (par défaut, le nombre de textes qui en parlent)
 export function entityChips(list, count = e => e.docs.length) {
   return `<div class="chips">${list.map(e => `<button type="button" class="chip" data-e="${S.entities.indexOf(e)}">
     ${esc(e.label)} <span class="n">${count(e)}</span></button>`).join("")}</div>`;
 }
+// Le texte d'une fiche en HTML, la première mention de chaque entité devenue un lien vers sa fiche.
+// mentions : les entités que prepare.py a trouvées dans ce texte ; terms : mots surlignés (recherche).
+export function linkText(text, mentions, terms = []) {
+  let html = "", at = 0;
+  for (const [a, b, e] of mentionSpans(text, mentions)) {
+    html += mark(esc(text.slice(at, a)), terms) +
+      `<button type="button" class="ent" data-e="${S.entities.indexOf(e)}" title="${esc(e.label)} · ${e.docs.length} texts">${mark(esc(text.slice(a, b)), terms)}</button>`;
+    at = b;
+  }
+  return html + mark(esc(text.slice(at)), terms);
+}
+
 export function bindEntityButtons() {
   panel.querySelectorAll("button[data-e]").forEach(b =>
     b.addEventListener("click", () => openEntity(S.entities[+b.dataset.e])));
@@ -26,14 +39,14 @@ export function showIndex() {
   panel.dataset.view = "index";
   record({ view: "index" });
   panel.innerHTML = `${panelTop()}<article class="card">
-    <h2>Personnages et lieux</h2>
-    <p class="hint">Le chiffre indique combien de textes en parlent. Chacun ouvre ces textes et les fait briller sur la carte.</p>
+    <h2>Characters and places</h2>
+    <p class="hint">The number: how many texts mention it.</p>
     ${Object.entries(KIND_LABELS).map(([k, [, plural]]) => {
       const list = S.entities.filter(e => e.kind === k);
       return list.length ? `<h3>${plural}</h3>${entityChips(list)}` : "";
     }).join("")}
     <h3>Dialogues</h3>
-    <p class="hint">Tout ce que dit un personnage, dans l'ordre (le chiffre : nombre de passages).</p>
+    <p class="hint">Everything a character says, in order.</p>
     <div class="chips">${[...S.dialogues].filter(([, l]) => l.length > 1).sort((a, b) => b[1].length - a[1].length)
       .map(([sp, l]) => `<button type="button" class="chip" data-sp="${esc(sp)}">${esc(sp)} <span class="n">${l.length}</span></button>`).join("")}</div>
   </article>`;
@@ -41,7 +54,7 @@ export function showIndex() {
   bindDialogueButtons();
   bindPanelTop();
   panel.scrollTop = 0;
-  focusPanel("Personnages et lieux");
+  focusPanel("Characters and places");
   draw();
 }
 
@@ -51,7 +64,7 @@ export function openEntity(e, { fly = true, focus = true } = {}) {
   S.selected = -1;
   S.lit = new Set(e.docs);
   const docs = e.docs.map(i => S.docs[i]);
-  const visible = docs.filter(d => !S.hidden.has(d.cat));
+  const visible = docs.filter(d => !isHidden(d));
   // snippet() cherche dans le texte replié (minuscules, sans accents), mark() surligne les noms tels quels
   const names = [e.name, ...e.aliases], folded = names.map(fold);
   // les groupes où l'entité revient le plus : là où son histoire se raconte
@@ -66,19 +79,20 @@ export function openEntity(e, { fly = true, focus = true } = {}) {
   panel.dataset.view = "entity";
   record({ view: "entity", name: e.name });
   panel.innerHTML = `${panelTop()}<article class="card">
-    <button type="button" class="to-index">Tous les personnages et lieux</button>
+    <button type="button" class="to-index">All characters and places</button>
     <div class="cat">${KIND_LABELS[e.kind][0]}</div>
     <h2>${esc(e.label)}</h2>
-    ${e.label !== e.name ? `<p class="jpname">${esc(e.name)} dans les textes</p>` : ""}
+    ${e.label !== e.name ? `<p class="jpname">${esc(e.name)} in the texts</p>` : ""}
     ${speakersFor(e).length ? `<div class="tools">${dialogueButtons(speakersFor(e))}</div>` : ""}
-    <p class="count">${e.docs.length} textes en parlent${visible.length < docs.length ? `, dont ${visible.length} dans les catégories affichées` : ""}. Ils brillent sur la carte.</p>
-    ${related.length ? `<h3>Liés à</h3>
-    <p class="hint">Les noms cités dans les mêmes textes, par affinité : d'abord ceux qui reviennent surtout avec celui-ci, pas seulement les plus fréquents. Le chiffre : textes en commun.</p>
+    <p class="count">${e.docs.length} texts mention it${visible.length < docs.length ? `, ${visible.length} of them shown` : ""}.</p>
+    <p class="hint">On the map, the brightest stars talk about it most.</p>
+    ${related.length ? `<h3>Linked to</h3>
+    <p class="hint">Names that come up with it most (the number: texts in common).</p>
     ${entityChips(related.map(([r]) => r), r => shared.get(r))}` : ""}
-    ${groups.length ? `<h3>Surtout dans</h3><div class="chips">${groups.map(([c, n]) =>
+    ${groups.length ? `<h3>Mostly in</h3><div class="chips">${groups.map(([c, n]) =>
       `<button type="button" class="chip" data-c="${c.id}">${esc(c.label)} <span class="n">${n}</span></button>`).join("")}</div>` : ""}
-    <h3>Les textes</h3>
-    <p class="hint">Ceux qui en parlent le plus d'abord ; ceux qui ne la nomment que dans leur titre en dernier.</p>
+    <h3>The texts</h3>
+    <p class="hint">Most relevant first.</p>
     <ol class="results">${visible.map(d => docRow(d, mark(esc(d.name), names), mark(esc(snippet(d.text, folded)), names))).join("")}</ol>
   </article>`;
   panel.querySelector(".to-index").addEventListener("click", showIndex);
@@ -89,8 +103,8 @@ export function openEntity(e, { fly = true, focus = true } = {}) {
   panel.querySelectorAll("button[data-c]").forEach(b =>
     b.addEventListener("click", () => openCluster(clusterById(+b.dataset.c))));
   panel.scrollTop = 0;
-  if (focus) focusPanel(`${e.label} : ${e.docs.length} textes en parlent`);
-  if (fly) fitPoints(docs);
+  if (focus) focusPanel(`${e.label}: ${e.docs.length} texts mention it`);
+  if (fly) frameFrom(docs);     // avec le texte d'où l'on vient, s'il y en a un
   draw();
 }
 $("#index").addEventListener("click", showIndex);

@@ -95,7 +95,11 @@ export function rrf(lists, k = 60, weights = lists.map(() => 1)) {
 export const POOL = 300;   // candidats gardés par chaque méthode avant la fusion
 
 // Le nom compte double : un texte qui porte le mot cherché dans son nom passe devant.
-export function corpusText(d) { return `${d.name} ${d.name} ${d.text}`; }
+// avec une seconde langue (Bloodborne : le texte anglais), son nom et son texte comptent aussi :
+// « Saw Cleaver » trouve « Couperet-scie »
+export function corpusText(d) {
+  return `${d.name} ${d.name} ${d.text}` + (d.alt ? ` ${d.altName} ${d.altName} ${d.alt}` : "");
+}
 
 export function lexicalRanking(bm25, query) { return bm25.search(query).slice(0, POOL); }
 
@@ -111,7 +115,7 @@ export function hybridRanking(lexical, queryVec, emb, dim) {
 }
 
 // ------------------------------------------------------------------ recherche précise
-// "expression exacte", +terme ou A + B (exigés), -terme (exclu), dans:catégorie. Le reste (et les
+// "expression exacte", +terme ou A + B (exigés), -terme (exclu), in:catégorie (ou dans:). Le reste (et les
 // expressions exactes) sert au classement ; une requête sans ces signes est rendue telle quelle.
 export function fold(s) { return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").trim(); }
 
@@ -121,7 +125,7 @@ export function parseQuery(raw) {
   const free = [], must = [], mustNot = [], cats = [];
   let requireNext = false;
   for (const tok of rest.split(/\s+/).filter(Boolean)) {
-    if (/^dans:./i.test(tok)) cats.push(fold(tok.slice(5)));
+    if (/^(in|dans):./i.test(tok)) cats.push(fold(tok.slice(tok.indexOf(":") + 1)));
     else if (tok === "+") { if (free.length) must.push(fold(free.pop())); requireNext = true; }
     else if (tok.length > 1 && tok[0] === "+") must.push(fold(tok.slice(1)));
     else if (tok.length > 1 && tok[0] === "-") mustNot.push(fold(tok.slice(1)));

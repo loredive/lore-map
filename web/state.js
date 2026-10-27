@@ -1,15 +1,9 @@
 // État partagé de la page, constantes et petits utilitaires communs aux modules.
 
-export const CAT_COLORS = {
-  "Objets": "#d9c48e",
-  "Armes": "#cf8e66",
-  "Armures": "#9db8a3",
-  "Talismans": "#c7a3d1",
-  "Cendres de guerre": "#7fc0cc",
-  "Compétences": "#e3dcc0",
-  "Écrans de chargement": "#8394c4",
-  "Dialogues": "#a7b6d6",
-};
+// Jeu affiché : ?jeu=bloodborne ; sans paramètre (ou jeu inconnu), Elden Ring. Ses données sont
+// dans data/<jeu>/, ses images dans img/<jeu>/, et data/<jeu>/game.json donne couleurs et exemples.
+export const DEFAULT_GAME = "elden-ring";
+export const dataPath = f => `data/${S.game}/${f}`;
 export const GRACE = "#f0dc9f";
 export const MAX_HITS_ON_MAP = 150;
 export const MAX_RESULTS = 40;
@@ -22,6 +16,7 @@ export const canvas = $("#sky"), ctx = canvas.getContext("2d");
 export const panel = $("#panel"), tip = $("#tip"), status = $("#status"), input = $("#q"), mode = $("#mode");
 
 export const S = {
+  game: DEFAULT_GAME, games: [], colors: {}, ui: {},   // jeu affiché, jeux disponibles, game.json
   docs: [], cats: [], clusters: [], meta: null,
   cam: { x: 0, y: 0, s: 1 },
   W: 0, H: 0, dpr: 1, base: 1,
@@ -43,9 +38,29 @@ export const S = {
   dialogues: new Map(), thread: null,   // passages de chaque PNJ ; fil du dialogue ouvert         // graphe des échos, construit au premier chemin
   bm25: null, emb: null, extractor: null, semanticState: "off",
   grid: null, sprites: {}, dust: [],
+  images: new Map(),     // nom du texte -> icône (ou portrait de l'interlocuteur), data/images.json
+  visited: new Set(), trailDocs: [], cameFrom: -1, trailShown: false,   // parcours de lecture (trail-ui.js)
+  tours: [], tour: null, tourStep: -1,   // visites guidées (tours-ui.js) ; visite ouverte et son étape
 };
 
-export function colorOf(catIdx) { return CAT_COLORS[S.cats[catIdx]] || "#cccccc"; }
+// Icône d'un texte, ou portrait du PNJ pour un passage de dialogue ; "" sans image.
+// Décorative (alt vide) : le nom est toujours écrit à côté.
+export function portrait(d, cls, size) {
+  const f = S.images.get(d.name);
+  // portrait de PNJ (paysage) : recadré pour remplir le cadre ; icône d'objet : entière
+  return f ? `<img class="${cls}${f.startsWith("pnj-") ? " face" : ""}" src="img/${S.game}/${f}.webp" alt="" width="${size}" height="${size}" loading="lazy" decoding="async">` : "";
+}
+
+export function colorOf(catIdx) { return S.colors[S.cats[catIdx]] || "#cccccc"; }
+
+// texte masqué : sa catégorie est décochée dans la légende, ou il vient du DLC et le DLC est masqué
+// les étoiles d'un groupe dans la vue k ; dans les rayons, celles de son plus gros bloc seulement
+export function membersIn(c, k) {
+  const b = c.views[k].block;
+  return b ? b.map(i => S.docs[i]) : S.docs.filter(d => d.cluster === c.id);
+}
+
+export function isHidden(d) { return S.hidden.has(d.cat) || (S.hideDlc && d.dlc); }
 
 export function esc(s) {
   return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -55,7 +70,7 @@ export function esc(s) {
 export function fold(s) { return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").trim(); }
 
 // Ce qu'affiche le panneau (groupe, entité, chemin) : un seul à la fois.
-export function resetContext() { S.cluster = S.entity = S.lit = S.path = S.pathSet = S.thread = null; }
+export function resetContext() { S.cluster = S.entity = S.lit = S.path = S.pathSet = S.thread = S.tour = null; S.tourStep = -1; }
 
 export function clusterById(id) { return S.clusters.find(c => c.id === id); }
 

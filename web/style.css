@@ -11,6 +11,7 @@
   --display: "Cormorant Garamond", "Garamond", Georgia, serif;
   --body: "EB Garamond", "Garamond", Georgia, serif;
   --jp: "Noto Serif JP", "Hiragino Mincho ProN", serif;
+  --panel-w: min(420px, 100vw);   /* largeur du panneau ; la recherche et le sélecteur s'y alignent */
   color-scheme: dark;
 }
 
@@ -31,6 +32,9 @@ body {
 
 :focus-visible { outline: 2px solid var(--grace); outline-offset: 2px; }
 
+/* textes posés sur le ciel : un halo sombre les garde lisibles devant les étoiles qui brillent */
+.masthead, #mode, .legend, .views, .credit { text-shadow: 0 0 3px var(--night), 0 0 8px var(--night), 0 0 14px var(--night); }
+
 /* ---------- titre ---------- */
 .masthead {
   position: fixed; top: 22px; left: 28px; max-width: 30ch;
@@ -47,6 +51,12 @@ body {
   text-decoration-color: var(--rim); text-underline-offset: 3px;
 }
 .help-btn:hover { color: var(--parch); text-decoration-color: var(--moon); }
+/* sélecteur de jeu (seulement quand plusieurs jeux ont leurs données) */
+.masthead .games { margin: .3rem 0 0; font-size: .85rem; pointer-events: auto; }
+.masthead .games a { color: var(--moon); text-underline-offset: 3px; text-decoration-color: var(--rim); }
+.masthead .games a:hover { color: var(--parch); }
+.masthead .games a[aria-current] { color: var(--grace); text-decoration: none; font-style: italic; }
+.masthead .games .sep { margin: 0 .4rem; color: var(--dim); }
 
 /* ---------- recherche ---------- */
 .seek {
@@ -63,6 +73,7 @@ body {
 .seek input:focus { outline: none; border-bottom-color: var(--grace); box-shadow: 0 1px 0 var(--grace); }
 .seek input::-webkit-search-cancel-button { filter: grayscale(1) brightness(1.6); }
 #mode { display: block; margin-top: .3rem; text-align: center; font-size: .8rem; color: var(--faint); min-height: 1.2em; }
+#mode:empty { display: none; }
 
 /* ---------- légende ---------- */
 .legend {
@@ -86,7 +97,7 @@ body {
 
 /* ---------- panneau ---------- */
 #panel {
-  position: fixed; z-index: 3; top: 0; right: 0; bottom: 0; width: min(420px, 100vw);
+  position: fixed; z-index: 3; top: 0; right: 0; bottom: 0; width: var(--panel-w);
   padding: 92px 28px 32px; overflow-y: auto;
   background: linear-gradient(90deg, rgba(18, 24, 41, 0) 0%, rgba(18, 24, 41, .94) 9%, rgba(16, 21, 37, .97) 100%);
   scrollbar-width: thin; scrollbar-color: var(--rim) transparent;
@@ -108,7 +119,7 @@ body {
 mark { background: none; color: var(--grace); }
 .count .refined { color: var(--dim); font-style: italic; }
 .understood { margin: 0 0 .4rem; color: var(--moon); font-style: italic; font-size: .92rem; }
-.search-tip { margin: 1rem 0 0; }
+.search-tip { margin: 1rem 0 0; color: var(--faint); font-size: .85rem; line-height: 1.45; }
 /* dialogue d'un PNJ */
 .card .tools .tdial, .card > .tools .tdial { text-align: left; }
 ol.script { list-style: none; margin: 1rem 0 0; padding: 0; }
@@ -131,8 +142,13 @@ ol.script .text { margin: 0; white-space: pre-line; line-height: 1.6; }
   padding: .3rem .4rem; min-height: 28px; border: 0; border-radius: 4px; background: none; text-align: left;
   color: var(--faint); font: .88rem var(--body); cursor: pointer;
 }
-.panel-top .close { flex: none; margin-left: auto; }
-.panel-top .back:hover, .panel-top .close:hover, .card .to-index:hover { color: var(--parch); }
+.panel-top .actions { flex: none; display: flex; gap: .3rem; margin-left: auto; }
+.panel-top .widen {
+  padding: .3rem .4rem; min-height: 28px; border: 0; border-radius: 4px; background: none; cursor: pointer;
+  color: var(--faint); font: .88rem var(--body);
+}
+.panel-top .widen[aria-pressed="true"] { color: var(--grace); }
+.panel-top .back:hover, .panel-top .close:hover, .panel-top .widen:hover, .card .to-index:hover { color: var(--parch); }
 .card .to-index { margin: 0 0 .6rem -.4rem; }
 .card .back {
   margin: 0 0 1rem -.4rem; padding: .3rem .4rem; min-height: 28px; border: 0; border-radius: 4px;
@@ -145,6 +161,8 @@ ol.script .text { margin: 0; white-space: pre-line; line-height: 1.6; }
 .card h2 { margin: .35rem 0 0; font: 600 1.9rem/1.1 var(--display); color: var(--grace); }
 .card .jpname { margin: .25rem 0 0; font: .95rem var(--jp); color: var(--faint); }
 .card .text { margin: 1.1rem 0 0; white-space: pre-line; line-height: 1.62; max-width: 62ch; }
+.card .alt { color: #cfc8b6; }
+.card .alt[hidden] { display: none; }
 .card .jp { margin: 1rem 0 0; font: .95rem/1.85 var(--jp); white-space: pre-line; color: #cfc8b6; }
 .card .tools { display: flex; flex-wrap: wrap; gap: .4rem 1rem; margin: 1.2rem 0 0; }
 .card .tools button {
@@ -162,6 +180,7 @@ ol.script .text { margin: 0; white-space: pre-line; line-height: 1.6; }
 .card .help { margin: 1.1rem 0 0; padding-left: 1.1rem; line-height: 1.62; }
 .card .help li { margin: 0 0 .5rem; }
 .card .help li::marker { color: var(--grace); }
+.card .help code, .search-tip code { font: .85em ui-monospace, monospace; color: var(--parch); white-space: nowrap; }
 .echoes small { color: var(--faint); font-size: .8rem; }
 
 /* ---------- groupe d'un texte, chemin d'échos ---------- */
@@ -177,7 +196,7 @@ ol.script .text { margin: 0; white-space: pre-line; line-height: 1.6; }
   font: italic 600 1rem var(--display);
 }
 .pathbar {
-  position: fixed; z-index: 4; top: 112px; left: 50%; transform: translateX(-50%);
+  position: fixed; z-index: 4; top: 140px; left: 50%; transform: translateX(-50%);
   width: min(560px, calc(100vw - 32px)); padding: .5rem .9rem; text-align: center;
   background: rgba(13, 18, 32, .94); border: 1px solid var(--grace); border-radius: 4px;
   color: var(--parch); font-size: .92rem; line-height: 1.4;
@@ -203,16 +222,20 @@ ol.script .text { margin: 0; white-space: pre-line; line-height: 1.6; }
 .views button:hover { color: var(--parch); }
 .views button[aria-pressed="true"] { color: var(--grace); text-decoration: underline; text-underline-offset: 3px; }
 /* le panneau ouvert ne doit pas cacher le sélecteur */
-body:has(#panel:not([hidden])) .views { right: calc(min(420px, 100vw) + 16px); }
+body:has(#panel:not([hidden])) .views { right: calc(var(--panel-w) + 16px); }
 
 /* ---------- divers ---------- */
 #tip {
-  position: fixed; z-index: 5; max-width: 300px; padding: .45rem .7rem; pointer-events: none;
-  background: rgba(13, 18, 32, .92); border: 1px solid var(--rim); border-radius: 4px;
+  position: fixed; z-index: 5; width: max-content; max-width: 360px; padding: .55rem .8rem .6rem; pointer-events: none;
+  background: rgba(13, 18, 32, .97); border: 1px solid var(--rim); border-radius: 4px;
   font-size: .88rem; line-height: 1.35;
 }
+#tip .thumb { float: left; margin: .1rem .65rem .2rem 0; border-radius: 6px; background: var(--dusk); }
+#tip .snip { clear: both; }
 #tip .name { display: block; font: 600 1.02rem/1.2 var(--display); color: var(--parch); }
-#tip .sub { color: var(--faint); font-size: .8rem; }
+#tip .sub { display: block; color: var(--faint); font-size: .8rem; }
+#tip .echo { display: block; margin-top: .15rem; color: var(--grace); font-style: italic; font-size: .82rem; }
+#tip .snip { display: block; margin-top: .4rem; padding-top: .35rem; border-top: 1px solid rgba(51, 64, 95, .7); color: var(--parch); font-size: .86rem; line-height: 1.42; }
 .chooser {
   position: fixed; z-index: 6; width: min(300px, calc(100vw - 16px)); padding: .5rem .4rem .4rem;
   background: rgba(13, 18, 32, .97); border: 1px solid var(--rim-strong); border-radius: 6px;
@@ -241,10 +264,29 @@ body:has(#panel:not([hidden])) .views { right: calc(min(420px, 100vw) + 16px); }
    qui commence sous elle (sinon elle chevauche le titre, ou le panneau la recouvre) */
 /* (jusqu'à 1359 px : en dessous, la recherche centrée et le panneau de 420 px se touchent) */
 @media (min-width: 761px) and (max-width: 1359px) {
-  .seek { left: auto; right: 24px; transform: none; width: min(420px, calc(100vw - 340px)); }
+  :root { --panel-w: clamp(420px, 38vw, 480px); }
+  .seek { left: auto; right: 24px; transform: none; width: min(calc(var(--panel-w) - 24px), calc(100vw - 340px)); }
   #panel { top: 104px; padding-top: 12px; }
   .credit { max-width: 44ch; }
+  .legend { bottom: 80px; }      /* au-dessus du crédit, qui tient sur trois lignes à cette largeur */
   body:has(#panel:not([hidden])) .credit { display: none; }
+}
+
+/* grand écran : un panneau plus large pour lire les textes longs (dialogues, écrans de chargement) */
+@media (min-width: 1360px) {
+  :root { --panel-w: clamp(420px, 32vw, 560px); }
+}
+
+/* mode lecture (« Agrandir ») : le panneau prend à peu près la moitié de l'écran, la recherche passe
+   au-dessus de lui comme sur tablette, et les textes s'étalent davantage */
+@media (min-width: 761px) {
+  body.reading { --panel-w: clamp(480px, 52vw, 920px); }
+  body.reading:has(#panel:not([hidden])) .seek {
+    left: auto; right: 24px; transform: none; width: min(calc(var(--panel-w) - 24px), calc(100vw - 340px));
+  }
+  body.reading #panel { top: 104px; padding-top: 12px; }
+  body.reading:has(#panel:not([hidden])) .credit { display: none; }
+  body.reading .card .text, body.reading ol.script .text { max-width: 70ch; font-size: 1.06rem; }
 }
 
 @media (max-width: 760px) {
@@ -256,9 +298,18 @@ body:has(#panel:not([hidden])) .views { right: calc(min(420px, 100vw) + 16px); }
   .help-btn { font-size: .82rem; margin-top: .3rem; }
   .masthead { max-width: none; right: 16px; }
   .masthead .links { flex-wrap: nowrap; gap: .9rem; margin-top: .3rem; }
+  /* téléphone : pas la place pour une ligne de plus ; seul l'autre jeu, à droite des liens */
+  .masthead .games { position: absolute; right: 0; bottom: .1rem; margin: 0; font-size: .82rem; }
+  .masthead .games a[aria-current], .masthead .games .sep { display: none; }
   .views, body:has(#panel:not([hidden])) .views { top: 14px; right: 12px; bottom: auto; }
   .views .label { display: none; }
-  .pathbar { top: 150px; }
+  .pathbar { top: 186px; }
+  /* titre et recherche tiennent sur le haut de la carte : un voile les détache des étoiles qui brillent */
+  body::after {
+    content: ""; position: fixed; z-index: 0; top: 0; left: 0; right: 0; height: 170px; pointer-events: none;
+    background: linear-gradient(rgba(13, 18, 32, .92) 0%, rgba(13, 18, 32, .8) 65%, rgba(13, 18, 32, 0) 100%);
+  }
+  .masthead, .seek, .views { z-index: 1; }
   .legend { left: 10px; bottom: 48px; }      /* au-dessus du crédit, qui tient sur deux lignes */
   .legend .label, .legend .n { display: none; }
   .legend button { min-width: 32px; min-height: 32px; justify-content: center; }   /* cibles tactiles */
@@ -289,3 +340,132 @@ body:has(#panel:not([hidden])) .views { right: calc(min(420px, 100vw) + 16px); }
   color: var(--grace); font: italic 600 1.05rem/1.3 var(--display); cursor: pointer;
 }
 .entity-link:hover, .entity-link:focus-visible { border-color: var(--grace); }
+
+/* ---------- icônes et portraits (images.py) ---------- */
+.card-head.has-img { display: grid; grid-template-columns: 96px 1fr; gap: 1rem; align-items: start; }
+.card .portrait {
+  width: 96px; height: 96px; object-fit: contain; border: 1px solid var(--rim); border-radius: 8px;
+  background: radial-gradient(circle at 50% 45%, rgba(217, 196, 142, .14), rgba(29, 37, 64, .7) 70%);
+  box-shadow: 0 0 18px rgba(217, 196, 142, .1);
+}
+.card-head.has-img h2 { margin-top: .2rem; }
+.card .portrait.face, #tip .thumb.face { object-fit: cover; object-position: 50% 30%; }
+#tip .thumb { object-fit: contain; }
+@media (max-width: 760px) {
+  .card-head.has-img { grid-template-columns: 72px 1fr; gap: .8rem; }
+  .card .portrait { width: 72px; height: 72px; }
+  .panel-top .widen { display: none; }   /* le panneau occupe déjà toute la largeur */
+}
+
+/* panneau large : échos et résultats sur deux colonnes */
+#panel { container-type: inline-size; }
+@container (min-width: 760px) {
+  .echoes, .results:not(.path) { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1rem; }
+}
+
+/* ---------- atmosphère (style d) : sous les étoiles, un calque fixe propre à chaque jeu ---------- */
+/* vignette et grain communs ; Elden Ring : une lueur dorée qui monte du bas ;
+   Bloodborne : la grande lune pâle et une brume froide, sur un ciel plus noir */
+body.sky-d::before {          /* (::after sert au voile du titre sur téléphone) */
+  content: ""; position: fixed; inset: 0; pointer-events: none;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse 75% 70% at 50% 45%, transparent 55%, rgba(4, 6, 12, .6) 100%),
+    var(--atmo, none);
+}
+body.sky-d[data-game="elden-ring"] {
+  --atmo: radial-gradient(ellipse 38% 55% at 50% 108%, rgba(240, 210, 140, .16), rgba(240, 210, 140, .05) 55%, transparent 75%);
+}
+body.sky-d[data-game="bloodborne"] {
+  background: radial-gradient(ellipse 120% 90% at 50% 40%, #161b2c 0%, #0c0f1a 55%, #06070d 100%);
+  --atmo:
+    radial-gradient(circle at 84% 16%, #efeadb 0, #e6e0cc 5.2vmin, rgba(230, 224, 204, .22) 5.8vmin,
+                    rgba(200, 205, 220, .08) 14vmin, transparent 32vmin),
+    linear-gradient(to top, rgba(150, 160, 180, .09), transparent 35%);
+}
+@media (max-width: 760px) {
+  /* téléphone : la lune quitte le haut, où passent le titre et la recherche */
+  body.sky-d[data-game="bloodborne"] {
+    --atmo:
+      radial-gradient(circle at 80% 30%, #efeadb 0, #e6e0cc 5.2vmin, rgba(230, 224, 204, .22) 5.8vmin,
+                      rgba(200, 205, 220, .08) 14vmin, transparent 32vmin),
+      linear-gradient(to top, rgba(150, 160, 180, .09), transparent 35%);
+  }
+}
+
+/* noms cités dans un texte : lien discret vers la fiche de l'entité */
+.text .ent {
+  font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer;
+  text-decoration: underline dotted; text-decoration-color: rgba(217, 196, 142, .55); text-underline-offset: 3px;
+}
+.text .ent:hover, .text .ent:focus-visible { color: var(--grace); text-decoration-style: solid; }
+
+/* texte ajouté par un DLC (Bloodborne : The Old Hunters) */
+.dlc-badge {
+  display: inline-block; margin-left: .5rem; padding: 0 .4rem; border: 1px solid rgba(167, 182, 214, .45);
+  border-radius: 999px; color: var(--moon); font-size: .72rem; letter-spacing: .04em; line-height: 1.5;
+}
+.legend button.dlc .dlc-badge { margin: 0 .45rem 0 0; font-size: .62rem; }
+.legend button.dlc[aria-pressed="false"] .dlc-badge { opacity: .35; }
+
+/* parcours de lecture : les derniers pas sous la recherche (trail-ui.js) */
+.trail {
+  display: flex; align-items: center; justify-content: center; flex-wrap: nowrap; gap: .3rem; white-space: nowrap;
+  margin-top: .45rem; font-size: .95rem;
+}
+.trail[hidden] { display: none; }
+.trail .title { color: var(--faint); font: italic .9rem var(--body); margin-right: .15rem; text-shadow: 0 0 6px var(--night); }
+.trail .step {
+  min-width: 0; max-width: 10rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  padding: .2rem .7rem .24rem; border: 1px solid var(--rim); border-radius: 999px;
+  background: rgba(13, 18, 32, .82); color: var(--parch); font: .92rem/1.3 var(--body); cursor: pointer;
+}
+.trail .step:hover, .trail .step:focus-visible { border-color: var(--grace); color: var(--grace); }
+.trail .step.last { border-color: rgba(217, 196, 142, .7); color: var(--grace); }
+.trail .sep { color: var(--faint); }
+.trail .act {
+  padding: .2rem .45rem; border: 0; background: none; cursor: pointer;
+  color: var(--moon); font: italic .9rem var(--body); text-decoration: underline;
+  text-decoration-color: var(--rim); text-underline-offset: 3px; text-shadow: 0 0 6px var(--night);
+}
+.trail .act:hover, .trail .act:focus-visible { color: var(--parch); }
+.trail .note { color: var(--parch); font: italic .9rem var(--body); text-shadow: 0 0 6px var(--night); }
+.trail-list .kind { color: var(--faint); font-size: .78rem; font-style: italic; margin-right: .45rem; }
+.card .tools .danger { color: #e3a3a3; text-decoration-color: rgba(227, 163, 163, .5); }
+@media (max-width: 760px) {
+  .trail .step, .trail .sep, .trail .title { display: none; }
+  .trail .step.last { display: inline-block; max-width: 9rem; }   /* au téléphone : le pas en cours seulement */
+}
+
+/* visites guidées (tours-ui.js) */
+.tours { list-style: none; margin: 1rem 0 0; padding: 0; }
+.tours li + li { margin-top: .5rem; }
+.tours button {
+  display: block; width: 100%; text-align: left; padding: .7rem .85rem; cursor: pointer;
+  border: 1px solid var(--rim); border-radius: 6px; background: rgba(13, 18, 32, .55); color: var(--parch);
+}
+.tours button:hover, .tours button:focus-visible { border-color: var(--grace); }
+.tours .name { font: 600 1.15rem var(--display); color: var(--grace); }
+.tours .n { color: var(--faint); font-size: .82rem; margin-left: .3rem; }
+.tours .snip { display: block; margin-top: .25rem; color: var(--parch); font-size: .92rem; line-height: 1.45; }
+.card.tour h2 { margin-bottom: .2rem; }
+.tour-intro { margin: .4rem 0 0; color: var(--faint); font-style: italic; line-height: 1.5; }
+.tour-note {
+  margin: 1rem 0 0; padding: .7rem .9rem; border-left: 3px solid var(--grace); background: rgba(217, 196, 142, .07);
+  font-size: 1.05rem; line-height: 1.55;
+}
+.tour-text { margin-top: 1.1rem; padding-top: .9rem; border-top: 1px solid var(--rim); }
+.tour-text h3 { margin: .15rem 0 0; font: 600 1.3rem var(--display); color: var(--parch); }
+.tour-text .topen { margin-top: .6rem; }
+.tour-nav { display: flex; justify-content: space-between; gap: .6rem; margin-top: 1.2rem; }
+.tour-nav button {
+  flex: 1; padding: .55rem .9rem; border: 1px solid var(--grace); border-radius: 6px; cursor: pointer;
+  background: rgba(217, 196, 142, .1); color: var(--grace); font: 600 1rem var(--body);
+}
+.tour-nav button:hover:not(:disabled), .tour-nav button:focus-visible { background: rgba(217, 196, 142, .2); }
+.tour-nav button:disabled { opacity: .35; cursor: default; }
+.tour-steps { list-style: none; margin: 1.1rem 0 0; padding: 0; font-size: .9rem; }
+.tour-steps button { display: flex; gap: .55rem; width: 100%; padding: .25rem 0; border: 0; background: none; color: var(--faint); text-align: left; cursor: pointer; font: inherit; }
+.tour-steps button:hover, .tour-steps button[aria-current] { color: var(--parch); }
+.tour-steps .step { flex: none; width: 1.4rem; height: 1.4rem; border: 1px solid var(--rim); border-radius: 50%; text-align: center; line-height: 1.3rem; font-size: .78rem; }
+.tour-steps button[aria-current] .step { border-color: var(--grace); color: var(--grace); }

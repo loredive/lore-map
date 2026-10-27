@@ -9,16 +9,21 @@ let pos = -1;
 let restoring = false;   // pendant qu'on rejoue une entrée : ne rien enregistrer
 let popped = null;       // adresse rétablie par popstate (le hashchange qui suit n'est pas un lien collé)
 let opener = null;       // ouvre une entrée ; fourni par panel.js (qui dépend de ce module)
+let watcher = null;      // prévenu de chaque entrée ouverte (le parcours de lecture, trail-ui.js)
 
 export function setOpener(f) { opener = f; }
+export function onRecord(f) { watcher = f; }
+// rouvre une entrée comme un nouveau pas (le parcours sous la recherche), pas comme un Retour
+export function openEntry(e) { opener(e); }
 
 function hashOf(e) {
   switch (e.view) {
     case "doc": return "#" + encodeURIComponent(S.docs[e.i].name);
-    case "cluster": return "#groupe=" + encodeURIComponent(e.label);
-    case "entity": return "#entite=" + encodeURIComponent(e.name);
-    case "path": return "#chemin=" + encodeURIComponent(S.docs[e.a].name) + "&" + encodeURIComponent(S.docs[e.b].name);
+    case "cluster": return "#group=" + encodeURIComponent(e.label);
+    case "entity": return "#entity=" + encodeURIComponent(e.name);
+    case "path": return "#path=" + encodeURIComponent(S.docs[e.a].name) + "&" + encodeURIComponent(S.docs[e.b].name);
     case "dialogue": return "#dialogue=" + encodeURIComponent(e.speaker);
+    case "tour": return `#tour=${encodeURIComponent(e.id)}/${e.k + 1}`;
     default: return location.pathname + location.search;      // résultats, index, aide, rien
   }
 }
@@ -34,6 +39,7 @@ export function record(entry) {
   popped = null;
   // la recherche en cours fait partie de l'état : revenir à une fiche ouverte avant elle l'efface
   if (entry.view !== "results") entry = { ...entry, q: S.query || "" };
+  watcher?.(entry);
   if (pos >= 0 && same(stack[pos], entry)) {
     stack[pos] = entry;
     history.replaceState({ k: pos }, "", hashOf(entry));
@@ -54,14 +60,17 @@ export function backLabel() {
   if (pos <= 0) return null;
   const e = stack[pos - 1];
   switch (e.view) {
-    case "doc": return `Retour à « ${S.docs[e.i].name} »`;
-    case "cluster": return `Retour au groupe « ${e.label} »`;
-    case "entity": return `Retour à « ${S.entities.find(x => x.name === e.name)?.label || e.name} »`;
-    case "results": return `Retour aux résultats « ${e.q} »`;
-    case "index": return "Retour aux personnages et lieux";
-    case "help": return "Retour à l'aide";
-    case "path": return "Retour au chemin";
-    case "dialogue": return `Retour au dialogue de ${e.speaker}`;
+    case "doc": return `Back to “${S.docs[e.i].name}”`;
+    case "cluster": return `Back to the group “${e.label}”`;
+    case "entity": return `Back to “${S.entities.find(x => x.name === e.name)?.label || e.name}”`;
+    case "results": return `Back to the results for “${e.q}”`;
+    case "index": return "Back to characters and places";
+    case "help": return "Back to help";
+    case "path": return "Back to the path";
+    case "dialogue": return `Back to the dialogue of ${e.speaker}`;
+    case "trail": return "Back to your trail";
+    case "tours": return "Back to the guided tours";
+    case "tour": return `Back to “${S.tours.find(t => t.id === e.id)?.title || e.id}”, step ${e.k + 1}`;
     default: return null;                       // avant : le panneau fermé, « Fermer » suffit
   }
 }
@@ -79,6 +88,7 @@ addEventListener("popstate", e => {
   if (k === undefined || !stack[k]) return;    // entrée d'une visite précédente : hashchange s'en charge
   popped = location.href;
   pos = k;
+  watcher?.(stack[k]);           // revenir à une fiche, c'est aussi la relire (avant : la caméra en dépend)
   restoring = true;
   try { opener(stack[k]); } finally { restoring = false; }
 });

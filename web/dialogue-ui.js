@@ -1,10 +1,11 @@
 // Le dialogue complet d'un PNJ, passage après passage. Les passages sont dispersés sur la carte
 // (ceux de Ranni dans plusieurs groupes) ; ici on les relit dans l'ordre, et la carte trace le fil
 // qui les relie.
-import { S, panel, esc, resetContext, focusPanel } from "./state.js";
-import { draw, fitPoints } from "./render.js";
+import { S, panel, esc, resetContext, focusPanel, portrait } from "./state.js";
+import { draw, frameFrom } from "./render.js";
 import { select, panelTop, bindPanelTop } from "./panel.js";
 import { record } from "./nav.js";
+import { linkText, bindEntityButtons } from "./entities-ui.js";
 
 const PASSAGE = /^(.*) — passage (\d+)$/;
 
@@ -29,7 +30,7 @@ export function speakersFor(e) {
 }
 
 export function dialogueButtons(speakers, cls = "tdial") {
-  return speakers.map(sp => `<button type="button" class="${cls}" data-sp="${esc(sp)}">Lire tout le dialogue de ${esc(sp)}
+  return speakers.map(sp => `<button type="button" class="${cls}" data-sp="${esc(sp)}">Read the full dialogue of ${esc(sp)}
     (${S.dialogues.get(sp).length} passages)</button>`).join("");
 }
 export function bindDialogueButtons(focusOn = -1) {
@@ -47,23 +48,27 @@ export function openDialogue(speaker, { focusOn = -1, fly = true } = {}) {
   panel.hidden = false;
   panel.dataset.view = "dialogue";
   record({ view: "dialogue", speaker });
+  const face = portrait(S.docs[list[0]], "portrait", 96);
   panel.innerHTML = `${panelTop()}<article class="card">
+    <div class="card-head${face ? " has-img" : ""}">${face}<div>
     <div class="cat">Dialogue</div>
     <h2>${esc(speaker)}</h2>
-    <p class="count">${list.length} passages, dans l'ordre des répliques du jeu. Sur la carte, un fil les relie :
-      on voit le dialogue passer d'un groupe à l'autre.</p>
+    </div></div>
+    <p class="count">${list.length} passages, in the order the game speaks them. On the map, a thread links them:
+      you can watch the dialogue move from one group to another.</p>
     <ol class="script">${list.map(i => {
       const d = S.docs[i];
       return `<li id="p${i}"${i === focusOn ? ' class="here"' : ""}>
-        <button type="button" class="pnum" data-i="${i}" aria-label="Passage ${d.part} : voir sa fiche et ses échos">${d.part}</button>
-        <p class="text">${esc(d.text)}</p></li>`;
+        <button type="button" class="pnum" data-i="${i}" aria-label="Passage ${d.part}: see its details and echoes">${d.part}</button>
+        <p class="text">${linkText(d.text, S.docEntities[i])}</p></li>`;
     }).join("")}</ol>
   </article>`;
   bindPanelTop();
   panel.querySelectorAll(".pnum").forEach(b => b.addEventListener("click", () => select(+b.dataset.i)));
+  bindEntityButtons();
   panel.scrollTop = 0;
   if (focusOn >= 0) panel.querySelector(`#p${focusOn}`)?.scrollIntoView({ block: "center" });
-  focusPanel(`Dialogue de ${speaker} : ${list.length} passages`);
-  if (fly) fitPoints(list.map(i => S.docs[i]), 0);
+  focusPanel(`Dialogue of ${speaker}: ${list.length} passages`);
+  if (fly) frameFrom(list.map(i => S.docs[i]));
   draw();
 }

@@ -1,17 +1,29 @@
 import { S, $, esc, MORPH_MS, reducedMotion } from "./state.js";
 import { buildGrid, draw, render, setHover, focusDoc, fitPoints } from "./render.js";
+import { shelves, SHELVES } from "./shelves.js";
 
 // ------------------------------------------------------------------ vues (projections)
 // Les mêmes textes et les mêmes groupes, aplatis autrement : passer d'une vue à l'autre
 // fait glisser les étoiles, ce qui montre que seules les proximités ont un sens.
+// la vue rayons (shelves.js) se calcule ici, à partir des catégories et des groupes
+export function addShelves() {
+  const L = shelves(S.docs, S.cats.length);
+  S.views = [...S.views, SHELVES];
+  S.docs.forEach((d, i) => d.views.push(L.pos[i]));
+  for (const c of S.clusters) c.views.push(L.clusters.get(c.id));
+  S.shelves = { k: S.views.length - 1, columns: L.columns, cell: L.cell };
+}
+
 export function buildViewSwitch() {
   const box = $("#views");
   if (S.views.length < 2) return;
   box.hidden = false;
-  // des noms parlants ; la méthode (t-SNE, UMAP) reste dans l'infobulle
-  const names = ["principale", "autre agencement"];
-  box.innerHTML = `<span class="label">Carte</span>${S.views.map((v, k) =>
-    `<button type="button" data-v="${k}" aria-pressed="${k === S.view}" title="Calculée par ${esc(v)}">${esc(names[k] || v)}</button>`).join("")}`;
+  // des noms parlants ; la méthode (t-SNE) reste dans l'infobulle
+  const names = ["by meaning"];
+  const name = (v, k) => v === SHELVES ? "by category" : names[k] || v;
+  const title = v => v === SHELVES ? "Columns are categories, blocks are topics, texts sorted by name" : `Computed with ${v}`;
+  box.innerHTML = `<span class="label">Map</span>${S.views.map((v, k) =>
+    `<button type="button" data-v="${k}" aria-pressed="${k === S.view}" title="${esc(title(v))}">${esc(name(v, k))}</button>`).join("")}`;
   box.querySelectorAll("button").forEach(b => b.addEventListener("click", () => setView(+b.dataset.v)));
 }
 

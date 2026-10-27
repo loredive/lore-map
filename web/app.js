@@ -1,43 +1,89 @@
 // Point d'entrée : chargement des données, souris, clavier, légende.
-import { S, $, canvas, panel, tip, status, input, mode, esc, colorOf, announce } from "./state.js";
+import { S, $, canvas, panel, status, input, mode, esc, colorOf, announce, dataPath, DEFAULT_GAME } from "./state.js";
 import { buildGrid, buildSprites, computeHulls, resize, draw, toWorld, nearest, flyTo, zoomAt, setHover, starsNear, viewCenter } from "./render.js";
-import { buildViewSwitch } from "./views.js";
+import { buildViewSwitch, addShelves } from "./views.js";
 import { prepareSky } from "./sky.js";
 import { buildDialogues } from "./dialogue-ui.js";
 import { buildIndex, runSearch, renderResults } from "./search-ui.js";
 import { select, openCluster, closePanel, openFromHash, cancelPath } from "./panel.js";
 import { record, current } from "./nav.js";
+import { showTip } from "./tip.js";
 import { openEntity } from "./entities-ui.js";
+import { initTrail } from "./trail-ui.js";
+import { loadTours } from "./tours-ui.js";
+
+// ------------------------------------------------------------------ jeu
+const optional = (f, empty) => fetch(f).then(r => r.ok ? r.json() : empty).catch(() => empty);
+
+// ?game=… (ou l'ancien ?jeu=…) s'il fait partie des jeux dont les données sont prêtes (data/games.json), sinon le jeu par
+// défaut ; puis ses couleurs et ses exemples (data/<jeu>/game.json)
+async function chooseGame() {
+  S.games = await optional("data/games.json", []);
+  const params = new URLSearchParams(location.search);
+  const want = params.get("game") || params.get("jeu");
+  S.game = S.games.some(g => g.id === want) ? want : DEFAULT_GAME;
+  const g = await optional(dataPath("game.json"), {});
+  S.colors = g.colors || {};
+  document.body.dataset.game = S.game;        // ciel propre au jeu (style.css)
+  S.hasImages = !!g.images;
+  S.hasTours = !!g.tours;
+  S.ui = g.ui || {};
+  if (S.ui.tagline) $(".masthead p").textContent = S.ui.tagline;
+  if (S.ui.aria) canvas.setAttribute("aria-label", S.ui.aria);
+  if (S.ui.credit) $(".credit").textContent = S.ui.credit;
+  if (S.games.length > 1) {
+    document.title = `The Lore Map · ${g.title}`;
+    buildGameSwitch();
+  }
+}
+
+// « Elden Ring · Bloodborne » sous le titre : un lien par jeu, le jeu affiché marqué
+function buildGameSwitch() {
+  const nav = document.createElement("nav");
+  nav.className = "games";
+  nav.setAttribute("aria-label", "Choose the game");
+  nav.innerHTML = S.games.map(g => g.id === S.game
+    ? `<a aria-current="page">${esc(g.title)}</a>`
+    : `<a href="?game=${encodeURIComponent(g.id)}">${esc(g.title)}</a>`).join('<span class="sep" aria-hidden="true">·</span>');
+  $(".masthead h1").after(nav);
+}
 
 // ------------------------------------------------------------------ données
 async function load() {
-  let lore, meta;
+  await chooseGame();
+  let lore, meta, images;
   try {
-    [lore, meta] = await Promise.all([
-      fetch("data/lore.json").then(r => { if (!r.ok) throw r; return r.json(); }),
-      fetch("data/meta.json").then(r => { if (!r.ok) throw r; return r.json(); }),
+    [lore, meta, images] = await Promise.all([
+      fetch(dataPath("lore.json")).then(r => { if (!r.ok) throw r; return r.json(); }),
+      fetch(dataPath("meta.json")).then(r => { if (!r.ok) throw r; return r.json(); }),
+      // icônes (images.py) : seulement pour un jeu qui en a (game.json : images) ; la carte s'en passe
+      S.hasImages ? optional(dataPath("images.json"), {}) : {},
     ]);
   } catch {
-    status.innerHTML = "Impossible de lire <code>data/lore.json</code>. Lance <code>python prepare.py</code>, " +
-      "puis ouvre la page via un serveur local : <code>python -m http.server -d web</code>.";
+    status.innerHTML = `Could not read <code>${dataPath("lore.json")}</code>. Run <code>python prepare.py</code>, ` +
+      "then open the page through a local server: <code>python -m http.server -d web</code>.";
     return;
   }
   const F = Object.fromEntries(lore.fields.map((f, i) => [f, i]));
   S.cats = lore.categories;
   S.clusters = lore.clusters.sort((a, b) => b.n - a.n);
   S.meta = meta;
+  S.images = new Map(Object.entries(images));
   // chaque texte a une position par vue ([x1, y1, x2, y2…]) ; la première est la carte principale
-  S.views = lore.views || ["Carte"];
+  S.views = lore.views || ["Map"];
   S.docs = lore.docs.map((r, i) => {
     const xy = F.xy !== undefined ? r[F.xy] : [r[F.x], r[F.y]];
     const views = S.views.map((_, k) => [xy[2 * k], xy[2 * k + 1]]);
     return { i, name: r[F.name], cat: r[F.cat], text: r[F.text], jp: r[F.jp], jpName: r[F.jpName],
+             alt: F.alt !== undefined ? r[F.alt] : "", altName: F.altName !== undefined ? r[F.altName] : "",
+             dlc: F.dlc !== undefined && !!r[F.dlc],
              views, x: views[0][0], y: views[0][1], cluster: r[F.cluster], echoes: r[F.echoes] };
   });
   for (const c of S.clusters) {
     c.views = c.views || [{ x: c.x, y: c.y, cohesion: 1 }];
     Object.assign(c, { x: c.views[0].x, y: c.views[0].y });
   }
+  addShelves();
   S.entities = (lore.entities || []).sort((a, b) => b.docs.length - a.docs.length);
   S.docEntities = S.docs.map(() => []);
   S.entities.forEach(e => e.docs.forEach(i => S.docEntities[i].push(e)));
@@ -49,8 +95,10 @@ async function load() {
   buildSprites();
   buildLegend();
   buildViewSwitch();
+  initTrail();                                  // avant openFromHash : le lien collé est un premier pas
+  await loadTours();                            // data/<jeu>/tours.json, s'il y en a
   status.textContent = "";
-  mode.textContent = meta.semantic ? "Recherche par mots-clés et par sens" : "Recherche par mots-clés";
+  mode.textContent = "";                       // la ligne d'état ne parle que quand il y a du nouveau
   resize();
   openFromHash();
   if (!current()) record({ view: "none" });     // premier état : la carte seule, panneau fermé
@@ -136,8 +184,8 @@ function tapZoom(sx, sy, label) {
   return true;
 }
 function openChooser(list, sx, sy, group = null) {
-  chooser.innerHTML = `<p class="title">Plusieurs choses ici</p><ul>${group
-    ? `<li><button type="button" class="group" data-c="${group.id}">Groupe : ${esc(group.label)}</button></li>` : ""}${list.map(i => {
+  chooser.innerHTML = `<p class="title">Several things here</p><ul>${group
+    ? `<li><button type="button" class="group" data-c="${group.id}">Group: ${esc(group.label)}</button></li>` : ""}${list.map(i => {
     const d = S.docs[i];
     return `<li><button type="button" data-i="${i}"><span class="dot" style="--c:${colorOf(d.cat)}"></span>${esc(d.name)}</button></li>`;
   }).join("")}</ul>`;
@@ -158,13 +206,9 @@ function aimAtCenter() {
   const i = pick(cx, cy, 30);
   setHover(i);
   if (i >= 0) {
-    const d = S.docs[i];
-    tip.innerHTML = `<span class="name">${esc(d.name)}</span><span class="sub">${esc(S.cats[d.cat])} · Entrée pour ouvrir</span>`;
-    tip.hidden = false;
-    tip.style.left = Math.min(cx + 40, S.W - tip.offsetWidth - 8) + "px";
-    tip.style.top = Math.min(cy + 34, S.H - tip.offsetHeight - 8) + "px";
+    showTip(i, cx, cy, { hint: "Enter to open", dx: 40, dy: 34 });
   }
-  announce(i >= 0 ? `Visée : ${S.docs[i].name}` : "Aucune étoile au centre");
+  announce(i >= 0 ? `Aiming at: ${S.docs[i].name}` : "No star at the center");
 }
 canvas.addEventListener("focus", () => { if (canvas.matches(":focus-visible")) { S.kbd = true; aimAtCenter(); draw(); } });
 canvas.addEventListener("blur", () => { S.kbd = false; setHover(-1); draw(); });
@@ -177,6 +221,14 @@ canvas.addEventListener("wheel", e => {
 }, { passive: false });
 canvas.addEventListener("dblclick", e => zoomAt(e.clientX, e.clientY, 2.2));
 addEventListener("resize", resize);
+// les images ne sont pas versionnées (images.py, icons.py) : une icône absente disparaît,
+// et sa fiche reprend la mise en page sans image
+addEventListener("error", e => {
+  const img = e.target;
+  if (!(img instanceof HTMLImageElement)) return;
+  img.closest(".card-head")?.classList.remove("has-img");
+  img.remove();
+}, true);
 
 addEventListener("keydown", e => {
   const typing = document.activeElement === input;
@@ -222,12 +274,7 @@ function updateHover(sx, sy) {
   setHover(i);
   canvas.classList.toggle("pointing", i >= 0 || !!label);
   if (i >= 0) {
-    const d = S.docs[i];
-    tip.innerHTML = `<span class="name">${esc(d.name)}</span><span class="sub">${esc(S.cats[d.cat])}</span>`;
-    tip.hidden = false;
-    const tw = tip.offsetWidth, th = tip.offsetHeight;
-    tip.style.left = Math.min(sx + 16, S.W - tw - 8) + "px";
-    tip.style.top = Math.min(sy + 14, S.H - th - 8) + "px";
+    showTip(i, sx, sy);
   }
 }
 
@@ -246,13 +293,34 @@ function buildLegend() {
       const on = S.hidden.has(i);
       on ? S.hidden.delete(i) : S.hidden.add(i);
       b.setAttribute("aria-pressed", String(on));
-      if (S.results.length && S.selected < 0) renderResults();
-      else if (S.cluster && S.selected < 0) openCluster(S.cluster, { fly: false, focus: false });
-      else if (S.entity && S.selected < 0) openEntity(S.entity, { fly: false, focus: false });
-      draw();
+      refreshVisible();
     });
     nav.append(b);
   });
+  // textes ajoutés par le DLC (Bloodborne : The Old Hunters) : les masquer d'un coup, toutes catégories
+  const dlc = S.docs.filter(d => d.dlc).length;
+  if (dlc) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "dlc";
+    b.setAttribute("aria-pressed", "true");
+    b.innerHTML = `<span class="dlc-badge">DLC</span><span class="label">${esc(S.ui.dlc_label || "DLC")}</span> <span class="n">${dlc}</span>`;
+    b.title = `Show or hide the texts added with ${S.ui.dlc_label || "the DLC"}`;
+    b.addEventListener("click", () => {
+      S.hideDlc = !S.hideDlc;
+      b.setAttribute("aria-pressed", String(!S.hideDlc));
+      refreshVisible();
+    });
+    nav.append(b);
+  }
+}
+
+// une catégorie (ou le DLC) masquée ou réaffichée : les listes ouvertes et la carte suivent
+function refreshVisible() {
+  if (S.results.length && S.selected < 0) renderResults();
+  else if (S.cluster && S.selected < 0) openCluster(S.cluster, { fly: false, focus: false });
+  else if (S.entity && S.selected < 0) openEntity(S.entity, { fly: false, focus: false });
+  draw();
 }
 
 load();

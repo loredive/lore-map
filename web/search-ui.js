@@ -1,7 +1,7 @@
 // La recherche dans la page : saisie, chargement du modèle, liste des résultats.
 import { BM25, tokenize, corpusText, lexicalRanking, hybridRanking, semanticScores, rrf, RRF_K, LEXICAL_WEIGHT, POOL,
          parseQuery, hasConstraints, satisfies } from "./search.js";
-import { S, panel, input, mode, esc, fold, resetContext, docRow, announce, MAX_HITS_ON_MAP, MAX_RESULTS } from "./state.js";
+import { S, panel, input, mode, esc, fold, resetContext, docRow, announce, dataPath, MAX_HITS_ON_MAP, MAX_RESULTS, isHidden } from "./state.js";
 import { draw } from "./render.js";
 import { select, snippet, mark, panelTop, bindPanelTop } from "./panel.js";
 import { record, current, goBack } from "./nav.js";
@@ -12,7 +12,7 @@ const TRANSFORMERS_URL = "https://cdn.jsdelivr.net/npm/@huggingface/transformers
 export function buildIndex() {
   S.bm25 = new BM25(S.docs.map(corpusText));
   // pour la recherche précise : nom + texte repliés (minuscules, sans accents), catégories repliées
-  S.folded = S.docs.map(d => fold(`${d.name} ${d.text}`));
+  S.folded = S.docs.map(d => fold(`${d.name} ${d.text}` + (d.alt ? ` ${d.altName} ${d.alt}` : "")));
   S.catFolded = S.cats.map(fold);
 }
 
@@ -47,7 +47,7 @@ export async function runSearch() {
     S.hits = null; S.results = [];
     // recherche effacée : on revient à ce qu'il y avait avant elle (une fiche, ou la carte seule)
     if (current()?.view === "results") goBack();
-    mode.textContent = S.meta?.semantic ? "Recherche par mots-clés et par sens" : "Recherche par mots-clés";
+    mode.textContent = "";
     draw();
     return;
   }
@@ -89,20 +89,23 @@ async function constrainedSearch(parsed, q, seq) {
 }
 
 function offerOrApply(hybrid, q) {
-  if (touched && panel.dataset.view === "results") {
+  mode.textContent = "Results by keyword and meaning";
+  // une fiche, un dialogue ou un chemin ouverts entre-temps restent affichés : « Retour aux résultats »
+  // relance la recherche, affinée d'emblée puisque le modèle est chargé
+  if (panel.hidden || panel.dataset.view !== "results") return;
+  if (touched) {
     pending = hybrid;
     showRefineOffer();
   } else {
     applyResults(hybrid, q);
-    panel.querySelector(".count")?.insertAdjacentHTML("beforeend", ' <span class="refined">Liste affinée par le sens.</span>');
+    panel.querySelector(".count")?.insertAdjacentHTML("beforeend", ' <span class="refined">List refined by meaning.</span>');
   }
-  mode.textContent = "Résultats par mots-clés et par sens";
 }
 
 function showRefineOffer() {
   if (panel.querySelector(".refine")) return;
   panel.querySelector(".count")?.insertAdjacentHTML("afterend",
-    '<button type="button" class="refine">Résultats affinés par le sens : afficher</button>');
+    '<button type="button" class="refine">Results refined by meaning: show them</button>');
   const b = panel.querySelector(".refine");
   b?.addEventListener("click", () => {
     const ranked = pending;
@@ -110,7 +113,7 @@ function showRefineOffer() {
     if (ranked) applyResults(ranked, S.query);
     panel.querySelector(".results button")?.focus();
   });
-  announce("Des résultats affinés par le sens sont prêts");
+  announce("Results refined by meaning are ready");
 }
 
 // « Textes qui contiennent …, mentionnent …, sans …, dans … » : ce que la requête a compris
@@ -119,13 +122,13 @@ function understood(p) {
   const name = t => esc(entityFor(t)?.label || t);
   const cat = c => esc(S.cats.find((_, k) => S.catFolded[k].startsWith(c)) || c);
   const verbs = [
-    p.phrases.length && `contiennent ${p.phrases.map(x => `« ${esc(x)} »`).join(" et ")}`,
-    p.must.length && `mentionnent ${p.must.map(name).join(" et ")}`,
+    p.phrases.length && `contain ${p.phrases.map(x => `“${esc(x)}”`).join(" and ")}`,
+    p.must.length && `mention ${p.must.map(name).join(" and ")}`,
   ].filter(Boolean);
   const free = p.text && fold(p.text) !== p.phrases.join(" ") ? p.text.replace(/"/g, "") : "";
-  return `<p class="understood">Textes${verbs.length ? ` qui ${verbs.join(" et ")}` : ""}${
-    p.mustNot.length ? `${verbs.length ? "," : ""} sans ${p.mustNot.map(name).join(" ni ")}` : ""}${
-    p.cats.length ? `, parmi ${p.cats.map(cat).join(" ou ")}` : ""}${free ? `, au plus près de « ${esc(free)} »` : ""}.</p>`;
+  return `<p class="understood">Texts${verbs.length ? ` that ${verbs.join(" and ")}` : ""}${
+    p.mustNot.length ? `${verbs.length ? "," : ""} without ${p.mustNot.map(name).join(" or ")}` : ""}${
+    p.cats.length ? `, among ${p.cats.map(cat).join(" or ")}` : ""}${free ? `, closest to “${esc(free)}”` : ""}.</p>`;
 }
 
 // Vide la recherche et ignore une réponse « par sens » encore en route (elle écraserait ce qui
@@ -152,10 +155,10 @@ export async function embedQuery(q) {
   try {
     if (!S.extractor) {
       S.semanticState = "loading";
-      mode.textContent = "Chargement du modèle de recherche par sens (une seule fois, ~120 Mo)…";
+      mode.textContent = "Loading the meaning-search model (only once, ~120 MB)…";
       const [{ pipeline }, buf] = await Promise.all([
         import(TRANSFORMERS_URL),
-        fetch("data/emb.bin").then(r => r.arrayBuffer()),
+        fetch(dataPath("emb.bin")).then(r => r.arrayBuffer()),
       ]);
       S.emb = new Int8Array(buf);
       S.extractor = await pipeline("feature-extraction", S.meta.model);
@@ -166,13 +169,20 @@ export async function embedQuery(q) {
   } catch (err) {
     console.warn(err);
     S.meta.semantic = false;
-    mode.textContent = "Recherche par sens indisponible (modèle non chargé) : mots-clés seulement";
+    mode.textContent = "Meaning search unavailable (model not loaded): keywords only";
     return null;
   }
 }
 
+// exemples de recherche précise, propres au jeu (game.json : ui.precise)
+function preciseTip() {
+  const x = S.ui.precise || {};
+  return `Precise search: <code>"${esc(x.phrase)}"</code> for an exact phrase, <code>${esc(x.both)}</code> to require
+    both, <code>${esc(x.exclude)}</code> to exclude, <code>${esc(x.category)}</code> for a category.`;
+}
+
 export function renderResults() {
-  const visible = S.results.filter(i => !S.hidden.has(S.docs[i].cat));
+  const visible = S.results.filter(i => !isHidden(S.docs[i]));
   const shown = visible.slice(0, MAX_RESULTS);
   const p = S.parsed || { text: S.query || "", must: [], phrases: [] };
   const terms = tokenize([p.text, ...p.must, ...p.phrases].join(" "));
@@ -182,31 +192,30 @@ export function renderResults() {
   panel.dataset.view = "results";
   record({ view: "results", q: S.query });
   if (!shown.length) {
-    panel.innerHTML = `${panelTop()}${understood(p)}<p class="count">Aucun texte ne correspond. ${hasConstraints(p)
-      ? "Ces conditions ne se rencontrent ensemble dans aucun texte : en retirer une ?"
-      : "Essaie un nom propre (Marika, Ranni) ou un mot du jeu en anglais."}</p>`;
+    panel.innerHTML = `${panelTop()}${understood(p)}<p class="count">No text matches. ${hasConstraints(p)
+      ? "No text meets all these conditions together: drop one?"
+      : `Try a proper name (${esc(S.ui.empty_hint || "")}) or a word from the game.`}</p>`;
     bindPanelTop();
     return;
   }
-  const more = visible.length > shown.length ? `, les ${shown.length} premiers ci-dessous` : "";
+  const more = visible.length > shown.length ? `, the first ${shown.length} below` : "";
   // une recherche qui nomme une entité connue mène à sa fiche
   const q = fold(S.query || "");
   const known = S.entities.find(e => [e.name, e.label, ...e.aliases].some(n => fold(n) === q));
   panel.innerHTML = `${panelTop()}${understood(p)}${known ? `<button type="button" class="entity-link" data-e="${S.entities.indexOf(known)}">
-      Fiche « ${esc(known.label)} » : ${known.docs.length} textes qui en parlent</button>` : ""}
-    <p class="count">${visible.length} textes trouvés${more}. Les plus pertinents brillent sur la carte.</p>
+      All about “${esc(known.label)}”: ${known.docs.length} texts mention it</button>` : ""}
+    <p class="count">${visible.length} texts found${more}. The most relevant glow on the map.</p>
     <ol class="results">${shown.map(i => {
       const d = S.docs[i];
       return docRow(d, mark(esc(d.name), terms), mark(esc(snippet(d.text, terms)), terms));
     }).join("")}</ol>
-    <p class="hint search-tip">Recherche précise : « "Destined Death" » pour une expression exacte,
-      « Ranni + Blaidd » pour exiger les deux, « -Malenia » pour exclure, « dans:armes » pour une catégorie.</p>`;
+    <p class="hint search-tip">${preciseTip()}</p>`;
   panel.querySelectorAll("button[data-i]").forEach(b =>
     b.addEventListener("click", () => select(+b.dataset.i)));
   bindPanelTop();
   bindEntityButtons();
   panel.scrollTop = 0;
   if (focused !== undefined) (panel.querySelector(`button[data-i="${focused}"]`) || panel.querySelector(".results button"))?.focus();
-  announce(`${visible.length} textes trouvés`);
+  announce(`${visible.length} texts found`);
 }
 

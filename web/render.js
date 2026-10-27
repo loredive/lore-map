@@ -1,6 +1,7 @@
 // Rendu du ciel sur le canvas : grille de sélection, étoiles, noms des groupes, caméra.
-import { S, $, canvas, ctx, panel, tip, GRACE, MIN_COHESION, reducedMotion, colorOf } from "./state.js";
-import { STYLE, drawNebulae, drawConstellations, drawThread, labelStyle, muteColor } from "./sky.js";
+import { S, $, canvas, ctx, panel, tip, GRACE, MIN_COHESION, reducedMotion, colorOf, isHidden, membersIn } from "./state.js";
+import { STYLE, drawNebulae, drawConstellations, drawThread, drawTrail, drawEntity, labelStyle, muteColor } from "./sky.js";
+import { drawClouds } from "./nebula.js";
 
 // Grille spatiale pour retrouver vite l'étoile sous le curseur
 const CELL = 0.02;
@@ -23,7 +24,7 @@ export function nearest(wx, wy, wr) {
     if (!cell) continue;
     for (const k of cell) {
       const d = S.docs[k];
-      if (S.hidden.has(d.cat)) continue;
+      if (isHidden(d)) continue;
       if (S.hits && !S.hits.has(k)) continue;
       const dd = (d.x - wx) ** 2 + (d.y - wy) ** 2;
       if (dd < bd) { bd = dd; best = k; }
@@ -43,7 +44,7 @@ export function starsNear(sx, sy, px) {
   for (let i = cx - r; i <= cx + r; i++) for (let j = cy - r; j <= cy + r; j++) {
     for (const n of S.grid.get(cellKey(i, j)) || []) {
       const d = S.docs[n];
-      if (S.hidden.has(d.cat) || (S.hits && !S.hits.has(n))) continue;
+      if (isHidden(d) || (S.hits && !S.hits.has(n))) continue;
       const dist = Math.hypot(d.x - wx, d.y - wy) * k;
       if (dist <= px) out.push([n, dist]);
     }
@@ -90,7 +91,7 @@ function roundedBuffer(poly, pad) {
 export function computeHulls() {
   for (const c of S.clusters) {
     c.hulls = S.views.map((_, k) => {
-      const pts = S.docs.filter(d => d.cluster === c.id).map(d => d.views[k]);
+      const pts = membersIn(c, k).map(d => d.views[k]);
       const cx = c.views[k].x, cy = c.views[k].y;   // médiane du groupe : les plus centraux d'abord
       pts.sort((a, b) => ((a[0] - cx) ** 2 + (a[1] - cy) ** 2) - ((b[0] - cx) ** 2 + (b[1] - cy) ** 2));
       // vue d'ensemble : le cœur du groupe ; groupe ouvert : tous ses textes, aucun hors du trait
@@ -171,9 +172,14 @@ export function render() {
   ctx.clearRect(0, 0, W, H);
 
   ctx.fillStyle = "#c9d3ee";
+  // poussière : fixe (styles a à c) ou en parallaxe (style d), les grains les plus gros (les plus
+  // « proches ») glissant plus vite quand on se déplace
+  const drift = STYLE.parallax ? S.base * 0.35 : 0;
   for (const [u, v, r, a] of S.dust) {
     ctx.globalAlpha = a;
-    ctx.fillRect(u * W, v * H, r, r);
+    const f = drift * r * r;
+    const x = ((u * W - S.cam.x * f) % W + W) % W, y = ((v * H + S.cam.y * f) % H + H) % H;
+    ctx.fillRect(x, y, r, r);
   }
 
   const r = Math.min(2.2 * Math.sqrt(S.cam.s), 9);   // rayon visuel d'une étoile
@@ -184,7 +190,8 @@ export function render() {
 
   // 0. nébuleuses (style c), contours des groupes, lignes de constellation (styles b et c)
   if (STYLE.nebula && !S.morphing) drawNebulae(toScreen);
-  if (!S.hits && !S.morphing && !S.path) drawHulls(sel);
+  if (STYLE.clouds && !S.morphing) drawClouds(toScreen, MIN_COHESION);
+  else if (!S.hits && !S.morphing && !S.path) drawHulls(sel);
   if (STYLE.lines && !S.morphing) drawConstellations(toScreen, sel);
 
   // 1. toutes les étoiles visibles ; de loin et sans rien d'ouvert, couleurs atténuées (style c)
@@ -197,7 +204,7 @@ export function render() {
   const density = Math.min(1, (S.base / 380) * Math.sqrt(S.cam.s));
   const [on, off] = STYLE.glow ? [Math.max(0.16, 0.55 * density), 0.06] : [0.9, 0.13];
   for (const d of S.docs) {
-    if (S.hidden.has(d.cat)) continue;
+    if (isHidden(d)) continue;
     const [sx, sy] = toScreen(d.x, d.y);
     if (sx < -pad || sy < -pad || sx > W + pad || sy > H + pad) continue;
     const dim = (S.path && !S.pathSet.has(d.i)) || (S.hits && !S.hits.has(d.i)) || (sel && d.i !== sel.i && !echoSet.has(d.i)) ||
@@ -208,11 +215,15 @@ export function render() {
   }
   ctx.globalCompositeOperation = "source-over";
 
+  // 1 bis. parcours de lecture : textes lus, derniers pas, texte d'où l'on vient (trail-ui.js)
+  // (pas pendant une visite, un chemin ou une recherche : leurs propres tracés suffisent)
+  if (S.trailShown && !S.morphing && !S.path && !S.hits) drawTrail(toScreen, R);
+
   // 2. résultats de recherche : étoiles dorées, plus vives pour les premiers rangs
   if (S.hits && !sel) {
     for (const [i, rank] of S.hits) {
       const d = S.docs[i];
-      if (S.hidden.has(d.cat)) continue;
+      if (isHidden(d)) continue;
       const [sx, sy] = toScreen(d.x, d.y);
       const k = rank < 10 ? 1.9 : rank < 40 ? 1.45 : 1.15;
       ctx.globalAlpha = rank < 40 ? 1 : 0.75;
@@ -220,12 +231,14 @@ export function render() {
     }
   }
 
-  // 2 bis. textes d'une entité ouverte : étoiles dorées
-  if (S.lit && !sel) {
+  // 2 bis. textes d'une entité ouverte : les plus pertinents en gros, et son nom sur la carte (sky.js) ;
+  // passages d'un dialogue : étoiles dorées
+  if (S.entity && !sel) drawEntity(toScreen, R);
+  else if (S.lit && !sel) {
     ctx.globalAlpha = 0.95;
     for (const i of S.lit) {
       const d = S.docs[i];
-      if (S.hidden.has(d.cat)) continue;
+      if (isHidden(d)) continue;
       const [sx, sy] = toScreen(d.x, d.y);
       ctx.drawImage(S.sprites.grace, sx - R * 1.5, sy - R * 1.5, 3 * R, 3 * R);
     }
@@ -246,6 +259,12 @@ export function render() {
       ctx.lineWidth = 3; ctx.strokeStyle = "rgba(14,19,34,.85)"; ctx.strokeText(String(k + 1), x + R * 0.9, y - R * 0.6);
       ctx.fillStyle = GRACE; ctx.fillText(String(k + 1), x + R * 0.9, y - R * 0.6);
     });
+    // visite guidée : l'étape en cours entourée
+    if (S.tourStep >= 0 && pts[S.tourStep]) {
+      const [x, y] = pts[S.tourStep];
+      ctx.globalAlpha = 1; ctx.lineWidth = 2; ctx.strokeStyle = GRACE;
+      ctx.beginPath(); ctx.arc(x, y, R * 2.4 + 6, 0, Math.PI * 2); ctx.stroke();
+    }
     ctx.restore();
   }
 
@@ -273,7 +292,8 @@ export function render() {
 
   // 4. noms des constellations (clusters), les plus grandes d'abord, sans chevauchement
   S.labelBoxes = [];
-  if (!S.hits && !sel && !S.morphing && !S.path) drawClusterLabels();
+  if (S.view === S.shelves?.k && !S.morphing) drawShelfHeaders();
+  if (!S.hits && !sel && !S.morphing && !S.path && !S.entity) drawClusterLabels();   // une entité ouverte écrit son propre nom
 
   // 4 bis. au clavier : un viseur au centre de la partie visible de la carte
   if (S.kbd) {
@@ -296,6 +316,53 @@ export function render() {
     ctx.beginPath(); ctx.arc(sx, sy, r + 5, 0, Math.PI * 2); ctx.stroke();
   }
   ctx.globalAlpha = 1;
+}
+
+// vue rayons : le nom de chaque colonne (sa catégorie) et son nombre de textes, au-dessus d'elle
+function drawShelfHeaders() {
+  const { columns, cell } = S.shelves;
+  const k = S.cam.s * S.base;
+  const size = Math.max(11, Math.min(18, cell * k * 2.2));
+  const font = px => `600 ${px}px "Cormorant Garamond", Georgia, serif`;
+  ctx.save();
+  ctx.textAlign = "center";
+  ctx.textBaseline = "bottom";
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = "rgba(14,19,34,.8)";
+  // une même mise en page pour toutes les colonnes, pour que les en-têtes restent alignés :
+  // « Nom · n » sur une ligne si toutes les colonnes le permettent ; sinon le nombre passe en
+  // dernière ligne partout, et un nom trop long se replie entre ses mots, vers le haut (les
+  // dernières lignes des noms restent au même niveau) ; on ne rapetisse que si un mot seul ne tient pas
+  const width = l => ctx.measureText(l).width;
+  const wrap = (name, room) => name.split(" ").reduce((ls, w) => {
+    const last = ls[ls.length - 1];
+    if (last && width(`${last} ${w}`) <= room) ls[ls.length - 1] = `${last} ${w}`; else ls.push(w);
+    return ls;
+  }, []);
+  let px = Math.round(size);
+  ctx.font = font(px);
+  let lines = columns.map(col => [`${S.cats[col.cat]} · ${col.n}`]);
+  if (!columns.every((col, j) => width(lines[j][0]) <= col.width * k)) {
+    const ratio = Math.min(1, ...columns.map(col =>
+      col.width * k / Math.max(...S.cats[col.cat].split(" ").map(width))));
+    if (ratio < 1) { px = Math.max(9, Math.floor(px * ratio)); ctx.font = font(px); }
+    const names = columns.map(col => wrap(S.cats[col.cat], col.width * k));
+    const depth = Math.max(...names.map(n => n.length));
+    lines = columns.map((col, j) => [...Array(depth - names[j].length).fill(""), ...names[j], String(col.n)]);
+  }
+  const rows = lines[0].length;
+  columns.forEach((col, c) => {
+    const [sx, sy] = toScreen(col.x, col.top);
+    ctx.globalAlpha = S.hidden.has(col.cat) ? 0.35 : 0.95;
+    ctx.fillStyle = colorOf(col.cat);
+    lines[c].forEach((l, j) => {
+      if (!l) return;
+      const y = sy - 6 - (rows - 1 - j) * px * 1.05;
+      ctx.strokeText(l, sx, y);
+      ctx.fillText(l, sx, y);
+    });
+  });
+  ctx.restore();
 }
 
 function drawClusterLabels() {
@@ -365,14 +432,28 @@ export function zoomAt(sx, sy, factor) {
   draw();
 }
 // Cadre la vue sur des étoiles : centre et étendue entre les quantiles trim et 1 - trim
-// (trim = 0 pour tout garder, comme les étapes d'un chemin).
-export function fitPoints(points, trim = 0.1) {
+// (trim = 0 pour tout garder, comme les étapes d'un chemin) ; maxScale : zoom maximal.
+export function fitPoints(points, trim = 0.1, maxScale = 12) {
   if (!points.length) return;
   const q = (a, t) => a[Math.min(a.length - 1, Math.floor((a.length - 1) * t))];
   const xs = points.map(p => p.x).sort((a, b) => a - b), ys = points.map(p => p.y).sort((a, b) => a - b);
   const [x0, x1, y0, y1] = [q(xs, trim), q(xs, 1 - trim), q(ys, trim), q(ys, 1 - trim)];
   const r = Math.max(x1 - x0, y1 - y0) / 2 || 0.1;
-  focusDoc({ x: (x0 + x1) / 2, y: (y0 + y1) / 2 }, Math.max(0.8, Math.min(12, 0.8 / r)));
+  focusDoc({ x: (x0 + x1) / 2, y: (y0 + y1) / 2 }, Math.max(0.8, Math.min(12, maxScale, 0.8 / r)));
+}
+
+// Cadre des étoiles avec le texte d'où l'on vient (S.cameFrom), sans jamais zoomer : on garde le
+// contexte, et l'on voit où l'on est par rapport à là d'où l'on vient. Rien ne bouge si tout est
+// déjà visible à gauche du panneau ; sinon la vue se déplace, et recule s'il le faut.
+export function frameFrom(points) {
+  const pts = S.cameFrom >= 0 ? [...points, S.docs[S.cameFrom]] : points;
+  if (!pts.length) return;
+  const right = !panel.hidden && innerWidth > 760 ? panel.getBoundingClientRect().left : S.W;
+  const bottom = !panel.hidden && innerWidth <= 760 ? S.H * 0.44 : S.H;   // téléphone : panneau en bas
+  const m = 24;
+  const seen = p => { const [x, y] = toScreen(p.x, p.y); return x > m && x < right - m && y > m && y < bottom - m; };
+  if (pts.every(seen)) { draw(); return; }
+  fitPoints(pts, 0, S.cam.s);
 }
 
 export function setHover(i) {
@@ -391,7 +472,7 @@ export function viewCenter() {
 
 // Centre la vue sur un point en tenant compte du panneau ouvert à droite
 export function focusDoc(d, s) {
-  const offset = panel.hidden || innerWidth <= 760 ? 0 : 210 / (s * S.base);
+  const offset = panel.hidden || innerWidth <= 760 ? 0 : panel.getBoundingClientRect().width / 2 / (s * S.base);
   const yOff = innerWidth <= 760 ? -innerHeight * 0.22 / (s * S.base) : 0;
   flyTo(d.x + offset, d.y + yOff, s);
 }

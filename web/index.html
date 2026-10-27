@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>La carte du lore</title>
+<title>The Lore Map</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23121829'/%3E%3Cpath d='M16 5l2.6 8.4L27 16l-8.4 2.6L16 27l-2.6-8.4L5 16l8.4-2.6z' fill='%23d9c48e'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,45 +11,47 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <canvas id="sky" tabindex="0" aria-label="Carte des textes d'Elden Ring : chaque étoile est un texte, les textes proches parlent des mêmes choses. Flèches pour se déplacer, plus et moins pour zoomer, Entrée pour ouvrir l'étoile visée."></canvas>
+  <canvas id="sky" tabindex="0" aria-label="Map of Elden Ring's texts: each star is a text, and texts close together talk about the same things. Arrow keys to move, plus and minus to zoom, Enter to open the targeted star."></canvas>
 
   <header class="masthead">
-    <h1>La carte du lore</h1>
-    <p>Chaque étoile est un texte d'Elden Ring. Plus deux textes parlent des mêmes choses, plus ils sont proches.</p>
+    <h1>The Lore Map</h1>
+    <p>Every star is a text from Elden Ring. The more two texts talk about the same things, the closer they sit.</p>
     <nav class="links">
-      <button type="button" id="help" class="help-btn">Comment lire cette carte</button>
-      <button type="button" id="index" class="help-btn">Personnages et lieux</button>
+      <button type="button" id="tours" class="help-btn" hidden>Guided tours</button>
+      <button type="button" id="index" class="help-btn">Characters and places</button>
+      <button type="button" id="help" class="help-btn">Help</button>
     </nav>
   </header>
 
   <form class="seek" role="search" onsubmit="return false">
-    <label for="q" class="visually-hidden">Chercher dans les textes</label>
-    <input id="q" type="search" placeholder="Chercher un nom, un lieu, un thème…" autocomplete="off" spellcheck="false">
+    <label for="q" class="visually-hidden">Search the texts</label>
+    <input id="q" type="search" placeholder="Search for a name, a place, a theme…" autocomplete="off" spellcheck="false">
     <span id="mode" aria-live="polite"></span>
+    <nav id="trail" class="trail" aria-label="Your trail" hidden></nav>
   </form>
 
   <div id="pathbar" class="pathbar" role="status" hidden>
-    Chemin depuis « <span class="from"></span> » : clique une étoile ou cherche le texte d'arrivée.
-    <button type="button" class="cancel">Annuler</button>
+    Path from “<span class="from"></span>”: click a star or search for the destination text.
+    <button type="button" class="cancel">Cancel</button>
   </div>
 
   <!-- le panneau suit la recherche dans l'ordre de tabulation ; il n'est pas une région « live » :
        un court message dans #announce dit ce qui vient de s'ouvrir -->
   <main>
-    <aside id="panel" aria-label="Fiche" hidden></aside>
+    <aside id="panel" aria-label="Details" hidden></aside>
   </main>
   <div id="announce" class="visually-hidden" role="status"></div>
 
-  <nav class="legend" id="legend" aria-label="Afficher ou masquer une catégorie"></nav>
+  <nav class="legend" id="legend" aria-label="Show or hide a category"></nav>
 
-  <div id="views" class="views" role="group" aria-label="Choisir l'agencement de la carte" hidden
-       title="Deux façons de disposer les mêmes textes sur la carte : seules les proximités ont un sens, pas les positions."></div>
+  <div id="views" class="views" role="group" aria-label="Choose the map layout" hidden
+       title="Two ways of laying out the same texts: only closeness means something, not position."></div>
 
   <div id="tip" role="tooltip" hidden></div>
-  <div id="chooser" class="chooser" role="dialog" aria-label="Plusieurs textes ici" hidden></div>
-  <div id="status" role="status">Chargement des textes…</div>
+  <div id="chooser" class="chooser" role="dialog" aria-label="Several texts here" hidden></div>
+  <div id="status" role="status">Loading texts…</div>
 
-  <p class="credit">Textes d'Elden Ring © FromSoftware / Bandai Namco, extraits par la communauté. Projet de fan non commercial.</p>
+  <p class="credit">Elden Ring texts © FromSoftware / Bandai Namco, extracted by the community; icons via the Elden Ring Fan API. Non-commercial fan project.</p>
 
   <script type="module" src="app.js"></script>
 </body>
