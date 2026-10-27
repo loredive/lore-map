@@ -1,7 +1,9 @@
 [
   {
     "title": "Valtr and the League",
+    "alt_title": "Valtr et la Ligue",
     "description": "Valtr, Master of the League, and his mission: to exterminate the Vermin with his confederates.",
+    "alt_description": "Valtr, Maître de la Ligue, et sa mission : exterminer la vermine avec ses confédérés.",
     "members": [
       "Valtr — passage 5",
       "Valtr — passage 3",
@@ -15,7 +17,9 @@
   },
   {
     "title": "Guardians of the Forbidden Woods",
+    "alt_title": "Gardiens du Bois interdit",
     "description": "Attire of Dores the graveguard and of the Madaras twins, butchers of the Forbidden Woods.",
+    "alt_description": "Les tenues de Dores, gardien des tombes, et des jumeaux Madaras, bouchers du Bois interdit.",
     "members": [
       "Butcher Gloves",
       "Butcher Garb",
@@ -30,7 +34,9 @@
   },
   {
     "title": "Blood gems",
+    "alt_title": "Gemmes sanglantes",
     "description": "Blood gems and gemstones that strengthen weapons, the blood stones used to upgrade them, and a few trinkets.",
+    "alt_description": "Gemmes sanglantes et pierres qui renforcent les armes, les pierres de sang qui servent à les améliorer, et quelques babioles.",
     "members": [
       "Odd Fire Abyssal Blood Gem",
       "Hard Adept Abyssal Blood Gem",
@@ -51,7 +57,9 @@
   },
   {
     "title": "Caryll Runes",
+    "alt_title": "Runes de Caryll",
     "description": "Runes of Caryll, the Byrgenwerth runesmith: transcriptions of the inhuman sounds of the Great Ones.",
+    "alt_description": "Les runes de Caryll, graveur de runes de Byrgenwerth : transcriptions des sons inhumains des Grands.",
     "members": [
       "Caryll Rune: \"Heir\"",
       "Great Lake",
@@ -72,7 +80,9 @@
   },
   {
     "title": "Healing blood and remedies",
+    "alt_title": "Sang curatif et remèdes",
     "description": "Blood vials and the blood of Arianna, Adella and Adeline, with antidotes, sedatives and elixirs.",
+    "alt_description": "Fioles de sang et sang d'Arianna, d'Adella et d'Adeline, avec antidotes, sédatifs et élixirs.",
     "members": [
       "Sedative",
       "Blood Vial",
@@ -91,7 +101,9 @@
   },
   {
     "title": "Cainhurst and the Vilebloods",
+    "alt_title": "Cainhurst et les Vilsangs",
     "description": "Queen Annalise, her royal guard and the Vilebloods of Cainhurst, enemies of the Healing Church.",
+    "alt_description": "La reine Annalise, sa garde royale et les Vilsangs de Cainhurst, ennemis de l'Église du remède.",
     "members": [
       "Cainhurst Helmet",
       "Cainhurst Leggings",
@@ -112,7 +124,9 @@
   },
   {
     "title": "Coldblood and Blood Echoes",
+    "alt_title": "Nécrosang et échos du sang",
     "description": "Coldblood relics that grant Blood Echoes, including those of the Great Ones.",
+    "alt_description": "Reliques de nécrosang qui donnent des échos du sang, dont ceux des Grands.",
     "members": [
       "Great One Coldblood",
       "Old Great One Coldblood",
@@ -128,7 +142,9 @@
   },
   {
     "title": "Patches",
+    "alt_title": "Patches",
     "description": "Patches' lines, between feigned friendship and betrayal.",
+    "alt_description": "Les répliques de Patches, entre amitié feinte et trahison.",
     "members": [
       "Patches — passage 5",
       "Patches — passage 6",
@@ -142,7 +158,9 @@
   },
   {
     "title": "Bells and resonance",
+    "alt_title": "Cloches et résonance",
     "description": "Resonant bells that link worlds: summoning hunters, the sinister bell, the Choir bell.",
+    "alt_description": "Les cloches résonnantes qui relient les mondes : l'appel des chasseurs, la cloche sinistre, la cloche du Chœur.",
     "members": [
       "Beckoning Bell",
       "Small Resonant Bell",
@@ -158,7 +176,9 @@
   },
   {
     "title": "Chalices and labyrinths",
+    "alt_title": "Calices et labyrinthes",
     "description": "Chalices that break the seals of the underground labyrinths (Pthumeru, Loran…).",
+    "alt_description": "Les calices qui brisent les sceaux des labyrinthes souterrains (Pthumeru, Loran…).",
     "members": [
       "Pthumeru Root Chalice",
       "Cursed and Defiled Root Chalice",
@@ -179,7 +199,9 @@
   },
   {
     "title": "Chalice ritual materials",
+    "alt_title": "Ingrédients des rites du Calice",
     "description": "Materials for Holy Chalice rituals: ritual vestiges, coldblood flowers, tomb mold, red jelly, ritual blood.",
+    "alt_description": "Composants des rites du Calice sacré : vestiges rituels, fleurs de nécrosang, moisissure des tombes, gelée rouge, sang rituel.",
     "members": [
       "Coldblood Flower Bulb",
       "Coldblood Flowerbud (1)",
@@ -200,7 +222,9 @@
   },
   {
     "title": "Chants and prayers",
+    "alt_title": "Chants et prières",
     "description": "Chanted words: the Fishing Hamlet villagers and priest, Yamamura, and a few cursed relics.",
+    "alt_description": "Des paroles psalmodiées : les villageois et le prêtre du village de pêcheurs, Yamamura, et quelques reliques maudites.",
     "members": [
       "Fishing Hamlet NPCs — passage 1",
       "Fishing Hamlet Priest — passage 2",
@@ -215,7 +239,9 @@
   },
   {
     "title": "Blood ministration and Paleblood",
+    "alt_title": "Transfusions et Pâlesang",
     "description": "The Blood Minister's welcome, Vicar Amelia's prayer, and the notes that set the hunter after Paleblood.",
+    "alt_description": "L'accueil des transfusions, la prière de la Vicaire Amélia, et les notes qui lancent le chasseur sur la piste du Pâlesang.",
     "members": [
       "Blood Minister — passage 1",
       "Blood Minister — passage 4",
@@ -231,7 +257,9 @@
   },
   {
     "title": "Fire and light",
+    "alt_title": "Feu et lumière",
     "description": "Molotovs, oil urns and fire paper, torches and the hand lantern, and a few iron helms.",
+    "alt_description": "Cocktails Molotov, urnes d'huile et papier de feu, torches et lanterne, et quelques heaumes de fer.",
     "members": [
       "Molotov Cocktail",
       "Hunter's Torch",
@@ -248,7 +276,9 @@
   },
   {
     "title": "Iosefka's clinic",
+    "alt_title": "La clinique de Iosefka",
     "description": "Iosefka and the impostor Iosefka at the clinic, and the survivors sent to them.",
+    "alt_description": "Iosefka et la fausse Iosefka à la clinique, et les survivants qu'on leur envoie.",
     "members": [
       "Impostor Iosefka — passage 3",
       "Impostor Iosefka — passage 4",
@@ -267,7 +297,9 @@
   },
   {
     "title": "Arianna",
+    "alt_title": "Arianna",
     "description": "Lines of Arianna, who offers her blood to the hunter.",
+    "alt_description": "Les répliques d'Arianna, qui offre son sang au chasseur.",
     "members": [
       "Arianna, Woman of Pleasure — passage 4",
       "Arianna, Woman of Pleasure — passage 6",
@@ -281,7 +313,9 @@
   },
   {
     "title": "Yahar'gul and the School of Mensis",
+    "alt_title": "Yahar'gul et l'École de Mensis",
     "description": "Black garb of Yahar'gul's kidnappers, the Mensis Cage and the madmen's hoods.",
+    "alt_description": "Les tenues noires des ravisseurs de Yahar'gul, la cage de Mensis et les capuches des fous.",
     "members": [
       "Black Hooded Iron Helm",
       "Yahar'gul Black Gloves",
@@ -299,7 +333,9 @@
   },
   {
     "title": "Messenger accessories",
+    "alt_title": "Accessoires des messagers",
     "description": "Hats, bandages and festivals that the little messengers love.",
+    "alt_description": "Chapeaux, bandages et fêtes qu'adorent les petits messagers.",
     "members": [
       "Messenger Top Hat",
       "Worn Messenger Top Hat",
@@ -317,7 +353,9 @@
   },
   {
     "title": "Adella, Alfred and the Church",
+    "alt_title": "Adella, Alfred et l'Église",
     "description": "The Healing Church's faithful: Adella the nun, Alfred, Hunter of Vilebloods, and Gilbert, with keys to the Cathedral Ward's locked doors.",
+    "alt_description": "Les fidèles de l'Église du remède : Adella la nonne, Alfred, chasseur de Vilsangs, et Gilbert, avec les clés des portes closes de la cathédrale.",
     "members": [
       "Adella, Nun of the Healing Church — passage 3",
       "Alfred, Hunter of Vilebloods — passage 2",
@@ -338,7 +376,9 @@
   },
   {
     "title": "Research Hall patients",
+    "alt_title": "Les patients des laboratoires",
     "description": "Adeline and the Research Hall patients, who beg Lady Maria and hear the sea.",
+    "alt_description": "Adeline et les patients des laboratoires, qui implorent Lady Maria et entendent la mer.",
     "members": [
       "Adeline — passage 4",
       "Research Hall Patients — passage 1",
@@ -355,7 +395,9 @@
   },
   {
     "title": "Hunter attire",
+    "alt_title": "Tenues de chasseur",
     "description": "Hunter garb old and new: Henryk's, Gascoigne's, the crows', the old hunters', and the Foreign Garb worn on waking.",
+    "alt_description": "Tenues de chasseur anciennes et nouvelles : celles de Henryk, de Gascoigne, des corbeaux, des anciens chasseurs, et la tenue d'étranger portée au réveil.",
     "members": [
       "Charred Hunter Garb",
       "Hunter Garb",
@@ -376,7 +418,9 @@
   },
   {
     "title": "Trick weapons and hunter badges",
+    "alt_title": "Armes trompeuses et badges de chasseur",
     "description": "The Workshop's trick weapons and firearms, hunter badges, bullets and throwing items.",
+    "alt_description": "Les armes trompeuses et les armes à feu de l'atelier, les badges de chasseur, les balles et les objets à lancer.",
     "members": [
       "Boom Hammer",
       "Saw Cleaver",
@@ -397,7 +441,9 @@
   },
   {
     "title": "The Narrow-Minded Man",
+    "alt_title": "L'homme à l'esprit étroit",
     "description": "The Narrow-Minded Man's suspicious lines about outsiders.",
+    "alt_description": "Les répliques méfiantes de l'homme à l'esprit étroit sur les étrangers.",
     "members": [
       "Narrow-Minded Man — passage 9",
       "Narrow-Minded Man — passage 5",
@@ -416,7 +462,9 @@
   },
   {
     "title": "Yharnamites",
+    "alt_title": "Les Yharnamiens",
     "description": "Townsfolk hiding behind doors and windows during the night of the hunt.",
+    "alt_description": "Les habitants cachés derrière portes et fenêtres pendant la nuit de la chasse.",
     "members": [
       "Yharnamites — passage 6",
       "Yharnamites — passage 9",
@@ -437,7 +485,9 @@
   },
   {
     "title": "Willem, Laurence and Byrgenwerth",
+    "alt_title": "Willem, Laurence et Byrgenwerth",
     "description": "Master Willem and those who left him, Laurence and Gehrman, with the Old Woman and the gatekeeper.",
+    "alt_description": "Maître Willem et ceux qui l'ont quitté, Laurence et Gehrman, avec la vieille femme et le gardien de la porte.",
     "members": [
       "Old Woman — passage 7",
       "Adeline — passage 7",
@@ -457,7 +507,9 @@
   },
   {
     "title": "The Hunter's Nightmare",
+    "alt_title": "Le Cauchemar du chasseur",
     "description": "Simon and Lady Maria, in the Hunter's Nightmare and its Church secrets.",
+    "alt_description": "Simon et Lady Maria, dans le Cauchemar du chasseur et ses secrets d'Église.",
     "members": [
       "Lady Maria — passage 1",
       "Lady Maria — passage 2",
@@ -473,7 +525,9 @@
   },
   {
     "title": "The Doll and Gehrman",
+    "alt_title": "La Poupée et Gehrman",
     "description": "The words of the Doll and Gehrman in the Hunter's Dream.",
+    "alt_description": "Les paroles de la Poupée et de Gehrman dans le rêve du chasseur.",
     "members": [
       "The Doll — passage 1",
       "Djura — passage 5",
@@ -494,7 +548,9 @@
   },
   {
     "title": "The Chapel Dweller",
+    "alt_title": "L'habitant de la chapelle",
     "description": "The Chapel Dweller's lines, welcoming survivors into Oedon Chapel.",
+    "alt_description": "Les répliques de l'habitant de la chapelle, qui accueille les survivants dans la chapelle Oedon.",
     "members": [
       "Chapel Dweller — passage 11",
       "Chapel Dweller — passage 8",

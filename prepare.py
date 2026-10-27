@@ -316,6 +316,9 @@ def export(docs, emb, views, labels, names, titles, entities, nbrs, embedder, ou
         clusters.append({"id": int(c), "label": t.get("title") or keywords,
                          "description": t.get("description", ""), "keywords": keywords,
                          "n": int(m.sum()), "views": at})
+        # titre et description dans la seconde langue du jeu (labels.json : alt_title, alt_description)
+        if t.get("alt_title"):
+            clusters[-1].update(altLabel=t["alt_title"], altDescription=t.get("alt_description", ""))
     fields = (["name", "cat", "text", "jp", "jpName", "xy", "cluster", "echoes"] + (["alt", "altName"] if has_alt else [])
               + (["dlc"] if has_dlc else []))
     with open(out / "lore.json", "w", encoding="utf-8") as f:

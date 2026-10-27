@@ -1,5 +1,5 @@
 // Point d'entrée : chargement des données, souris, clavier, légende.
-import { S, $, canvas, panel, tip, status, input, mode, esc, colorOf, announce, dataPath, DEFAULT_GAME } from "./state.js";
+import { S, $, canvas, panel, tip, status, input, mode, esc, colorOf, announce, dataPath, DEFAULT_GAME, nameOf, groupName } from "./state.js";
 import { buildGrid, buildSprites, computeHulls, resize, draw, toWorld, nearest, flyTo, zoomAt, setHover, starsNear, viewCenter } from "./render.js";
 import { buildViewSwitch, addShelves } from "./views.js";
 import { prepareSky } from "./sky.js";
@@ -187,9 +187,9 @@ function tapZoom(sx, sy, label) {
 }
 function openChooser(list, sx, sy, group = null) {
   chooser.innerHTML = `<p class="title">Several things here</p><ul>${group
-    ? `<li><button type="button" class="group" data-c="${group.id}">Group: ${esc(group.label)}</button></li>` : ""}${list.map(i => {
+    ? `<li><button type="button" class="group" data-c="${group.id}">Group: ${esc(groupName(group))}</button></li>` : ""}${list.map(i => {
     const d = S.docs[i];
-    return `<li><button type="button" data-i="${i}"><span class="dot" style="--c:${colorOf(d.cat)}"></span>${esc(d.name)}</button></li>`;
+    return `<li><button type="button" data-i="${i}"><span class="dot" style="--c:${colorOf(d.cat)}"></span>${esc(nameOf(d))}</button></li>`;
   }).join("")}</ul>`;
   chooser.hidden = false;
   const w = chooser.offsetWidth, h = chooser.offsetHeight;

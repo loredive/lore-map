@@ -5,7 +5,7 @@
 // Style d : nuages de gaz épousant les groupes (nebula.js) au lieu des contours, constellations
 // seulement pour le groupe survolé ou ouvert, poussière en parallaxe, ciel propre à chaque jeu.
 // Les couleurs atténuées de loin (muted) ont été essayées puis écartées : les catégories doivent rester lisibles.
-import { S, ctx, colorOf, isHidden, membersIn, nameOf } from "./state.js";
+import { S, ctx, colorOf, isHidden, membersIn, nameOf, groupName } from "./state.js";
 
 const STYLES = {
   a: {},
@@ -211,7 +211,7 @@ export function entityAnchor(docs) {
 // opacité croissante avec la taille du groupe à l'écran, pour que les petits apparaissent en zoomant.
 export function labelStyle(c, size, toScreenRadius) {
   const big = STYLE.caps && c.n >= 60;
-  const text = big ? c.label.toLocaleUpperCase("fr") : c.label;
+  const text = big ? groupName(c).toLocaleUpperCase("fr") : groupName(c);
   const font = big ? `600 ${Math.round(size * 0.78)}px "Cormorant Garamond", Georgia, serif`
                    : `italic 600 ${size}px "Cormorant Garamond", Georgia, serif`;
   // les grands groupes restent toujours affichés ; un petit n'apparaît qu'une fois assez étendu à

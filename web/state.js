@@ -49,6 +49,9 @@ export const S = {
 export const nameOf = d => (S.altLang && d.altName) || d.name;
 export const textOf = d => (S.altLang && d.alt) || d.text;
 export const textLang = d => (S.altLang && d.alt ? S.ui.alt_lang : "en");
+// de même pour un groupe : son titre et sa description ; le titre anglais (c.label) reste l'identifiant
+export const groupName = c => (S.altLang && c.altLabel) || c.label;
+export const groupDesc = c => (S.altLang && c.altDescription) || c.description;
 
 // Icône d'un texte, ou portrait du PNJ pour un passage de dialogue ; "" sans image.
 // Décorative (alt vide) : le nom est toujours écrit à côté.

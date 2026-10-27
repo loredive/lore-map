@@ -1,6 +1,6 @@
 // Le panneau de droite : fiche d'un texte, fiche d'un groupe, aide, liens (#…).
 import { tokenize } from "./search.js";
-import { S, $, panel, input, esc, colorOf, resetContext, clusterById, docRow, focusPanel, portrait, isHidden, nameOf, textOf, textLang } from "./state.js";
+import { S, $, panel, input, esc, colorOf, resetContext, clusterById, docRow, focusPanel, portrait, isHidden, nameOf, textOf, textLang, groupName, groupDesc } from "./state.js";
 import { draw, focusDoc, fitPoints, frameFrom, setHover } from "./render.js";
 import { echoGraph, echoPath } from "./graph.js";
 import { runSearch, resetSearch } from "./search-ui.js";
@@ -155,8 +155,8 @@ export function openCluster(c, { fly = true, focus = true } = {}) {
   record({ view: "cluster", id: c.id, label: c.label });
   panel.innerHTML = `${panelTop()}<article class="card">
     <div class="cat">Group of texts</div>
-    <h2>${esc(c.label)}</h2>
-    ${c.description ? `<p class="text">${esc(c.description)}</p>` : ""}
+    <h2>${esc(groupName(c))}</h2>
+    ${groupDesc(c) ? `<p class="text">${esc(groupDesc(c))}</p>` : ""}
     <p class="count">${c.n} texts${visible.length < members.length ? `, ${visible.length} of them shown` : ""}.</p>
     ${keywords}
     <ol class="results">${visible.map(d => docRow(d, esc(nameOf(d)), esc(snippet(textOf(d), [])))).join("")}</ol>
@@ -165,7 +165,7 @@ export function openCluster(c, { fly = true, focus = true } = {}) {
     b.addEventListener("click", () => select(+b.dataset.i)));
   bindPanelTop();
   panel.scrollTop = 0;
-  if (focus) focusPanel(`Group ${c.label}: ${c.n} texts`);
+  if (focus) focusPanel(`Group ${groupName(c)}: ${c.n} texts`);
   if (fly) frameFrom(members);      // les étoiles du groupe à l'écran, avec le texte d'où l'on vient
   draw();
 }
@@ -289,7 +289,7 @@ export function groupOf(d) {
 function groupLine(d) {
   const g = groupOf(d);
   if (!g?.c) return "";
-  const link = `<button type="button" class="glink" data-c="${g.c.id}">${esc(g.c.label)}</button>`;
+  const link = `<button type="button" class="glink" data-c="${g.c.id}">${esc(groupName(g.c))}</button>`;
   return `<p class="group">${g.near ? `Outside any group · nearest: ${link}` : `Group: ${link}`}</p>`;
 }
 function bindGroupButtons() {

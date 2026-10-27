@@ -1,7 +1,7 @@
 // L'historique de lecture : enregistré par jeu dans le navigateur, montré sur la carte (sky.js :
 // drawTrail, les textes déjà lus) et en entier dans le panneau « History » (bouton de la barre).
 // Chaque fiche ouverte (texte, entité, groupe, dialogue) est un pas ; nav.js nous les signale.
-import { S, $, panel, esc, colorOf, resetContext, focusPanel, nameOf, textOf } from "./state.js";
+import { S, $, panel, esc, colorOf, resetContext, focusPanel, nameOf, textOf, groupName } from "./state.js";
 import { draw } from "./render.js";
 import { panelTop, bindPanelTop, snippet } from "./panel.js";
 import { record, onRecord, openEntry } from "./nav.js";
@@ -41,7 +41,7 @@ function entryOf(s) {
 }
 function labelOf(s) {
   return s.kind === "entity" ? entityOf(s.key)?.label || s.key : s.kind === "dialogue" ? `Dialogue: ${s.key}`
-    : s.kind === "doc" ? nameOf(S.docs[docIndex.get(s.key)]) : s.key;
+    : s.kind === "doc" ? nameOf(S.docs[docIndex.get(s.key)]) : groupName(clusterOf(s.key));
 }
 function kindOf(s) {
   return s.kind === "doc" ? S.cats[S.docs[docIndex.get(s.key)].cat] : s.kind === "entity"

@@ -1,7 +1,7 @@
 // Bulle d'une étoile : nom, catégorie et groupe, début du texte ; si une fiche est ouverte et que
 // l'étoile est l'un de ses échos, son rang. Partagée par le survol de la carte, la visée au clavier
 // et le survol de la liste des échos dans le panneau.
-import { S, tip, esc, portrait, nameOf, textOf } from "./state.js";
+import { S, tip, esc, portrait, nameOf, textOf, groupName } from "./state.js";
 import { toScreen } from "./render.js";
 import { groupOf, snippet, dlcBadge } from "./panel.js";
 
@@ -10,7 +10,7 @@ const TIP_WIDTH = 360;      // px, largeur maximale de la bulle
 
 function tipHTML(i, hint) {
   const d = S.docs[i], g = groupOf(d);
-  const group = g?.c ? ` · ${g.near ? "near " : ""}${esc(g.c.label)}` : "";
+  const group = g?.c ? ` · ${g.near ? "near " : ""}${esc(groupName(g.c))}` : "";
   const sel = S.selected >= 0 && S.selected !== i ? S.docs[S.selected] : null;
   const rank = sel ? sel.echoes.indexOf(i) : -1;
   return portrait(d, "thumb", 48)

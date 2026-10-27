@@ -2,7 +2,7 @@
 // chemin, résultats) est une entrée de l'historique du navigateur. « Retour » dans le panneau et le
 // bouton Retour du navigateur font la même chose ; revenir au premier état referme le panneau
 // au lieu de quitter la page.
-import { S, nameOf } from "./state.js";
+import { S, nameOf, groupName } from "./state.js";
 
 const stack = [];        // entrées {view, …} de cette visite, dans l'ordre de l'historique
 let pos = -1;
@@ -61,7 +61,7 @@ export function backLabel() {
   const e = stack[pos - 1];
   switch (e.view) {
     case "doc": return `Back to “${nameOf(S.docs[e.i])}”`;
-    case "cluster": return `Back to the group “${e.label}”`;
+    case "cluster": { const c = S.clusters.find(x => x.label === e.label); return `Back to the group “${c ? groupName(c) : e.label}”`; }
     case "entity": return `Back to “${S.entities.find(x => x.name === e.name)?.label || e.name}”`;
     case "results": return `Back to the results for “${e.q}”`;
     case "index": return "Back to characters and places";
