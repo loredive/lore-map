@@ -1,0 +1,481 @@
+[
+ {
+  "name": "Gehrman",
+  "kind": "personnage",
+  "aliases": [
+   "Gherman"
+  ]
+ },
+ {
+  "name": "Laurence",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Willem",
+  "kind": "personnage",
+  "aliases": [
+   "Master Willem",
+   "Maître Willem"
+  ]
+ },
+ {
+  "name": "Ludwig",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Maria",
+  "kind": "personnage",
+  "aliases": [
+   "Lady Maria"
+  ]
+ },
+ {
+  "name": "Annalise",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Alfred",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Eileen",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Djura",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Gascoigne",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Iosefka",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Arianna",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Adella",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Valtr",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Simon",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Micolash",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Kos",
+  "kind": "personnage",
+  "aliases": [
+   "Kosm"
+  ]
+ },
+ {
+  "name": "Ebrietas",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Amygdala",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Oedon",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Caryll",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Rom",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Logarius",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Henryk",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Yamamura",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Brador",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Amelia",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Gratia",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Patches",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Dores",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Madaras",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Archibald",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Doll",
+  "kind": "personnage",
+  "aliases": [
+   "the Doll",
+   "Poupée"
+  ],
+  "label": "The Doll"
+ },
+ {
+  "name": "Yharnam",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Old Yharnam",
+  "kind": "lieu",
+  "aliases": [
+   "Vieux Yharnam"
+  ]
+ },
+ {
+  "name": "Cathedral Ward",
+  "kind": "lieu",
+  "aliases": [
+   "Faubourg de la Cathédrale"
+  ]
+ },
+ {
+  "name": "Byrgenwerth",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Cainhurst",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Pthumeru",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Yahar'gul",
+  "kind": "lieu",
+  "aliases": [
+   "Unseen Village",
+   "Village invisible"
+  ]
+ },
+ {
+  "name": "Forbidden Woods",
+  "kind": "lieu",
+  "aliases": [
+   "Bois interdit"
+  ]
+ },
+ {
+  "name": "Hemwick",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Astral Clocktower",
+  "kind": "lieu",
+  "aliases": [
+   "Tour astrale"
+  ]
+ },
+ {
+  "name": "Loran",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Isz",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Hunter's Dream",
+  "kind": "lieu",
+  "aliases": [
+   "hunter's dream",
+   "rêve du chasseur",
+   "Rêve du chasseur"
+  ]
+ },
+ {
+  "name": "Orphanage",
+  "kind": "lieu",
+  "aliases": [
+   "Orphelinat"
+  ]
+ },
+ {
+  "name": "Fishing Hamlet",
+  "kind": "lieu",
+  "aliases": [
+   "fishing hamlet",
+   "Hameau de pêcheurs"
+  ]
+ },
+ {
+  "name": "Research Hall",
+  "kind": "lieu",
+  "aliases": [
+   "research hall",
+   "Pavillon de recherche"
+  ]
+ },
+ {
+  "name": "Healing Church",
+  "kind": "faction",
+  "aliases": [
+   "the Church",
+   "The Church",
+   "Église du remède",
+   "Église"
+  ]
+ },
+ {
+  "name": "Choir",
+  "kind": "faction",
+  "aliases": [
+   "Chœur"
+  ]
+ },
+ {
+  "name": "School of Mensis",
+  "kind": "faction",
+  "aliases": [
+   "Mensis",
+   "École de Mensis"
+  ]
+ },
+ {
+  "name": "Vilebloods",
+  "kind": "faction",
+  "aliases": [
+   "Vileblood",
+   "Vilsangs",
+   "Vilsang"
+  ]
+ },
+ {
+  "name": "League",
+  "kind": "faction",
+  "aliases": [
+   "Ligue"
+  ]
+ },
+ {
+  "name": "Powder Kegs",
+  "kind": "faction",
+  "aliases": [
+   "Powder Keg",
+   "Barils de Poudre"
+  ]
+ },
+ {
+  "name": "Workshop",
+  "kind": "faction",
+  "aliases": [
+   "workshop",
+   "Atelier",
+   "atelier"
+  ]
+ },
+ {
+  "name": "Pthumerian",
+  "kind": "faction",
+  "aliases": [
+   "Pthumerians"
+  ],
+  "label": "Pthumerians"
+ },
+ {
+  "name": "Executioners",
+  "kind": "faction",
+  "aliases": [
+   "Executioner"
+  ]
+ },
+ {
+  "name": "Watchers",
+  "kind": "faction",
+  "aliases": [
+   "Watcher"
+  ]
+ },
+ {
+  "name": "Great Ones",
+  "kind": "notion",
+  "aliases": [
+   "Great One"
+  ]
+ },
+ {
+  "name": "Paleblood",
+  "kind": "notion",
+  "aliases": [
+   "Pâlesang"
+  ]
+ },
+ {
+  "name": "blood ministration",
+  "kind": "notion",
+  "aliases": [
+   "Blood ministration",
+   "Blood Ministration",
+   "thérapie du sang",
+   "Thérapie du sang"
+  ],
+  "label": "Blood ministration"
+ },
+ {
+  "name": "Insight",
+  "kind": "notion",
+  "aliases": [
+   "insight",
+   "lucidité",
+   "Lucidité"
+  ]
+ },
+ {
+  "name": "Old Blood",
+  "kind": "notion",
+  "aliases": [
+   "old blood",
+   "sang ancien",
+   "Sang ancien"
+  ]
+ },
+ {
+  "name": "Nightmare",
+  "kind": "notion",
+  "aliases": [
+   "nightmare",
+   "Nightmares",
+   "nightmares",
+   "cauchemar",
+   "Cauchemar"
+  ],
+  "broad": true
+ },
+ {
+  "name": "Blood Echoes",
+  "kind": "notion",
+  "aliases": [
+   "blood echoes",
+   "échos du sang",
+   "Échos du sang"
+  ]
+ },
+ {
+  "name": "Moon",
+  "kind": "notion",
+  "aliases": [
+   "moon",
+   "Lune",
+   "lune"
+  ]
+ },
+ {
+  "name": "beasts",
+  "kind": "notion",
+  "aliases": [
+   "beast",
+   "Beast",
+   "Beasts",
+   "monstres",
+   "monstre",
+   "Monstres",
+   "bête"
+  ],
+  "label": "Beasts",
+  "broad": true
+ },
+ {
+  "name": "Holy Chalice",
+  "kind": "notion",
+  "aliases": [
+   "Holy Chalices",
+   "Calice sacré"
+  ]
+ },
+ {
+  "name": "Truth",
+  "kind": "notion",
+  "aliases": [
+   "Eldritch Truth"
+  ]
+ },
+ {
+  "name": "Child of Blood",
+  "kind": "notion",
+  "aliases": [
+   "child of blood"
+  ]
+ },
+ {
+  "name": "cosmos",
+  "kind": "notion",
+  "aliases": [
+   "Cosmos"
+  ],
+  "label": "The cosmos"
+ }
+]

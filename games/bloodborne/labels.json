@@ -1,0 +1,516 @@
+[
+  {
+    "title": "Valtr and the League",
+    "description": "Valtr, Master of the League, and his mission: to exterminate the Vermin with his confederates.",
+    "members": [
+      "Valtr — passage 5",
+      "Valtr — passage 3",
+      "Valtr — passage 6",
+      "Valtr — passage 4",
+      "Valtr — passage 2",
+      "Valtr — passage 1",
+      "Vermin",
+      "League Staff"
+    ]
+  },
+  {
+    "title": "Guardians of the Forbidden Woods",
+    "description": "Attire of Dores the graveguard and of the Madaras twins, butchers of the Forbidden Woods.",
+    "members": [
+      "Butcher Gloves",
+      "Butcher Garb",
+      "Graveguard Manchettes",
+      "Graveguard Robe",
+      "Graveguard Mask",
+      "Butcher Trousers",
+      "Butcher Mask",
+      "Graveguard Kilt",
+      "Madaras Whistle"
+    ]
+  },
+  {
+    "title": "Blood gems",
+    "description": "Blood gems and gemstones that strengthen weapons, the blood stones used to upgrade them, and a few trinkets.",
+    "members": [
+      "Odd Fire Abyssal Blood Gem",
+      "Hard Adept Abyssal Blood Gem",
+      "Cursed Odd Fire Abyssal Blood Gem",
+      "Hard Adept Blood Gemstone (2)",
+      "Hard Adept Blood Gemstone (1)",
+      "Cursed Hard Adept Blood Gemstone (3)",
+      "Hard Adept Blood Gemstone (3)",
+      "Cursed Hard Adept Abyssal Blood Gem",
+      "Cursed Hard Adept Blood Gemstone (1)",
+      "Cursed Odd Arcane Abyssal Blood Gem",
+      "Cursed Odd Bolt Abyssal Blood Gem",
+      "Cursed Hard Adept Blood Gemstone (2)",
+      "Cursed Odd Abyssal Bloodtinge Gem",
+      "Odd Bolt Abyssal Blood Gem",
+      "Odd Abyssal Bloodtinge Gem"
+    ]
+  },
+  {
+    "title": "Caryll Runes",
+    "description": "Runes of Caryll, the Byrgenwerth runesmith: transcriptions of the inhuman sounds of the Great Ones.",
+    "members": [
+      "Caryll Rune: \"Heir\"",
+      "Great Lake",
+      "Lake",
+      "Caryll Rune: \"Moon\"",
+      "Dissipating Lake",
+      "Hunter",
+      "Moon",
+      "Fading Lake",
+      "Caryll Rune: \"Beast\"",
+      "Arcane Lake",
+      "Caryll Rune: \"Reveler\"",
+      "Caryll Rune: \"Communion\"",
+      "Caryll Rune: \"Liaison\"",
+      "Caryll Rune: \"Deep Sea\"",
+      "Caryll Rune: \"Lake\""
+    ]
+  },
+  {
+    "title": "Healing blood and remedies",
+    "description": "Blood vials and the blood of Arianna, Adella and Adeline, with antidotes, sedatives and elixirs.",
+    "members": [
+      "Sedative",
+      "Blood Vial",
+      "Blood of Arianna",
+      "Blood of Adeline",
+      "Brain Fluid",
+      "Blood of Adella",
+      "Antidote",
+      "Blue Elixir",
+      "Pungent Blood Cocktail",
+      "Iosefka's Blood Vial",
+      "Lead Elixir",
+      "Enlarged Head",
+      "Arianna's Shoes"
+    ]
+  },
+  {
+    "title": "Cainhurst and the Vilebloods",
+    "description": "Queen Annalise, her royal guard and the Vilebloods of Cainhurst, enemies of the Healing Church.",
+    "members": [
+      "Cainhurst Helmet",
+      "Cainhurst Leggings",
+      "Cainhurst Armor",
+      "Cainhurst Badge",
+      "Cainhurst Gauntlets",
+      "Blood Dreg",
+      "Annalise, Queen of Castle Cainhurst — passage 5",
+      "Queenly Blood",
+      "Vileblood Register",
+      "Queenly Flesh",
+      "Knight's Gloves",
+      "Annalise, Queen of Castle Cainhurst — passage 1",
+      "Knight's Garb",
+      "Chikage",
+      "Annalise, Queen of Castle Cainhurst — passage 2"
+    ]
+  },
+  {
+    "title": "Coldblood and Blood Echoes",
+    "description": "Coldblood relics that grant Blood Echoes, including those of the Great Ones.",
+    "members": [
+      "Great One Coldblood",
+      "Old Great One Coldblood",
+      "Revered Great One Coldblood",
+      "Coldblood Dew (1)",
+      "Frenzied Coldblood (7)",
+      "Kin Coldblood (10)",
+      "Thick Coldblood (4)",
+      "Madman's Knowledge",
+      "Ring of Betrothal",
+      "One Third of Umbilical Cord"
+    ]
+  },
+  {
+    "title": "Patches",
+    "description": "Patches' lines, between feigned friendship and betrayal.",
+    "members": [
+      "Patches — passage 5",
+      "Patches — passage 6",
+      "Patches — passage 1",
+      "Patches — passage 2",
+      "Patches — passage 3",
+      "Patches — passage 8",
+      "Patches — passage 4",
+      "Patches — passage 7"
+    ]
+  },
+  {
+    "title": "Bells and resonance",
+    "description": "Resonant bells that link worlds: summoning hunters, the sinister bell, the Choir bell.",
+    "members": [
+      "Beckoning Bell",
+      "Small Resonant Bell",
+      "Old Hunter Bell",
+      "Sinister Resonant Bell",
+      "Choir Bell",
+      "Silencing Blank",
+      "A Call Beyond",
+      "Augur of Ebrietas",
+      "Empty Phantasm Shell",
+      "Cosmic Eye Watcher Badge"
+    ]
+  },
+  {
+    "title": "Chalices and labyrinths",
+    "description": "Chalices that break the seals of the underground labyrinths (Pthumeru, Loran…).",
+    "members": [
+      "Pthumeru Root Chalice",
+      "Cursed and Defiled Root Chalice",
+      "Central Pthumeru Chalice",
+      "Pthumeru Ihyll Root Chalice",
+      "Ailing Loran Root Chalice",
+      "Hintertomb Root Chalice",
+      "Isz Root Chalice",
+      "Lower Loran Chalice",
+      "Sinister Lower Pthumeru Root Chalice",
+      "Sinister Lower Loran Root Chalice",
+      "Sinister Isz Root Chalice",
+      "Sinister Pthumeru Ihyll Root Chalice",
+      "Short Ritual Root Chalice",
+      "Sinister Hintertomb Root Chalice",
+      "Defiled Chalice"
+    ]
+  },
+  {
+    "title": "Chalice ritual materials",
+    "description": "Materials for Holy Chalice rituals: ritual vestiges, coldblood flowers, tomb mold, red jelly, ritual blood.",
+    "members": [
+      "Coldblood Flower Bulb",
+      "Coldblood Flowerbud (1)",
+      "Coldblood Flowerbud",
+      "Coldblood Flower Bulb (6)",
+      "Tomb Mold (1)",
+      "Soaring Tomb Mold",
+      "Vermiculum (not needed)",
+      "Blooming Coldblood Flower",
+      "Ritual Blood (1)",
+      "Ritual Vestige (6)",
+      "Perfect Ritual Vestige",
+      "Red Jelly",
+      "Inflicted Organ",
+      "Bloodshot Eyeball",
+      "Pearl Slug"
+    ]
+  },
+  {
+    "title": "Chants and prayers",
+    "description": "Chanted words: the Fishing Hamlet villagers and priest, Yamamura, and a few cursed relics.",
+    "members": [
+      "Fishing Hamlet NPCs — passage 1",
+      "Fishing Hamlet Priest — passage 2",
+      "Fishing Hamlet NPCs — passage 2",
+      "Fishing Hamlet Priest — passage 1",
+      "Fishing Hamlet Priest — passage 3",
+      "Yamamura the Wanderer — passage 1",
+      "Accursed Brew",
+      "Eye of a Blood-drunk Hunter",
+      "Kos Parasite"
+    ]
+  },
+  {
+    "title": "Blood ministration and Paleblood",
+    "description": "The Blood Minister's welcome, Vicar Amelia's prayer, and the notes that set the hunter after Paleblood.",
+    "members": [
+      "Blood Minister — passage 1",
+      "Blood Minister — passage 4",
+      "Blood Minister — passage 3",
+      "Blood Minister — passage 2",
+      "Vicar Amelia — passage 1",
+      "Heir to the ritual of blood,…",
+      "Cutscenes — passage 1",
+      "Church Doctor (Recovery Room) — passage 1",
+      "Seek Paleblood to transcend the hunt.",
+      "When the red moon hangs low,…"
+    ]
+  },
+  {
+    "title": "Fire and light",
+    "description": "Molotovs, oil urns and fire paper, torches and the hand lantern, and a few iron helms.",
+    "members": [
+      "Molotov Cocktail",
+      "Hunter's Torch",
+      "Torch",
+      "Hand Lantern",
+      "Fire Paper",
+      "Rope Molotov Cocktail",
+      "Monocular",
+      "Shining Coins",
+      "Oil Urn",
+      "One-eyed Iron Helm",
+      "Master's Iron Helm"
+    ]
+  },
+  {
+    "title": "Iosefka's clinic",
+    "description": "Iosefka and the impostor Iosefka at the clinic, and the survivors sent to them.",
+    "members": [
+      "Impostor Iosefka — passage 3",
+      "Impostor Iosefka — passage 4",
+      "Impostor Iosefka — passage 9",
+      "Impostor Iosefka — passage 2",
+      "Iosefka — passage 3",
+      "Impostor Iosefka — passage 1",
+      "Impostor Iosefka — passage 7",
+      "Iosefka — passage 2",
+      "Impostor Iosefka — passage 6",
+      "Iosefka — passage 1",
+      "Iosefka — passage 4",
+      "Impostor Iosefka — passage 8",
+      "Impostor Iosefka — passage 5"
+    ]
+  },
+  {
+    "title": "Arianna",
+    "description": "Lines of Arianna, who offers her blood to the hunter.",
+    "members": [
+      "Arianna, Woman of Pleasure — passage 4",
+      "Arianna, Woman of Pleasure — passage 6",
+      "Arianna, Woman of Pleasure — passage 3",
+      "Arianna, Woman of Pleasure — passage 2",
+      "Arianna, Woman of Pleasure — passage 5",
+      "Arianna, Woman of Pleasure — passage 1",
+      "Arianna, Woman of Pleasure — passage 7",
+      "Arianna, Woman of Pleasure — passage 8"
+    ]
+  },
+  {
+    "title": "Yahar'gul and the School of Mensis",
+    "description": "Black garb of Yahar'gul's kidnappers, the Mensis Cage and the madmen's hoods.",
+    "members": [
+      "Black Hooded Iron Helm",
+      "Yahar'gul Black Gloves",
+      "Yahar'gul Black Trousers",
+      "Yahar'gul Black Garb",
+      "Iron Yahar'gul Helm",
+      "Black Hood",
+      "Madman Garb",
+      "Madman Hood",
+      "Harrowed Hood",
+      "Mensis Cage",
+      "Tomb Prospector Hood",
+      "Sullied Bandage"
+    ]
+  },
+  {
+    "title": "Messenger accessories",
+    "description": "Hats, bandages and festivals that the little messengers love.",
+    "members": [
+      "Messenger Top Hat",
+      "Worn Messenger Top Hat",
+      "Black Messenger Hat",
+      "Yharnam Messenger Hat",
+      "Messenger Head Bandage",
+      "Bloody Messenger Head Bandage",
+      "Messenger Urn Festival",
+      "Messenger's Gift",
+      "Red Messenger Ribbon",
+      "White Messenger Ribbon",
+      "Notebook",
+      "Top Hat"
+    ]
+  },
+  {
+    "title": "Adella, Alfred and the Church",
+    "description": "The Healing Church's faithful: Adella the nun, Alfred, Hunter of Vilebloods, and Gilbert, with keys to the Cathedral Ward's locked doors.",
+    "members": [
+      "Adella, Nun of the Healing Church — passage 3",
+      "Alfred, Hunter of Vilebloods — passage 2",
+      "Alfred, Hunter of Vilebloods — passage 3",
+      "Adella, Nun of the Healing Church — passage 5",
+      "Adella, Nun of the Healing Church — passage 1",
+      "Adella, Nun of the Healing Church — passage 6",
+      "Gilbert, Critically Ill Man — passage 2",
+      "Alfred, Hunter of Vilebloods — passage 5",
+      "Alfred, Hunter of Vilebloods — passage 4",
+      "Alfred, Hunter of Vilebloods — passage 8",
+      "Gilbert, Critically Ill Man — passage 3",
+      "Adella, Nun of the Healing Church — passage 2",
+      "Alfred, Hunter of Vilebloods — passage 10",
+      "Adella, Nun of the Healing Church — passage 7",
+      "Alfred, Hunter of Vilebloods — passage 11"
+    ]
+  },
+  {
+    "title": "Research Hall patients",
+    "description": "Adeline and the Research Hall patients, who beg Lady Maria and hear the sea.",
+    "members": [
+      "Adeline — passage 4",
+      "Research Hall Patients — passage 1",
+      "Adeline — passage 1",
+      "Adeline — passage 6",
+      "Adeline — passage 5",
+      "Research Hall Patients — passage 3",
+      "Adeline — passage 2",
+      "Research Hall Patients — passage 4",
+      "Research Hall Patients — passage 2",
+      "Adeline — passage 3",
+      "Research Hall Patients — passage 5"
+    ]
+  },
+  {
+    "title": "Hunter attire",
+    "description": "Hunter garb old and new: Henryk's, Gascoigne's, the crows', the old hunters', and the Foreign Garb worn on waking.",
+    "members": [
+      "Charred Hunter Garb",
+      "Hunter Garb",
+      "Charred Hunter Gloves",
+      "Henryk's Hunter Garb",
+      "Crowfeather Garb",
+      "Hunter Hat",
+      "Hunter Gloves",
+      "Gehrman's Hunter Cap",
+      "Old Hunter Garb",
+      "Decorative Old Hunter Garb",
+      "Constable's Garb",
+      "Ashen Hunter Garb",
+      "Henryk's Hunter Cap",
+      "Old Hunter Trousers",
+      "Old Hunter Top Hat"
+    ]
+  },
+  {
+    "title": "Trick weapons and hunter badges",
+    "description": "The Workshop's trick weapons and firearms, hunter badges, bullets and throwing items.",
+    "members": [
+      "Boom Hammer",
+      "Saw Cleaver",
+      "Hunter Pistol",
+      "Hunter Blunderbuss",
+      "Kirkhammer",
+      "Saw Spear",
+      "Beast Cutter",
+      "Ludwig's Holy Blade",
+      "Hunter Axe",
+      "Whirligig Saw",
+      "Beasthunter Saif",
+      "Throwing Knife",
+      "Burial Blade",
+      "Threaded Cane",
+      "Church Pick"
+    ]
+  },
+  {
+    "title": "The Narrow-Minded Man",
+    "description": "The Narrow-Minded Man's suspicious lines about outsiders.",
+    "members": [
+      "Narrow-Minded Man — passage 9",
+      "Narrow-Minded Man — passage 5",
+      "Narrow-Minded Man — passage 12",
+      "Narrow-Minded Man — passage 3",
+      "Narrow-Minded Man — passage 8",
+      "Narrow-Minded Man — passage 7",
+      "Narrow-Minded Man — passage 2",
+      "Narrow-Minded Man — passage 1",
+      "Narrow-Minded Man — passage 6",
+      "Narrow-Minded Man — passage 11",
+      "Narrow-Minded Man — passage 4",
+      "Narrow-Minded Man — passage 13",
+      "Narrow-Minded Man — passage 10"
+    ]
+  },
+  {
+    "title": "Yharnamites",
+    "description": "Townsfolk hiding behind doors and windows during the night of the hunt.",
+    "members": [
+      "Yharnamites — passage 6",
+      "Yharnamites — passage 9",
+      "Yharnamites — passage 10",
+      "Yharnamites — passage 14",
+      "Yharnamites — passage 21",
+      "Yharnamites — passage 7",
+      "Yharnamites — passage 5",
+      "Yharnamites — passage 8",
+      "Yharnamites — passage 13",
+      "Yharnamites — passage 17",
+      "Yharnamites — passage 20",
+      "Yharnamites — passage 2",
+      "Yharnamites — passage 3",
+      "Yharnamites — passage 18",
+      "Yharnamites — passage 15"
+    ]
+  },
+  {
+    "title": "Willem, Laurence and Byrgenwerth",
+    "description": "Master Willem and those who left him, Laurence and Gehrman, with the Old Woman and the gatekeeper.",
+    "members": [
+      "Old Woman — passage 7",
+      "Adeline — passage 7",
+      "Old Woman — passage 5",
+      "Old Woman — passage 1",
+      "Old Woman — passage 3",
+      "Gatekeeper — passage 4",
+      "Old Woman — passage 4",
+      "Old Woman — passage 2",
+      "Gatekeeper — passage 3",
+      "Old Woman — passage 6",
+      "Willem — passage 2",
+      "Laurence, the First Vicar — passage 2",
+      "Brador — passage 3",
+      "Master Willem was right. Evolution without…"
+    ]
+  },
+  {
+    "title": "The Hunter's Nightmare",
+    "description": "Simon and Lady Maria, in the Hunter's Nightmare and its Church secrets.",
+    "members": [
+      "Lady Maria — passage 1",
+      "Lady Maria — passage 2",
+      "Simon — passage 4",
+      "Simon — passage 1",
+      "Simon — passage 6",
+      "Simon — passage 3",
+      "Simon — passage 2",
+      "Simon — passage 5",
+      "Brador — passage 1",
+      "Lady Maria — passage 3"
+    ]
+  },
+  {
+    "title": "The Doll and Gehrman",
+    "description": "The words of the Doll and Gehrman in the Hunter's Dream.",
+    "members": [
+      "The Doll — passage 1",
+      "Djura — passage 5",
+      "Eileen the Crow — passage 6",
+      "Eileen the Crow — passage 1",
+      "Eileen the Crow — passage 5",
+      "Eileen the Crow — passage 7",
+      "Gehrman — passage 6",
+      "Djura — passage 1",
+      "Djura — passage 2",
+      "The Doll — passage 4",
+      "Gehrman — passage 7",
+      "Gehrman — passage 1",
+      "Djura — passage 3",
+      "Suspicious Beggar — passage 4",
+      "Laurence, the First Vicar — passage 1"
+    ]
+  },
+  {
+    "title": "The Chapel Dweller",
+    "description": "The Chapel Dweller's lines, welcoming survivors into Oedon Chapel.",
+    "members": [
+      "Chapel Dweller — passage 11",
+      "Chapel Dweller — passage 8",
+      "Chapel Dweller — passage 12",
+      "Chapel Dweller — passage 15",
+      "Chapel Dweller — passage 4",
+      "Chapel Dweller — passage 13",
+      "Chapel Dweller — passage 10",
+      "Chapel Dweller — passage 9",
+      "Chapel Dweller — passage 3",
+      "Chapel Dweller — passage 5",
+      "Chapel Dweller — passage 2",
+      "Chapel Dweller — passage 7",
+      "Chapel Dweller — passage 14",
+      "Chapel Dweller — passage 6",
+      "Chapel Dweller — passage 1"
+    ]
+  }
+]

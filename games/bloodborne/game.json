@@ -1,0 +1,171 @@
+{
+  "id": "bloodborne",
+  "title": "Bloodborne",
+  "source": "message archives of the player's PS4 copy (msg/engus, frafr, jpnjp), read by games/bloodborne/extract.py",
+  "text_lang": "en",
+  "alt_lang": "fr",
+  "min_chars": 15,
+  "categories": {
+    "goods": {
+      "label": "Items",
+      "text_fields": [
+        "caption_en"
+      ],
+      "jp_field": "caption_jp"
+    },
+    "weapon": {
+      "label": "Weapons",
+      "text_fields": [
+        "caption_en"
+      ],
+      "jp_field": "caption_jp"
+    },
+    "protector": {
+      "label": "Attire",
+      "text_fields": [
+        "caption_en"
+      ],
+      "jp_field": "caption_jp"
+    },
+    "rune": {
+      "label": "Caryll Runes",
+      "text_fields": [
+        "caption_en"
+      ],
+      "jp_field": "caption_jp"
+    },
+    "gem": {
+      "label": "Blood Gems",
+      "text_fields": [
+        "caption_en"
+      ],
+      "jp_field": "caption_jp"
+    },
+    "note": {
+      "label": "Notes",
+      "text_fields": [
+        "caption_en"
+      ],
+      "jp_field": "caption_jp"
+    }
+  },
+  "dialog_label": "Dialogue",
+  "colors": {
+    "Items": "#d9c48e",
+    "Weapons": "#cf8e66",
+    "Attire": "#9db8a3",
+    "Caryll Runes": "#c7a3d1",
+    "Blood Gems": "#e08a96",
+    "Notes": "#e3dcc0",
+    "Dialogue": "#a7b6d6"
+  },
+  "junk": [
+    "%null%",
+    "[ERROR]",
+    "dummy"
+  ],
+  "extra_stop": [
+    "thou",
+    "thee",
+    "thy",
+    "thine",
+    "thyself",
+    "hath",
+    "doth",
+    "art",
+    "ye",
+    "upon",
+    "shall",
+    "unto",
+    "also",
+    "used",
+    "use",
+    "uses",
+    "using",
+    "increases",
+    "increase",
+    "increased",
+    "boosts",
+    "boost",
+    "raises",
+    "raise",
+    "greatly",
+    "slightly",
+    "temporarily",
+    "reduces",
+    "reduce",
+    "attack",
+    "attacks",
+    "damage",
+    "hp",
+    "stamina",
+    "weapon",
+    "weapons",
+    "item",
+    "items",
+    "effect",
+    "effects",
+    "one",
+    "two",
+    "may",
+    "can",
+    "will",
+    "would",
+    "could",
+    "said",
+    "known",
+    "like",
+    "even",
+    "still",
+    "yet",
+    "whose",
+    "within",
+    "among",
+    "well",
+    "i'm",
+    "i'll",
+    "i've",
+    "you're",
+    "you'll",
+    "it's",
+    "that's",
+    "there's",
+    "don't",
+    "can't",
+    "won't",
+    "oh",
+    "ah",
+    "yes"
+  ],
+  "speaker_names": {
+    "Gascoigne": "Father Gascoigne",
+    "Amelia": "Vicar Amelia",
+    "Laurence": "Laurence, the First Vicar",
+    "Micolash": "Micolash, Host of the Nightmare",
+    "Yamamura": "Yamamura the Wanderer"
+  },
+  "min_cluster": 8,
+  "min_samples": 3,
+  "images": "game-files",
+  "ui": {
+    "tagline": "Every star is a text from Bloodborne. The more two texts talk about the same things, the closer they sit.",
+    "aria": "Map of Bloodborne's texts: each star is a text, and texts close together talk about the same things. Arrow keys to move, plus and minus to zoom, Enter to open the targeted star.",
+    "credit": "Bloodborne texts and artwork © FromSoftware / Sony Interactive Entertainment. Non-commercial fan project.",
+    "alt_label": "French",
+    "alt_lang": "fr",
+    "search_examples": [
+      "who is Gehrman",
+      "Paleblood"
+    ],
+    "precise": {
+      "phrase": "Hunter's Dream",
+      "both": "Laurence + Willem",
+      "exclude": "-Gehrman",
+      "category": "in:notes"
+    },
+    "entity_examples": "Laurence or Byrgenwerth",
+    "empty_hint": "Gehrman, Byrgenwerth",
+    "dlc_label": "The Old Hunters"
+  },
+  "max_cluster": 60
+}

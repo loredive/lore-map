@@ -1,0 +1,342 @@
+{
+ "k": 10,
+ "min_hit_rate": 0.9,
+ "note": "Bloodborne queries, written 2026-10-25 after the switch to English and never used to tune the search (the fusion weight comes from the Elden Ring dev set): all are \"test\". About a third are names, the rest describe the lore in a newcomer's words, avoiding the texts' own key words where possible. Expected texts were chosen by searching the texts for the defining phrase, not from the search results.",
+ "queries": [
+  {
+   "query": "Gehrman",
+   "expect": [
+    "Gehrman's Hunter Cap",
+    "Burial Blade"
+   ],
+   "expect_prefix": [
+    "Gehrman — "
+   ],
+   "split": "test"
+  },
+  {
+   "query": "Lady Maria",
+   "expect": [
+    "Rakuyo",
+    "Maria Hunter Cap",
+    "Maria Hunter Garb"
+   ],
+   "expect_prefix": [
+    "Lady Maria — "
+   ],
+   "split": "test"
+  },
+  {
+   "query": "Djura",
+   "expect": [],
+   "expect_prefix": [
+    "Djura — "
+   ],
+   "split": "test"
+  },
+  {
+   "query": "Simon",
+   "expect": [
+    "Simon's Bowblade"
+   ],
+   "expect_prefix": [
+    "Simon — "
+   ],
+   "split": "test"
+  },
+  {
+   "query": "Annalise",
+   "expect": [
+    "Queenly Flesh",
+    "Vileblood Register"
+   ],
+   "expect_prefix": [
+    "Annalise, Queen of Castle Cainhurst — "
+   ],
+   "split": "test"
+  },
+  {
+   "query": "Logarius",
+   "expect": [
+    "Logarius' Wheel",
+    "Wheel Hunter Badge",
+    "Crown of Illusions"
+   ],
+   "expect_prefix": [],
+   "split": "test"
+  },
+  {
+   "query": "Holy Moonlight Sword",
+   "expect": [
+    "Holy Moonlight Sword"
+   ],
+   "expect_prefix": [],
+   "split": "test"
+  },
+  {
+   "query": "Paleblood",
+   "expect": [
+    "Seek Paleblood to transcend the hunt.",
+    "The nameless moon presence beckoned by…"
+   ],
+   "expect_prefix": [],
+   "split": "test"
+  },
+  {
+   "query": "Kos",
+   "expect": [
+    "Kos Parasite"
+   ],
+   "expect_prefix": [
+    "Fishing Hamlet Priest — ",
+    "Fishing Hamlet NPCs — "
+   ],
+   "split": "test"
+  },
+  {
+   "query": "Yamamura",
+   "expect": [
+    "Yamamura Hunter Hat",
+    "Khaki Haori"
+   ],
+   "expect_prefix": [
+    "Yamamura the Wanderer — "
+   ],
+   "split": "test"
+  },
+  {
+   "query": "who was the first vicar of the Church",
+   "expect": [
+    "Laurence's Skull"
+   ],
+   "expect_prefix": [
+    "Laurence, the First Vicar — "
+   ],
+   "split": "test"
+  },
+  {
+   "query": "the master who warned his students to fear the blood",
+   "expect": [
+    "Laurence, the First Vicar — passage 1"
+   ],
+   "expect_prefix": [
+    "Willem — "
+   ],
+   "split": "test"
+  },
+  {
+   "query": "the oldest of all hunters",
+   "expect": [
+    "Gehrman's Hunter Cap",
+    "Burial Blade",
+    "Old Hunter Bone",
+    "Beckoning Bell"
+   ],
+   "expect_prefix": [
+    "Gehrman — "
+   ],
+   "split": "test"
+  },
+  {
+   "query": "the woman who hunts hunters who lost themselves",
+   "expect": [
+    "Crow Hunter Badge",
+    "Beak Mask",
+    "Crowfeather Garb",
+    "Crowfeather Manchettes"
+   ],
+   "expect_prefix": [],
+   "split": "test"
+  },
+  {
+   "query": "a sword that shines with blue light from the cosmos",
+   "expect": [
+    "Holy Moonlight Sword"
+   ],
+   "expect_prefix": [],
+   "split": "test"
+  },
+  {
+   "query": "the village by the sea and its curse",
+   "expect": [
+    "Kos Parasite"
+   ],
+   "expect_prefix": [
+    "Fishing Hamlet Priest — ",
+    "Fishing Hamlet NPCs — "
+   ],
+   "split": "test"
+  },
+  {
+   "query": "the queen of the corrupted blood in her castle",
+   "expect": [
+    "Queenly Flesh",
+    "Vileblood Register",
+    "Cainhurst Summons",
+    "Blood Dreg"
+   ],
+   "expect_prefix": [
+    "Annalise, Queen of Castle Cainhurst — "
+   ],
+   "split": "test"
+  },
+  {
+   "query": "the men in gold masks who purged the castle",
+   "expect": [
+    "Logarius' Wheel",
+    "Wheel Hunter Badge",
+    "Executioner Garb",
+    "Executioner Gauntlets",
+    "Executioner Trousers",
+    "Crown of Illusions",
+    "Gold Ardeo"
+   ],
+   "expect_prefix": [],
+   "split": "test"
+  },
+  {
+   "query": "the little girl looking for her mother",
+   "expect": [
+    "Tiny Music Box"
+   ],
+   "expect_prefix": [
+    "Gascoigne's Younger Daughter — "
+   ],
+   "split": "test"
+  },
+  {
+   "query": "a music box that calms a hunter gone mad",
+   "expect": [
+    "Tiny Music Box"
+   ],
+   "expect_prefix": [],
+   "split": "test"
+  },
+  {
+   "query": "the hunter who threw her blade into the well",
+   "expect": [
+    "Rakuyo"
+   ],
+   "expect_prefix": [
+    "Lady Maria — "
+   ],
+   "split": "test"
+  },
+  {
+   "query": "the bowman who sought the secret of the nightmare",
+   "expect": [
+    "Simon's Bowblade"
+   ],
+   "expect_prefix": [
+    "Simon — "
+   ],
+   "split": "test"
+  },
+  {
+   "query": "the church that heals with blood",
+   "expect": [
+    "Blood Vial",
+    "Communion"
+   ],
+   "expect_prefix": [
+    "Blood Minister — "
+   ],
+   "split": "test"
+  },
+  {
+   "query": "the patients who grew heads full of water",
+   "expect": [
+    "Brain Fluid"
+   ],
+   "expect_prefix": [
+    "Research Hall Patients — ",
+    "Adeline — "
+   ],
+   "split": "test"
+  },
+  {
+   "query": "the hunters who liked loud explosive weapons",
+   "expect": [
+    "Powder Keg Hunter Badge",
+    "Firing Hammer Badge",
+    "Stake Driver",
+    "Cannon",
+    "Boom Hammer",
+    "Whirligig Saw",
+    "Rifle Spear"
+   ],
+   "expect_prefix": [],
+   "split": "test"
+  },
+  {
+   "query": "the hunter who gave up and protects the burned town",
+   "expect": [
+    "Stake Driver",
+    "Gatling Gun",
+    "Ashen Hunter Garb"
+   ],
+   "expect_prefix": [
+    "Djura — "
+   ],
+   "split": "test"
+  },
+  {
+   "query": "a mother's gift that grants eyes to the brain",
+   "expect": [
+    "One Third of Umbilical Cord"
+   ],
+   "expect_prefix": [],
+   "split": "test"
+  },
+  {
+   "query": "the spider guarding the secret of the moon",
+   "expect": [
+    "The Byrgenwerth spider hides all manner…",
+    "The spider hides all manner of…"
+   ],
+   "expect_prefix": [],
+   "split": "test"
+  },
+  {
+   "query": "the doll that speaks to the hunter in the dream",
+   "expect": [],
+   "expect_prefix": [
+    "The Doll — "
+   ],
+   "split": "test"
+  },
+  {
+   "query": "the masked school that kidnaps people",
+   "expect": [
+    "Mensis Cage",
+    "Black Hooded Iron Helm",
+    "Yahar'gul Black Garb",
+    "Yahar'gul Black Gloves",
+    "Yahar'gul Black Trousers"
+   ],
+   "expect_prefix": [],
+   "split": "test"
+  },
+  {
+   "query": "the nun who offers her blood to the hunter",
+   "expect": [
+    "Blood of Adella",
+    "Blood of Adeline"
+   ],
+   "expect_prefix": [
+    "Adella, Nun of the Healing Church — ",
+    "Adeline — "
+   ],
+   "split": "test"
+  },
+  {
+   "query": "the vicar who prayed before turning into a beast",
+   "expect": [],
+   "expect_prefix": [
+    "Vicar Amelia — "
+   ],
+   "split": "test"
+  }
+ ],
+ "min_mrr": 0.68
+}
