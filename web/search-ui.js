@@ -7,7 +7,7 @@ import { select, snippet, mark, panelTop, bindPanelTop } from "./panel.js";
 import { record, current, goBack } from "./nav.js";
 import { bindEntityButtons } from "./entities-ui.js";
 
-const TRANSFORMERS_URL = "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3";
+const TRANSFORMERS_URL = "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1";   // version exacte : ce code tourne là où est la clé du visiteur
 
 export function buildIndex() {
   S.bm25 = new BM25(S.docs.map(corpusText));
