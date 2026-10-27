@@ -1,5 +1,5 @@
-// Le parcours de lecture : enregistré par jeu dans le navigateur, montré sous la recherche (les
-// derniers pas), sur la carte (sky.js : drawTrail) et en entier dans le panneau (« Your trail »).
+// L'historique de lecture : enregistré par jeu dans le navigateur, montré sur la carte (sky.js :
+// drawTrail, les textes déjà lus) et en entier dans le panneau « History » (bouton de la barre).
 // Chaque fiche ouverte (texte, entité, groupe, dialogue) est un pas ; nav.js nous les signale.
 import { S, $, panel, esc, colorOf, resetContext, focusPanel } from "./state.js";
 import { draw } from "./render.js";
@@ -8,9 +8,7 @@ import { record, onRecord, openEntry } from "./nav.js";
 import { KIND_LABELS } from "./entities-ui.js";
 import { push, previousDoc, docKeys, recentDocs, serialize, parse } from "./trail.js";
 
-const STRIP = 2;                 // pas montrés sous la recherche (une seule ligne)
 const UNDO_MS = 10000;           // « Undo » reste proposé après « Clear »
-const strip = $("#trail");
 const storeKey = () => `lore-map:trail:${S.game}`;
 let steps = [], docIndex = new Map();
 let cleared = null, undoTimer = 0;   // parcours effacé, récupérable quelques secondes
@@ -75,26 +73,6 @@ function update(save = true) {
   if (save) {
     try { localStorage.setItem(storeKey(), serialize(steps, S.trailShown)); } catch { /* stockage bloqué */ }
   }
-  renderStrip();
-}
-
-function renderStrip() {
-  if (!steps.length) {
-    // juste après « Clear » : de quoi revenir en arrière, sans fenêtre de confirmation
-    strip.hidden = !cleared;
-    strip.innerHTML = cleared ? '<span class="note" role="status">Trail cleared.</span> <button type="button" class="act undo">Undo</button>' : "";
-    strip.querySelector(".undo")?.addEventListener("click", undoClear);
-    return;
-  }
-  strip.hidden = false;
-  const first = Math.max(0, steps.length - STRIP);
-  strip.innerHTML = (first > 0 ? '<span class="sep" aria-hidden="true">…</span>' : "") + steps.slice(first).map((s, k) =>
-    `<button type="button" class="step${first + k === steps.length - 1 ? " last" : ""}" data-k="${first + k}" title="${esc(kindOf(s))} · ${esc(labelOf(s))}">${esc(labelOf(s))}</button>`)
-    .join('<span class="sep" aria-hidden="true">›</span>') +
-    `<button type="button" class="act all">Trail (${steps.length})</button><button type="button" class="act clear">Clear</button>`;
-  strip.querySelectorAll("button.step").forEach(b => b.addEventListener("click", () => openEntry(entryOf(steps[+b.dataset.k]))));
-  strip.querySelector("button.all").addEventListener("click", showTrail);
-  strip.querySelector("button.clear").addEventListener("click", clearTrail);
 }
 
 // Effacer tout de suite, et proposer « Undo » quelques secondes (pas de confirm() du navigateur)
@@ -103,10 +81,10 @@ function clearTrail() {
   steps = [];
   S.cameFrom = -1;
   clearTimeout(undoTimer);
-  undoTimer = setTimeout(() => { cleared = null; renderStrip(); if (panel.dataset.view === "trail") showTrail(); }, UNDO_MS);
+  undoTimer = setTimeout(() => { cleared = null; if (panel.dataset.view === "trail") showTrail(); }, UNDO_MS);
   update();
   if (panel.dataset.view === "trail") showTrail();
-  strip.querySelector(".undo")?.focus();
+  panel.querySelector(".tundo")?.focus();
   draw();
 }
 function undoClear() {
@@ -131,20 +109,23 @@ export function showTrail() {
       <span class="head">${d ? `<span class="dot" style="--c:${colorOf(d.cat)}"></span>` : `<span class="kind">${esc(kindOf(s))}</span>`}<span class="name">${esc(labelOf(s))}</span></span>
       ${d ? `<span class="snip">${esc(snippet(d.text, [], 110))}</span>` : ""}</button></li>`;
   }).join("");
+  const last = steps.at(-1);
   panel.innerHTML = `${panelTop()}<article class="card">
-    <h2>Your trail</h2>
+    <h2>History</h2>
     <p class="count">${S.visited.size} of ${S.docs.length} texts read, in ${steps.length} ${steps.length === 1 ? "step" : "steps"}.</p>
+    ${last ? `<button type="button" class="entity-link tcontinue">Continue where you left off: ${esc(labelOf(last))}</button>` : ""}
     <div class="tools">
-      <button type="button" class="tshow" aria-pressed="${S.trailShown}">Show the trail on the map</button>
-      ${steps.length ? '<button type="button" class="tclear danger">Clear the trail</button>' : cleared ? '<button type="button" class="tundo">Undo clear</button>' : ""}
+      <button type="button" class="tshow" aria-pressed="${S.trailShown}">Show the path through the last texts read</button>
+      ${steps.length ? '<button type="button" class="tclear danger">Clear the history</button>' : cleared ? '<button type="button" class="tundo">Undo clear</button>' : ""}
     </div>
-    <p class="hint">Newest first. On the map, a dotted line joins the last texts you read, a ring marks every text
-      already read, and the text you came from is named. Kept in this browser, one trail per game.</p>
+    <p class="hint">Newest first. On the map, a ring marks every text already read, and the text you came from is
+      named. Kept in this browser, one history per game.</p>
     ${steps.length ? `<ol class="results trail-list">${rows}</ol>` : '<p class="text">Nothing read yet: open a star to start.</p>'}
   </article>`;
   bindPanelTop();
   panel.querySelectorAll(".trail-list button[data-k]").forEach(b =>
     b.addEventListener("click", () => openEntry(entryOf(steps[+b.dataset.k]))));
+  panel.querySelector(".tcontinue")?.addEventListener("click", () => openEntry(entryOf(last)));
   panel.querySelector(".tshow").addEventListener("click", ev => {
     S.trailShown = !S.trailShown;
     ev.currentTarget.setAttribute("aria-pressed", String(S.trailShown));
@@ -154,6 +135,8 @@ export function showTrail() {
   panel.querySelector(".tclear")?.addEventListener("click", clearTrail);
   panel.querySelector(".tundo")?.addEventListener("click", undoClear);
   panel.scrollTop = 0;
-  focusPanel(`Your trail: ${steps.length} steps`);
+  focusPanel(`History: ${steps.length} steps`);
   draw();
 }
+
+$("#history").addEventListener("click", showTrail);

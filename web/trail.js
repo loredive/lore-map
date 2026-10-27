@@ -37,14 +37,16 @@ export function recentDocs(trail, n = 12) {
 }
 
 // Enregistrement : { steps, shown } ; un JSON illisible ou d'un autre format donne un parcours vide.
-export function serialize(steps, shown = true) { return JSON.stringify({ v: 1, steps, shown }); }
+// shown : le pointillé sur la carte, masqué par défaut ; en v1 il était montré sans qu'on l'ait choisi,
+// on garde donc les pas d'un enregistrement v1 mais pas son shown.
+export function serialize(steps, shown = false) { return JSON.stringify({ v: 2, steps, shown }); }
 export function parse(raw) {
   try {
     const o = JSON.parse(raw);
-    if (!o || o.v !== 1 || !Array.isArray(o.steps)) throw new Error("format");
+    if (!o || (o.v !== 1 && o.v !== 2) || !Array.isArray(o.steps)) throw new Error("format");
     const steps = o.steps.filter(s => s && KINDS.includes(s.kind) && typeof s.key === "string").slice(-MAX_STEPS);
-    return { steps, shown: o.shown !== false };
+    return { steps, shown: o.v === 2 && o.shown === true };
   } catch {
-    return { steps: [], shown: true };
+    return { steps: [], shown: false };
   }
 }

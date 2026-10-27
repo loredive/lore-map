@@ -68,7 +68,7 @@ export function backLabel() {
     case "help": return "Back to help";
     case "path": return "Back to the path";
     case "dialogue": return `Back to the dialogue of ${e.speaker}`;
-    case "trail": return "Back to your trail";
+    case "trail": return "Back to your history";
     case "tours": return "Back to the guided tours";
     case "tour": return `Back to “${S.tours.find(t => t.id === e.id)?.title || e.id}”, step ${e.k + 1}`;
     default: return null;                       // avant : le panneau fermé, « Fermer » suffit

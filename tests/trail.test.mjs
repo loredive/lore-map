@@ -25,8 +25,10 @@ test("texts read and the recent thread", () => {
 });
 
 test("saved trails round-trip, and bad data gives an empty trail", () => {
-  assert.deepEqual(parse(serialize([doc("A"), ent("B")], false)), { steps: [doc("A"), ent("B")], shown: false });
-  assert.deepEqual(parse("not json"), { steps: [], shown: true });
-  assert.deepEqual(parse(JSON.stringify({ v: 1, steps: [doc("A"), { kind: "?", key: "x" }, { kind: "doc" }] })),
-                   { steps: [doc("A")], shown: true });
+  assert.deepEqual(parse(serialize([doc("A"), ent("B")], true)), { steps: [doc("A"), ent("B")], shown: true });
+  assert.deepEqual(parse(serialize([doc("A")])), { steps: [doc("A")], shown: false });
+  assert.deepEqual(parse("not json"), { steps: [], shown: false });
+  // un enregistrement v1 garde ses pas, mais le pointillé repart masqué
+  assert.deepEqual(parse(JSON.stringify({ v: 1, steps: [doc("A"), { kind: "?", key: "x" }, { kind: "doc" }], shown: true })),
+                   { steps: [doc("A")], shown: false });
 });

@@ -221,7 +221,7 @@ export function render() {
 
   // 1 bis. parcours de lecture : textes lus, derniers pas, texte d'où l'on vient (trail-ui.js)
   // (pas pendant une visite, un chemin ou une recherche : leurs propres tracés suffisent)
-  if (S.trailShown && !S.morphing && !S.path && !S.hits) drawTrail(toScreen, R);
+  if (!S.morphing && !S.path && !S.hits) drawTrail(toScreen, R);
 
   // 2. résultats de recherche : étoiles dorées, plus vives pour les premiers rangs
   if (S.hits && !sel) {

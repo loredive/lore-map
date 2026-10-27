@@ -124,8 +124,8 @@ export function drawThread(toScreen, R) {
   ctx.restore();
 }
 
-// Parcours de lecture (trail-ui.js) : un anneau léger autour des textes déjà lus, les derniers
-// textes reliés en pointillé (les plus anciens s'effacent), et le texte d'où l'on vient, nommé.
+// Historique de lecture (trail-ui.js) : un anneau léger autour des textes déjà lus, le texte d'où l'on
+// vient, nommé, et, si le visiteur l'a demandé, les derniers textes reliés en pointillé.
 export function drawTrail(toScreen, R) {
   ctx.save();
   ctx.strokeStyle = "#f0dc9f"; ctx.lineWidth = 1.5;
@@ -137,7 +137,7 @@ export function drawTrail(toScreen, R) {
     if (x < -R || y < -R || x > S.W + R || y > S.H + R) continue;
     ctx.beginPath(); ctx.arc(x, y, R * 0.9 + 3, 0, Math.PI * 2); ctx.stroke();
   }
-  const pts = S.trailDocs.map(i => toScreen(S.docs[i].x, S.docs[i].y));
+  const pts = S.trailShown ? S.trailDocs.map(i => toScreen(S.docs[i].x, S.docs[i].y)) : [];
   ctx.setLineDash([4, 6]); ctx.lineWidth = 2;
   for (let k = 1; k < pts.length; k++) {
     ctx.globalAlpha = 0.25 + 0.65 * k / (pts.length - 1);
