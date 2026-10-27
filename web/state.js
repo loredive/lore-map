@@ -1,8 +1,8 @@
 // État partagé de la page, constantes et petits utilitaires communs aux modules.
 
-// Jeu affiché : ?jeu=bloodborne ; sans paramètre (ou jeu inconnu), Elden Ring. Ses données sont
+// Jeu affiché : ?game=elden-ring ; sans paramètre (ou jeu inconnu), Bloodborne. Ses données sont
 // dans data/<jeu>/, ses images dans img/<jeu>/, et data/<jeu>/game.json donne couleurs et exemples.
-export const DEFAULT_GAME = "elden-ring";
+export const DEFAULT_GAME = "bloodborne";
 export const dataPath = f => `data/${S.game}/${f}`;
 export const GRACE = "#f0dc9f";
 export const MAX_HITS_ON_MAP = 150;

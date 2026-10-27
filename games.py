@@ -13,7 +13,8 @@ from pathlib import Path
 ROOT = Path(__file__).parent
 GAMES = ROOT / "games"
 WEB = ROOT / "web"
-DEFAULT = "elden-ring"
+DEFAULT = "elden-ring"                  # jeu des scripts sans --game
+FIRST = "bloodborne"                    # premier jeu de la page, celui qu'elle ouvre sans ?game=
 PAGE_KEYS = ("id", "title", "colors", "ui", "images")     # ce que la page lit de game.json
 
 
@@ -81,7 +82,7 @@ def publish(game: Game) -> None:
     (game.data_dir / "game.json").write_text(json.dumps(page, ensure_ascii=False, indent=1), encoding="utf-8")
     publish_tours(game)
     ready = [g for g in list_games() if (WEB / "data" / g / "lore.json").exists()]
-    ready.sort(key=lambda g: g != DEFAULT)          # le jeu par défaut d'abord, puis les autres
+    ready.sort(key=lambda g: g != FIRST)            # le premier jeu de la page d'abord, puis les autres
     listing = [{"id": g, "title": load_game(g).title} for g in ready]
     (WEB / "data" / "games.json").write_text(json.dumps(listing, ensure_ascii=False), encoding="utf-8")
 
