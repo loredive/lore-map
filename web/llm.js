@@ -20,8 +20,10 @@ export const PROVIDERS = {
   },
 };
 
-// kind : "key" (clé refusée), "rate" (limite atteinte), "model" (modèle inconnu), "network",
-// "refusal" (le modèle a décliné), "other"
+// kind : "key" (clé refusée), "quota" (compte sans crédit), "rate" (limite atteinte), "model" (modèle
+// inconnu), "network", "refusal" (le modèle a décliné), "other"
+const NO_CREDIT = "This API account has no credit left. API usage is billed separately from a ChatGPT or Claude " +
+  "subscription: add credit in the provider's billing settings, then try again.";
 export class LLMError extends Error {
   constructor(kind, message) { super(message); this.kind = kind; }
 }
@@ -61,9 +63,10 @@ async function anthropicAnswer({ model, key, system, messages, onText, signal })
     if (err instanceof Anthropic.AuthenticationError || err instanceof Anthropic.PermissionDeniedError)
       throw new LLMError("key", "The API key was refused.");
     if (err instanceof Anthropic.NotFoundError) throw new LLMError("model", `Unknown model: ${model}.`);
-    if (err instanceof Anthropic.RateLimitError) throw new LLMError("rate", "Rate limit reached: wait a moment and try again.");
+    const detail = err.error?.error?.message || "";        // le message de l'API, sans le corps JSON brut
+    if (err instanceof Anthropic.RateLimitError) throw new LLMError("rate", `Rate limit reached: wait a moment and try again.${detail ? ` (${detail})` : ""}`);
     if (err instanceof Anthropic.APIConnectionError) throw new LLMError("network", "Could not reach Anthropic.");
-    if (err instanceof Anthropic.APIError) throw new LLMError("other", err.message);
+    if (err instanceof Anthropic.APIError) throw new LLMError("other", detail || err.message);
     throw err;
   }
 }
@@ -82,10 +85,13 @@ async function openaiAnswer({ base, model, key, system, messages, onText, signal
     throw new LLMError("network", "Could not reach the provider.");
   }
   if (!r.ok) {
-    const detail = await r.json().then(j => j.error?.message || "").catch(() => "");
+    const error = await r.json().then(j => j.error || {}).catch(() => ({}));
+    const detail = error.message || "";
     if (r.status === 401 || r.status === 403) throw new LLMError("key", "The API key was refused.");
     if (r.status === 404) throw new LLMError("model", detail || `Unknown model: ${model}.`);
-    if (r.status === 429) throw new LLMError("rate", "Rate limit reached: wait a moment and try again.");
+    // OpenAI répond 429 aussi quand le compte n'a pas de crédit (insufficient_quota) ; OpenRouter, 402
+    if (r.status === 402 || error.code === "insufficient_quota" || error.type === "insufficient_quota") throw new LLMError("quota", NO_CREDIT);
+    if (r.status === 429) throw new LLMError("rate", `Rate limit reached: wait a moment and try again.${detail ? ` (${detail})` : ""}`);
     throw new LLMError("other", detail || `The provider answered ${r.status}.`);
   }
   const reader = r.body.getReader(), decoder = new TextDecoder();
