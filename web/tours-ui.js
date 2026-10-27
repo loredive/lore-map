@@ -1,7 +1,7 @@
 // Visites guidées (data/<jeu>/tours.json, écrites à la main) : une suite de textes, chacun avec
 // une phrase qui le situe. La carte trace la visite comme un chemin numéroté (render.js), l'étape
 // en cours entourée ; le panneau lit l'étape, avec Précédent / Suivant.
-import { S, $, panel, esc, colorOf, resetContext, focusPanel, portrait, dataPath } from "./state.js";
+import { S, $, panel, esc, colorOf, resetContext, focusPanel, portrait, dataPath, nameOf, textOf, textLang } from "./state.js";
 import { draw, fitPoints, frameFrom } from "./render.js";
 import { panelTop, bindPanelTop, select, dlcBadge } from "./panel.js";
 import { record } from "./nav.js";
@@ -65,8 +65,8 @@ export function openTour(id, k = 0) {
     <div class="tour-text">
       <div class="card-head${icon ? " has-img" : ""}">${icon}<div>
         <div class="cat"><span class="dot" style="--c:${colorOf(d.cat)}"></span>${esc(S.cats[d.cat])}${dlcBadge(d)}</div>
-        <h3>${esc(d.name)}</h3></div></div>
-      <p class="text">${linkText(d.text, S.docEntities[d.i])}</p>
+        <h3>${esc(nameOf(d))}</h3></div></div>
+      <p class="text" lang="${textLang(d)}">${linkText(textOf(d), S.docEntities[d.i])}</p>
       <div class="tools"><button type="button" class="topen">Open this text (echoes, links…)</button></div>
     </div>
     <nav class="tour-nav" aria-label="Tour steps">
@@ -74,7 +74,7 @@ export function openTour(id, k = 0) {
       <button type="button" class="tnext">${last ? "All tours" : "Next →"}</button>
     </nav>
     <ol class="tour-steps">${t.steps.map((s, j) => `<li><button type="button" data-k="${j}"${j === k ? ' aria-current="step"' : ""}>
-      <span class="step">${j + 1}</span> ${esc(s.text)}</button></li>`).join("")}</ol>
+      <span class="step">${j + 1}</span> ${esc(nameOf(S.docs[s.i]))}</button></li>`).join("")}</ol>
   </article>`;
   bindPanelTop();
   bindEntityButtons();
@@ -83,7 +83,7 @@ export function openTour(id, k = 0) {
   panel.querySelector(".tnext").addEventListener("click", () => (last ? showTours() : openTour(id, k + 1)));
   panel.querySelectorAll(".tour-steps button").forEach(b => b.addEventListener("click", () => openTour(id, +b.dataset.k)));
   panel.scrollTop = 0;
-  focusPanel(`${t.title}, step ${k + 1} of ${t.steps.length}: ${d.name}`);
+  focusPanel(`${t.title}, step ${k + 1} of ${t.steps.length}: ${nameOf(d)}`);
   // au départ, toute la visite à l'écran ; ensuite, l'étape avec la précédente, sans zoomer
   if (fresh) fitPoints(t.steps.map(s => S.docs[s.i]), 0);
   else frameFrom([d]);

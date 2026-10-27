@@ -1,7 +1,7 @@
 // L'historique de lecture : enregistré par jeu dans le navigateur, montré sur la carte (sky.js :
 // drawTrail, les textes déjà lus) et en entier dans le panneau « History » (bouton de la barre).
 // Chaque fiche ouverte (texte, entité, groupe, dialogue) est un pas ; nav.js nous les signale.
-import { S, $, panel, esc, colorOf, resetContext, focusPanel } from "./state.js";
+import { S, $, panel, esc, colorOf, resetContext, focusPanel, nameOf, textOf } from "./state.js";
 import { draw } from "./render.js";
 import { panelTop, bindPanelTop, snippet } from "./panel.js";
 import { record, onRecord, openEntry } from "./nav.js";
@@ -40,7 +40,8 @@ function entryOf(s) {
   }
 }
 function labelOf(s) {
-  return s.kind === "entity" ? entityOf(s.key)?.label || s.key : s.kind === "dialogue" ? `Dialogue: ${s.key}` : s.key;
+  return s.kind === "entity" ? entityOf(s.key)?.label || s.key : s.kind === "dialogue" ? `Dialogue: ${s.key}`
+    : s.kind === "doc" ? nameOf(S.docs[docIndex.get(s.key)]) : s.key;
 }
 function kindOf(s) {
   return s.kind === "doc" ? S.cats[S.docs[docIndex.get(s.key)].cat] : s.kind === "entity"
@@ -107,7 +108,7 @@ export function showTrail() {
     const d = s.kind === "doc" ? S.docs[docIndex.get(s.key)] : null;
     return `<li><button type="button" data-k="${k}">
       <span class="head">${d ? `<span class="dot" style="--c:${colorOf(d.cat)}"></span>` : `<span class="kind">${esc(kindOf(s))}</span>`}<span class="name">${esc(labelOf(s))}</span></span>
-      ${d ? `<span class="snip">${esc(snippet(d.text, [], 110))}</span>` : ""}</button></li>`;
+      ${d ? `<span class="snip">${esc(snippet(textOf(d), [], 110))}</span>` : ""}</button></li>`;
   }).join("");
   const last = steps.at(-1);
   panel.innerHTML = `${panelTop()}<article class="card">

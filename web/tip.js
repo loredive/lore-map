@@ -1,7 +1,7 @@
 // Bulle d'une étoile : nom, catégorie et groupe, début du texte ; si une fiche est ouverte et que
 // l'étoile est l'un de ses échos, son rang. Partagée par le survol de la carte, la visée au clavier
 // et le survol de la liste des échos dans le panneau.
-import { S, tip, esc, portrait } from "./state.js";
+import { S, tip, esc, portrait, nameOf, textOf } from "./state.js";
 import { toScreen } from "./render.js";
 import { groupOf, snippet, dlcBadge } from "./panel.js";
 
@@ -14,10 +14,10 @@ function tipHTML(i, hint) {
   const sel = S.selected >= 0 && S.selected !== i ? S.docs[S.selected] : null;
   const rank = sel ? sel.echoes.indexOf(i) : -1;
   return portrait(d, "thumb", 48)
-    + `<span class="name">${esc(d.name)}</span>`
+    + `<span class="name">${esc(nameOf(d))}</span>`
     + `<span class="sub">${esc(S.cats[d.cat])}${group}${dlcBadge(d)}</span>`
-    + (rank >= 0 ? `<span class="echo">Echo #${rank + 1} of “${esc(sel.name)}”</span>` : "")
-    + `<span class="snip">${esc(snippet(d.text, [], TIP_SNIPPET))}</span>`
+    + (rank >= 0 ? `<span class="echo">Echo #${rank + 1} of “${esc(nameOf(sel))}”</span>` : "")
+    + `<span class="snip">${esc(snippet(textOf(d), [], TIP_SNIPPET))}</span>`
     + (hint ? `<span class="sub">${hint}</span>` : "");
 }
 

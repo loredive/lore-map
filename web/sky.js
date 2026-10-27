@@ -5,7 +5,7 @@
 // Style d : nuages de gaz épousant les groupes (nebula.js) au lieu des contours, constellations
 // seulement pour le groupe survolé ou ouvert, poussière en parallaxe, ciel propre à chaque jeu.
 // Les couleurs atténuées de loin (muted) ont été essayées puis écartées : les catégories doivent rester lisibles.
-import { S, ctx, colorOf, isHidden, membersIn } from "./state.js";
+import { S, ctx, colorOf, isHidden, membersIn, nameOf } from "./state.js";
 
 const STYLES = {
   a: {},
@@ -151,7 +151,7 @@ export function drawTrail(toScreen, R) {
     ctx.beginPath(); ctx.arc(x, y, R * 1.3 + 5, 0, Math.PI * 2); ctx.stroke();
     ctx.font = `italic 600 17px "Cormorant Garamond", Georgia, serif`;
     ctx.textAlign = "left"; ctx.textBaseline = "middle";
-    const label = `from ${d.name}`, lx = x + R * 1.3 + 11;
+    const label = `from ${nameOf(d)}`, lx = x + R * 1.3 + 11;
     ctx.lineWidth = 4; ctx.strokeStyle = "rgba(14,19,34,.85)"; ctx.strokeText(label, lx, y);
     ctx.fillStyle = "#f0dc9f"; ctx.fillText(label, lx, y);
   }

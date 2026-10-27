@@ -1,5 +1,5 @@
 // Personnages, lieux, factions et notions : index, fiches et pastilles.
-import { S, $, panel, esc, fold, resetContext, clusterById, docRow, focusPanel, isHidden } from "./state.js";
+import { S, $, panel, esc, fold, resetContext, clusterById, docRow, focusPanel, isHidden, nameOf, textOf } from "./state.js";
 import { draw, frameFrom } from "./render.js";
 import { select, openCluster, snippet, mark, panelTop, bindPanelTop } from "./panel.js";
 import { record } from "./nav.js";
@@ -93,7 +93,7 @@ export function openEntity(e, { fly = true, focus = true } = {}) {
       `<button type="button" class="chip" data-c="${c.id}">${esc(c.label)} <span class="n">${n}</span></button>`).join("")}</div>` : ""}
     <h3>The texts</h3>
     <p class="hint">Most relevant first.</p>
-    <ol class="results">${visible.map(d => docRow(d, mark(esc(d.name), names), mark(esc(snippet(d.text, folded)), names))).join("")}</ol>
+    <ol class="results">${visible.map(d => docRow(d, mark(esc(nameOf(d)), names), mark(esc(snippet(textOf(d), folded)), names))).join("")}</ol>
   </article>`;
   panel.querySelector(".to-index").addEventListener("click", showIndex);
   bindDialogueButtons();

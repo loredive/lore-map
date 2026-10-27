@@ -1,7 +1,7 @@
 // La recherche dans la page : saisie, chargement du modèle, liste des résultats.
 import { BM25, tokenize, corpusText, lexicalRanking, hybridRanking, semanticScores, rrf, RRF_K, LEXICAL_WEIGHT, POOL,
          parseQuery, hasConstraints, satisfies } from "./search.js";
-import { S, panel, input, mode, esc, fold, resetContext, docRow, announce, dataPath, MAX_HITS_ON_MAP, MAX_RESULTS, isHidden } from "./state.js";
+import { S, panel, input, mode, esc, fold, resetContext, docRow, announce, dataPath, MAX_HITS_ON_MAP, MAX_RESULTS, isHidden, nameOf, textOf } from "./state.js";
 import { draw } from "./render.js";
 import { select, snippet, mark, panelTop, bindPanelTop } from "./panel.js";
 import { record, current, goBack } from "./nav.js";
@@ -207,7 +207,7 @@ export function renderResults() {
     <p class="count">${visible.length} texts found${more}. The most relevant glow on the map.</p>
     <ol class="results">${shown.map(i => {
       const d = S.docs[i];
-      return docRow(d, mark(esc(d.name), terms), mark(esc(snippet(d.text, terms)), terms));
+      return docRow(d, mark(esc(nameOf(d)), terms), mark(esc(snippet(textOf(d), terms)), terms));
     }).join("")}</ol>
     <p class="hint search-tip">${preciseTip()}</p>`;
   panel.querySelectorAll("button[data-i]").forEach(b =>

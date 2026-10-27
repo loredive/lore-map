@@ -41,7 +41,14 @@ export const S = {
   images: new Map(),     // nom du texte -> icône (ou portrait de l'interlocuteur), data/images.json
   visited: new Set(), trailDocs: [], cameFrom: -1, trailShown: false,   // parcours de lecture (trail-ui.js)
   tours: [], tour: null, tourStep: -1,   // visites guidées (tours-ui.js) ; visite ouverte et son étape
+  altLang: false,        // textes affichés dans la seconde langue du jeu (Bloodborne : le français officiel)
 };
+
+// Ce qu'on affiche d'un texte : son nom et son texte dans la langue choisie. Le nom anglais (d.name)
+// reste l'identifiant partout ailleurs (liens, historique, visites, icônes).
+export const nameOf = d => (S.altLang && d.altName) || d.name;
+export const textOf = d => (S.altLang && d.alt) || d.text;
+export const textLang = d => (S.altLang && d.alt ? S.ui.alt_lang : "en");
 
 // Icône d'un texte, ou portrait du PNJ pour un passage de dialogue ; "" sans image.
 // Décorative (alt vide) : le nom est toujours écrit à côté.

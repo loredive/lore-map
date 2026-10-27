@@ -1,6 +1,6 @@
 // Le panneau de droite : fiche d'un texte, fiche d'un groupe, aide, liens (#…).
 import { tokenize } from "./search.js";
-import { S, $, panel, input, esc, colorOf, resetContext, clusterById, docRow, focusPanel, portrait, isHidden } from "./state.js";
+import { S, $, panel, input, esc, colorOf, resetContext, clusterById, docRow, focusPanel, portrait, isHidden, nameOf, textOf, textLang } from "./state.js";
 import { draw, focusDoc, fitPoints, frameFrom, setHover } from "./render.js";
 import { echoGraph, echoPath } from "./graph.js";
 import { runSearch, resetSearch } from "./search-ui.js";
@@ -72,19 +72,22 @@ export function select(i, { fly = true } = {}) {
   const mentions = S.docEntities[i].filter(e => !e.broad);   // Erdtree, Entre-terre… : partout, donc sans intérêt ici
   record({ view: "doc", i });
   const icon = portrait(d, "portrait", 96);
+  // l'autre langue du texte (le français si l'anglais est affiché, et inversement), sous le bouton « Show the … text »
+  const otherName = S.altLang ? d.name : d.altName, otherText = S.altLang ? d.text : d.alt;
+  const otherLang = S.altLang ? "en" : S.ui.alt_lang || "en", otherLabel = S.altLang ? "English" : S.ui.alt_label || "English";
   panel.innerHTML = `${panelTop()}<article class="card">
     <div class="card-head${icon ? " has-img" : ""}">${icon}<div>
     <div class="cat"><span class="dot" style="--c:${colorOf(d.cat)}"></span>${esc(S.cats[d.cat])}${dlcBadge(d)}</div>
-    <h2>${esc(d.name)}</h2>
+    <h2>${esc(nameOf(d))}</h2>
     ${groupLine(d)}
-    ${d.altName && d.altName !== d.name ? `<p class="jpname" lang="${S.ui.alt_lang || "en"}">${esc(d.altName)}</p>` : ""}
+    ${otherName && otherName !== nameOf(d) ? `<p class="jpname" lang="${otherLang}">${esc(otherName)}</p>` : ""}
     ${d.jpName ? `<p class="jpname" lang="ja">${esc(d.jpName)}</p>` : ""}
     </div></div>
-    <p class="text">${linkText(d.text, mentions, terms)}</p>
-    ${d.alt ? `<div class="alt text" lang="${S.ui.alt_lang || "en"}" hidden>${linkText(d.alt, mentions)}</div>` : ""}
+    <p class="text" lang="${textLang(d)}">${linkText(textOf(d), mentions, terms)}</p>
+    ${d.alt ? `<div class="alt text" lang="${otherLang}" hidden>${linkText(otherText, mentions)}</div>` : ""}
     <div class="jp" lang="ja" hidden>${esc(d.jp)}</div>
     <div class="tools">
-      ${d.alt ? `<button type="button" class="talt" aria-expanded="false">Show the ${esc(S.ui.alt_label || "English")} text</button>` : ""}
+      ${d.alt ? `<button type="button" class="talt" aria-expanded="false">Show the ${esc(otherLabel)} text</button>` : ""}
       ${d.jp ? `<button type="button" class="tjp" aria-expanded="false">Show the Japanese text</button>` : ""}
       <button type="button" class="tlink">Copy a link to this text</button>
       <button type="button" class="tpath">Trace a path to another text</button>
@@ -107,7 +110,7 @@ export function select(i, { fly = true } = {}) {
     ev.target.textContent = open ? "Hide the Japanese text" : "Show the Japanese text";
   });
   panel.querySelector(".talt")?.addEventListener("click", ev => {
-    const alt = panel.querySelector(".alt"), open = alt.hidden, lang = S.ui.alt_label || "English";
+    const alt = panel.querySelector(".alt"), open = alt.hidden, lang = otherLabel;
     alt.hidden = !open;
     ev.target.setAttribute("aria-expanded", String(open));
     ev.target.textContent = open ? `Hide the ${lang} text` : `Show the ${lang} text`;
@@ -129,7 +132,7 @@ export function select(i, { fly = true } = {}) {
   bindGroupButtons();
   bindEntityButtons();
   panel.scrollTop = 0;
-  focusPanel(`Text: ${d.name}`);
+  focusPanel(`Text: ${nameOf(d)}`);
   if (fly) frameFrom([d]);        // sans zoomer : le texte, et celui d'où l'on vient
   draw();
 }
@@ -156,7 +159,7 @@ export function openCluster(c, { fly = true, focus = true } = {}) {
     ${c.description ? `<p class="text">${esc(c.description)}</p>` : ""}
     <p class="count">${c.n} texts${visible.length < members.length ? `, ${visible.length} of them shown` : ""}.</p>
     ${keywords}
-    <ol class="results">${visible.map(d => docRow(d, esc(d.name), esc(snippet(d.text, [])))).join("")}</ol>
+    <ol class="results">${visible.map(d => docRow(d, esc(nameOf(d)), esc(snippet(textOf(d), [])))).join("")}</ol>
   </article>`;
   panel.querySelectorAll("button[data-i]").forEach(b =>
     b.addEventListener("click", () => select(+b.dataset.i)));
@@ -326,7 +329,7 @@ function showPathView({ from, to } = {}) {
   panel.dataset.view = "path";
   if (!S.path) {
     panel.innerHTML = `${panelTop()}<article class="card"><h2>Echo path</h2>
-      <p class="text">No echo path links “${esc(S.docs[from].name)}” to “${esc(S.docs[to].name)}”.</p></article>`;
+      <p class="text">No echo path links “${esc(nameOf(S.docs[from]))}” to “${esc(nameOf(S.docs[to]))}”.</p></article>`;
     bindPanelTop();
     draw();
     return;
@@ -335,11 +338,11 @@ function showPathView({ from, to } = {}) {
   const hops = S.path.length - 1;
   panel.innerHTML = `${panelTop()}<article class="card">
     <div class="cat">Echo path</div>
-    <h2>${esc(first.name)} → ${esc(last.name)}</h2>
+    <h2>${esc(nameOf(first))} → ${esc(nameOf(last))}</h2>
     <p class="count">${hops} ${hops > 1 ? "echoes" : "echo"}: at each step, the next text is one of the closest in meaning.</p>
     <ol class="results path">${S.path.map((i, k) => {
       const d = S.docs[i];
-      return docRow(d, esc(d.name), esc(snippet(d.text, [])), `<span class="step">${k + 1}</span>`);
+      return docRow(d, esc(nameOf(d)), esc(snippet(textOf(d), [])), `<span class="step">${k + 1}</span>`);
     }).join("")}</ol>
   </article>`;
   panel.querySelectorAll("button[data-i]").forEach(b => b.addEventListener("click", () => select(+b.dataset.i)));

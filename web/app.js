@@ -1,12 +1,12 @@
 // Point d'entrée : chargement des données, souris, clavier, légende.
-import { S, $, canvas, panel, status, input, mode, esc, colorOf, announce, dataPath, DEFAULT_GAME } from "./state.js";
+import { S, $, canvas, panel, tip, status, input, mode, esc, colorOf, announce, dataPath, DEFAULT_GAME } from "./state.js";
 import { buildGrid, buildSprites, computeHulls, resize, draw, toWorld, nearest, flyTo, zoomAt, setHover, starsNear, viewCenter } from "./render.js";
 import { buildViewSwitch, addShelves } from "./views.js";
 import { prepareSky } from "./sky.js";
 import { buildDialogues } from "./dialogue-ui.js";
 import { buildIndex, runSearch, renderResults } from "./search-ui.js";
 import { select, openCluster, closePanel, openFromHash, cancelPath } from "./panel.js";
-import { record, current } from "./nav.js";
+import { record, current, openEntry } from "./nav.js";
 import { showTip } from "./tip.js";
 import { openEntity } from "./entities-ui.js";
 import { initTrail } from "./trail-ui.js";
@@ -96,6 +96,7 @@ async function load() {
   buildLegend();
   legendFade();
   buildViewSwitch();
+  buildLangSwitch();
   initTrail();                                  // avant openFromHash : le lien collé est un premier pas
   await loadTours();                            // data/<jeu>/tours.json, s'il y en a
   status.textContent = "";
@@ -296,6 +297,32 @@ function updateHover(sx, sy) {
   if (i >= 0) {
     showTip(i, sx, sy);
   }
+}
+
+// ------------------------------------------------------------------ langue des textes
+// Un jeu dont les données ont une seconde langue (Bloodborne : le français officiel) propose
+// « English | Français » ; le choix est gardé par jeu, et ce qui est ouvert se réaffiche aussitôt.
+const NATIVE = { fr: "Français", ja: "日本語", de: "Deutsch", es: "Español", it: "Italiano" };
+const langKey = () => `lore-map:lang:${S.game}`;
+function buildLangSwitch() {
+  const box = $("#lang");
+  if (!S.ui.alt_lang || !S.docs.some(d => d.alt)) return;
+  try { S.altLang = localStorage.getItem(langKey()) === "alt"; } catch { /* stockage bloqué */ }
+  const label = NATIVE[S.ui.alt_lang] || S.ui.alt_label;
+  box.innerHTML = `<button type="button" data-alt="0" lang="en">English</button><button type="button" data-alt="1" lang="${esc(S.ui.alt_lang)}">${esc(label)}</button>`;
+  box.hidden = false;
+  const mark = () => box.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(+b.dataset.alt === +S.altLang)));
+  mark();
+  box.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+    if (+b.dataset.alt === +S.altLang) return;
+    S.altLang = !S.altLang;
+    try { localStorage.setItem(langKey(), S.altLang ? "alt" : "main"); } catch { /* idem */ }
+    mark();
+    tip.hidden = true;
+    if (!panel.hidden && current()) openEntry(current());   // la fiche, la liste ou la visite ouverte, dans l'autre langue
+    draw();
+    announce(S.altLang ? `Texts in ${label}` : "Texts in English");
+  }));
 }
 
 // ------------------------------------------------------------------ légende

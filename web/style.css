@@ -86,7 +86,7 @@ body {
 /* catégories : des pastilles qui servent aussi de légende des couleurs */
 /* une seule ligne : si les catégories débordent, elles défilent de côté (le bord s'estompe pour le dire) */
 .legend {
-  display: flex; gap: .3rem; min-width: 0; overflow-x: auto; scrollbar-width: none;
+  display: flex; gap: .3rem; min-width: 0; overflow-x: auto; scrollbar-width: none; margin-right: auto;
 }
 .legend.scrolls:not(.at-end) { mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); }
 .legend::-webkit-scrollbar { display: none; }

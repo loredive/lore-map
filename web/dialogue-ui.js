@@ -1,7 +1,7 @@
 // Le dialogue complet d'un PNJ, passage après passage. Les passages sont dispersés sur la carte
 // (ceux de Ranni dans plusieurs groupes) ; ici on les relit dans l'ordre, et la carte trace le fil
 // qui les relie.
-import { S, panel, esc, resetContext, focusPanel, portrait } from "./state.js";
+import { S, panel, esc, resetContext, focusPanel, portrait, textOf, textLang } from "./state.js";
 import { draw, frameFrom } from "./render.js";
 import { select, panelTop, bindPanelTop } from "./panel.js";
 import { record } from "./nav.js";
@@ -60,7 +60,7 @@ export function openDialogue(speaker, { focusOn = -1, fly = true } = {}) {
       const d = S.docs[i];
       return `<li id="p${i}"${i === focusOn ? ' class="here"' : ""}>
         <button type="button" class="pnum" data-i="${i}" aria-label="Passage ${d.part}: see its details and echoes">${d.part}</button>
-        <p class="text">${linkText(d.text, S.docEntities[i])}</p></li>`;
+        <p class="text" lang="${textLang(d)}">${linkText(textOf(d), S.docEntities[i])}</p></li>`;
     }).join("")}</ol>
   </article>`;
   bindPanelTop();
