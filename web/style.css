@@ -367,8 +367,8 @@ ol.script .text { margin: 0; white-space: pre-line; line-height: 1.6; }
 
 /* ---------- atmosphère (style d) : sous les étoiles, un calque fixe propre à chaque jeu ---------- */
 /* vignette et grain communs ; Elden Ring : une lueur dorée qui monte du bas ;
-   Bloodborne : la grande lune pâle et une brume froide, sur un ciel plus noir */
-body.sky-d::before {          /* (::after sert au voile du titre sur téléphone) */
+   Bloodborne : Yharnam sous la lune (bg/bloodborne.webp), posée sous la barre du haut */
+body.sky-d::before {
   content: ""; position: fixed; inset: 0; pointer-events: none;
   background:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
@@ -378,21 +378,17 @@ body.sky-d::before {          /* (::after sert au voile du titre sur téléphone
 body.sky-d[data-game="elden-ring"] {
   --atmo: radial-gradient(ellipse 38% 55% at 50% 108%, rgba(240, 210, 140, .16), rgba(240, 210, 140, .05) 55%, transparent 75%);
 }
-body.sky-d[data-game="bloodborne"] {
-  background: radial-gradient(ellipse 120% 90% at 50% 40%, #161b2c 0%, #0c0f1a 55%, #06070d 100%);
-  --atmo:
-    radial-gradient(circle at 84% 16%, #efeadb 0, #e6e0cc 5.2vmin, rgba(230, 224, 204, .22) 5.8vmin,
-                    rgba(200, 205, 220, .08) 14vmin, transparent 32vmin),
-    linear-gradient(to top, rgba(150, 160, 180, .09), transparent 35%);
+body.sky-d[data-game="bloodborne"] { background: #06070d; }
+/* sous les étoiles (z-index -1 : au-dessus du fond de la page, sous la carte) ; la ville reste en bas,
+   la lune à droite, même quand l'écran rogne l'image */
+body.sky-d[data-game="bloodborne"]::after {
+  content: ""; position: fixed; z-index: -1; top: var(--bar-h, 100px); left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  background: url("bg/bloodborne.webp") 82% 100% / cover no-repeat;
 }
 @media (max-width: 760px) {
-  /* téléphone : la lune quitte le haut, où passent le titre et la recherche */
-  body.sky-d[data-game="bloodborne"] {
-    --atmo:
-      radial-gradient(circle at 80% 30%, #efeadb 0, #e6e0cc 5.2vmin, rgba(230, 224, 204, .22) 5.8vmin,
-                      rgba(200, 205, 220, .08) 14vmin, transparent 32vmin),
-      linear-gradient(to top, rgba(150, 160, 180, .09), transparent 35%);
-  }
+  /* écran en hauteur : on ne voit qu'une bande de l'image, décalée pour garder toute la lune */
+  body.sky-d[data-game="bloodborne"]::after { background-position: 90% 100%; }
 }
 
 /* noms cités dans un texte : lien discret vers la fiche de l'entité */
