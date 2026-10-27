@@ -7,7 +7,7 @@ Tout tourne en local, sans LLM ni serveur.
 
 ## Voir la carte tout de suite
 
-Le dossier `web/data/` contient déjà les données générées (embeddings e5, cartes t-SNE et UMAP,
+Le dossier `web/data/elden-ring/` contient déjà les données générées (embeddings e5, carte t-SNE,
 groupes titrés), utilisables sans rien installer :
 
 ```bash
@@ -18,16 +18,25 @@ python -m http.server 8000 -d web
 Il faut passer par un serveur local : ouvrir `index.html` directement depuis le disque ne
 marche pas, le navigateur bloque la lecture des fichiers de données.
 
-## Régénérer les données (embeddings sémantiques, t-SNE et UMAP)
+## Plusieurs jeux
+
+Tout ce qui dépend du jeu vit dans `games/<id>/` : `game.json` (catégories du texte source,
+couleurs, mots vides, noms d'interlocuteurs, réglages des groupes, exemples de la page),
+`entities.json`, `labels.json` et `eval/`. Les données générées vont dans `web/data/<id>/`, les
+images dans `web/img/<id>/`. La page affiche Elden Ring par défaut, un autre jeu avec `?jeu=<id>` ;
+le sélecteur sous le titre n'apparaît que lorsque plusieurs jeux ont leurs données
+(`web/data/games.json`, écrit par `prepare.py`).
+
+## Régénérer les données (embeddings sémantiques, carte t-SNE)
 
 ```bash
 git clone https://github.com/EldenRingExplorer/EldenRingTextExplorer ../EldenRingTextExplorer
 uv sync
-uv run python prepare.py --source ../EldenRingTextExplorer/elden_ring_text.json
+uv run python prepare.py --source ../EldenRingTextExplorer/elden_ring_text.json   # --game elden-ring
 ```
 
 Quelques minutes sur CPU, moins d'une sur GPU. Le script télécharge
-`intfloat/multilingual-e5-small` et écrit dans `web/data/` :
+`intfloat/multilingual-e5-small` et écrit dans `web/data/<id>/` :
 
 - `lore.json` : textes, positions 2D, clusters et leurs noms, 8 « échos » par texte
 - `emb.bin` : les embeddings en int8 (~1,2 Mo), pour la recherche par sens
@@ -39,8 +48,7 @@ par Reciprocal Rank Fusion, les mots-clés comptant moitié moins que le sens (v
 recherche*). On peut alors chercher en français (« qui a assassiné Godwyn ») dans des textes anglais.
 
 Options : `--embedder tfidf` (sans réseau ni GPU, pas de recherche par sens),
-`--reducer` (carte principale, `tsne` par défaut, ou `umap`), `--alt-reducer` (vue alternative
-proposée dans la page, `umap` par défaut, `none` pour s'en passer), `--min-cluster 15` et
+`--reducer` (la carte, `tsne` par défaut, ou `umap`), `--min-cluster 15` et
 `--min-samples 5` (réglages de HDBSCAN : taille minimale d'un groupe, et à quel point il doit être
 dense).
 
@@ -70,17 +78,17 @@ Les groupes sont calculés sur la carte principale elle-même, pour rester d'un 
 Un clustering sur une projection UMAP en 10 dimensions colle à peine mieux au sens (+0,5 point de
 voisins communs) mais déborde nettement sur la carte (−6 points de contiguïté).
 
-### La vue alternative
+### La vue par catégorie
 
-La page propose aussi la carte UMAP, avec **les mêmes groupes** : on bascule de l'une à l'autre et
-les étoiles glissent jusqu'à leur nouvelle place. La vue alternative est alignée sur la principale
-(Procrustes : rotation, miroir, échelle) pour que seul bouge ce qui diffère vraiment. Les groupes
-qui s'y éparpillent (cohésion sous 0,6 : moins de 60 % des voisins d'un texte sur la carte sont de
-son groupe) n'y affichent pas leur nom.
+La page propose aussi une vue « by category » (`web/shelves.js`), calculée dans le navigateur :
+une colonne par catégorie, un bloc par groupe, les textes triés par nom. On bascule de l'une à
+l'autre et les étoiles glissent jusqu'à leur nouvelle place. Elle remplace l'ancienne seconde
+carte (UMAP alignée sur la t-SNE), qui montrait les mêmes voisinages autrement arrangés sans
+rien apprendre de plus.
 
 ## Titres des groupes
 
-Les titres sont écrits à la main dans `labels.json`, une liste d'entrées :
+Les titres sont écrits à la main dans `games/<id>/labels.json`, une liste d'entrées :
 
 ```json
 {"title": "Pots à lancer", "description": "…", "members": ["Fire Pot", "Poison Pot", "…"]}
@@ -90,7 +98,7 @@ Les titres sont écrits à la main dans `labels.json`, une liste d'entrées :
 qui contient au moins la moitié de ses `members` (les meilleurs recouvrements d'abord, un titre
 par groupe) : il suit donc son groupe même si les numéros de clusters changent.
 
-`prepare.py` écrit aussi `web/data/clusters.md`, de quoi écrire les titres : pour chaque groupe son
+`prepare.py` écrit aussi `web/data/<id>/clusters.md`, de quoi écrire les titres : pour chaque groupe son
 titre actuel, ses mots clés, sa taille et ses 15 textes les plus centraux ; pour un groupe sans
 titre, une entrée prête à copier dans `labels.json` ; et à la fin les titres dont le groupe s'est
 dispersé. Les groupes sans titre gardent leurs mots clés sur la carte.
@@ -101,7 +109,7 @@ titre : il suit la plus grande part du groupe, mais son sens a pu se resserrer.
 
 ## Personnages, lieux, factions et notions
 
-`entities.json` liste à la main les noms qui traversent les textes, avec leur type (`personnage`,
+`games/<id>/entities.json` liste à la main les noms qui traversent les textes, avec leur type (`personnage`,
 `lieu`, `faction`, `notion`), d'éventuels `aliases` (variantes du même nom seulement), un `label`
 français facultatif et des expressions à `exclude` (« Crystal Torrent » n'est pas Torrent) :
 
@@ -125,7 +133,7 @@ dernier. « Liés à » liste les entités citées dans les mêmes textes (au mo
 affinité (textes en commun divisés par la racine du produit des deux tailles), pour que les noms très
 fréquents ne l'emportent pas partout.
 
-`prepare.py` écrit `web/data/entities.md` : pour chaque entrée, le nombre de textes et les groupes où
+`prepare.py` écrit `web/data/<id>/entities.md` : pour chaque entrée, le nombre de textes et les groupes où
 elle revient le plus, puis les noms propres fréquents que la liste ne couvre pas encore.
 
 ## Utiliser la carte
@@ -171,6 +179,8 @@ elle revient le plus, puis les noms propres fréquents que la liste ne couvre pa
   recentrer, Entrée pour ouvrir l'étoile visée.
 - « Retour » en haut du panneau, comme le bouton Retour du navigateur, revient à la fiche
   précédente ; « Fermer » ferme le panneau (et Retour le rouvre).
+- « Agrandir » élargit le panneau à environ la moitié de l'écran pour lire longtemps (retenu d'une
+  visite à l'autre) ; « Réduire » le ramène.
 - La première liste de résultats vient des mots-clés ; celle « par sens » arrive ensuite. Si l'on a
   déjà commencé à lire, elle ne remplace pas la liste sous les yeux : un bouton propose de l'afficher.
 - L'adresse de la page change avec le texte ou la fiche ouverte (`#entite=Godwyn`,
@@ -178,16 +188,82 @@ elle revient le plus, puis les noms propres fréquents que la liste ne couvre pa
   titre ; un groupe sans titre (nommé par ses mots clés) n'a pas de lien stable d'une génération à
   l'autre.
 
+## Bloodborne
+
+Pas de texte publié pour Bloodborne : il vient des archives de messages d'une copie PS4 du jeu
+(`dvdroot_ps4/msg/{engus,frafr,jpnjp}/item.msgbnd.dcx` et `menu.msgbnd.dcx`, la mise à jour de
+préférence : elle contient le DLC). `games/bloodborne/extract.py` les lit sans outil extérieur
+(DCX « DFLT » = zlib, archive BND4, tables FMG v2) et n'écrit rien dans le dossier du jeu :
+
+```bash
+uv run python games/bloodborne/extract.py --msg "/mnt/c/PS4Games/CUSA00207-UPDATE/dvdroot_ps4/msg" \
+    --base "/mnt/c/PS4Games/CUSA00207/dvdroot_ps4/msg" --out ../bloodborne-text/bloodborne_text.json   # --base : marque le DLC
+uv run python prepare.py --game bloodborne --source ../bloodborne-text/bloodborne_text.json
+```
+
+- Catégories : objets, armes, tenues, runes de Caryll, gemmes de sang, notes manuscrites et
+  dialogues (avec les sous-titres des cinématiques). Les variantes d'armes sans nom propre et les
+  descriptions répétées sont écartées : 667 textes.
+- Texte affiché en **français** (traduction officielle du jeu), l'anglais à la demande (« Voir le
+  texte anglais ») et le japonais ; la recherche trouve aussi les noms et textes anglais
+  (« Saw Cleaver » donne « Couperet-scie »).
+- Les répliques n'ont pas de nom d'interlocuteur, seulement des identifiants rangés par blocs de
+  10 000 par personnage (100 dans certains blocs du DLC). `games/bloodborne/vote_speakers.py`
+  cherche chaque réplique dans la page « Dialogue Reference » de bloodborne-wiki.com, rangée par
+  personnage, et donne à chaque bloc celui qui y a le plus de répliques ; le résultat,
+  `speakers.json`, est relu et versionné. Sur 58 blocs, la plupart l'emportent avec plus de 85 %
+  des répliques reconnues ; les 2 430 répliques ont un interlocuteur.
+- Illustrations : `games/bloodborne/icons.py` lit le numéro d'icône de chaque objet, arme et tenue
+  dans les paramètres du jeu (`param/gameparam`, disposition donnée par `paramdef/`), puis décode
+  la texture `menu/menu_knowledge_<n>.tpf.dcx` (BC7 rangé en tuiles PS4) en WebP de 192 px dans
+  `web/img/bloodborne/` : 170 objets sur 176, toutes les armes et toutes les tenues (2,7 Mo).
+  Pas d'image pour les gemmes, runes, notes et dialogues.
+
+```bash
+uv run python games/bloodborne/icons.py --dump /mnt/c/PS4Games/CUSA00207-UPDATE/dvdroot_ps4 \
+    --base /mnt/c/PS4Games/CUSA00207/dvdroot_ps4 --text ../bloodborne-text/bloodborne_text.json
+```
+
+## Icônes et portraits
+
+```bash
+uv run python images.py              # après prepare.py ; --game, --refresh pour redemander les listes
+```
+
+Les icônes des objets et les portraits des PNJ viennent de l'[Elden Ring Fan API](https://docs.eldenring.fanapis.com)
+(jeu de base, sans le DLC). Le script associe chaque texte à une image par son nom : nom exact, puis
+sans le niveau (« Crimson Amber Medallion +1 » prend l'icône du médaillon), puis une compétence prend
+l'icône de sa Cendre de guerre ; un passage de dialogue prend le portrait de son interlocuteur. Rien
+d'approché : un texte sans correspondance reste sans image. Les images sont réduites (128 px, WebP)
+dans `web/img/<id>/` et la correspondance écrite dans `web/data/<id>/images.json` ; la page s'en passe si le
+fichier manque. Les réponses de l'API sont gardées dans `.cache/fanapi/`.
+
+`web/img/` n'est pas versionné : ce sont des fichiers du jeu, et ils se régénèrent (`images.py` pour
+Elden Ring, `games/bloodborne/icons.py` depuis ses propres fichiers du jeu pour Bloodborne). Après un
+clone, `images.json` est là mais pas les images : la page masque chaque icône absente, et les fiches
+s'affichent sans image.
+
+| Catégorie | Avec image |
+|---|---|
+| Armes | 423 / 463 |
+| Armures | 483 / 521 |
+| Talismans | 112 / 118 |
+| Objets | 527 / 760 |
+| Cendres de guerre | 78 / 97 |
+| Compétences | 80 / 177 |
+| Dialogues (portrait) | 316 / 846 |
+| Écrans de chargement | 0 / 67 |
+
 ## Tests et évaluation de la recherche
 
 ```bash
-uv run pytest                                    # Python : titres, entités, projections
+uv run pytest                                    # Python : titres, entités, projections, icônes
 node --test tests/*.test.mjs                     # page : recherche, chemins d'échos, seuil d'évaluation
 uv run python eval/embed_queries.py              # après un changement de requêtes ou de modèle
 node eval/search_eval.mjs                        # détail requête par requête
 ```
 
-`eval/queries.json` contient 42 questions et noms, avec les textes qui y répondent vraiment (vérifiés
+`games/elden-ring/eval/queries.json` contient 42 questions et noms, avec les textes qui y répondent vraiment (vérifiés
 dans le corpus : aucun texte ne dit par exemple que Marika est la mère de Miquella, la question n'y
 figure donc pas). Une requête réussit si l'un de ces textes est dans les 10 premiers résultats.
 Deux lots : `dev` (30 requêtes, qui ont servi à régler le poids de la fusion) et `test`
@@ -207,13 +283,15 @@ sa version quantifiée (q8), aux scores très proches.
 ## Fichiers
 
 ```
-prepare.py        données -> documents -> embeddings -> t-SNE (+ UMAP) -> clusters -> export
+prepare.py        données -> documents -> embeddings -> t-SNE -> clusters -> export
+games.py          chargement de games/<id>/game.json, publication pour la page
+games/<id>/       game.json, entities.json, labels.json, eval/ (requêtes) d'un jeu
+games/bloodborne/  extract.py (archives du jeu -> JSON), icons.py (illustrations), vote_speakers.py, speakers.json
+images.py         icônes et portraits : Fan API -> web/img/<id>/ + web/data/<id>/images.json
 labels.py         rattachement des titres de labels.json aux clusters
-labels.json       titres et descriptions des groupes
 layouts.py        projections 2D, alignement de la vue alternative, cohésion des groupes
 entities.py       textes qui mentionnent chaque entité de entities.json
-entities.json     personnages, lieux, factions et notions
-eval/             requêtes d'évaluation, leurs embeddings, évaluation, comparaison des projections
+eval/             embeddings des requêtes, évaluation, comparaison des projections
 tests/            tests Python (pytest) et JavaScript (node --test)
 web/index.html    la page
 web/app.js        point d'entrée : chargement, souris, clavier, légende
@@ -228,6 +306,9 @@ web/entities-ui.js  index et fiches des personnages, lieux…
 web/graph.js      graphe des échos, plus court chemin (fonctions pures)
 web/dialogue-ui.js  dialogue complet d'un personnage et son fil sur la carte
 web/sky.js        habillage du ciel : constellations, halos, nébuleuses, style des noms
+web/tip.js        bulle d'une étoile (carte, clavier, liste des échos)
+web/data/<id>/     données générées d'un jeu (prepare.py, images.py)
+web/img/<id>/      icônes et portraits (images.py, icons.py), non versionnés
 web/style.css
 ```
 
@@ -247,4 +328,5 @@ web/style.css
   du dump, pour que les corriger ne déplace pas les textes sur la carte.
 - Pas de texte français officiel : le dump n'a que l'anglais et le japonais.
 
-Textes d'Elden Ring © FromSoftware / Bandai Namco. Projet de fan, non commercial.
+Textes et images d'Elden Ring © FromSoftware / Bandai Namco ; icônes via l'Elden Ring Fan API.
+Projet de fan, non commercial.
