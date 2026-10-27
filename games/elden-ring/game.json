@@ -179,6 +179,7 @@
       "exclude": "-Malenia",
       "category": "in:weapons"
     },
+    "chat_examples": ["Who killed Godwyn?", "Why did Marika shatter the Elden Ring?", "Who is Ranni?"],
     "entity_examples": "Ranni or Leyndell",
     "empty_hint": "Marika, Ranni"
   }

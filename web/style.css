@@ -447,7 +447,7 @@ body.sky-d[data-game="bloodborne"] {
 .tours li + li { margin-top: .5rem; }
 .tours button {
   display: block; width: 100%; text-align: left; padding: .7rem .85rem; cursor: pointer;
-  border: 1px solid var(--rim); border-radius: 6px; background: rgba(13, 18, 32, .55); color: var(--parch);
+  border: 1px solid var(--rim); border-radius: 6px; background: rgba(13, 18, 32, .55); color: var(--parch); font: inherit;
 }
 .tours button:hover, .tours button:focus-visible { border-color: var(--grace); }
 .tours .name { font: 600 1.15rem var(--display); color: var(--grace); }
@@ -474,3 +474,53 @@ body.sky-d[data-game="bloodborne"] {
 .tour-steps button:hover, .tour-steps button[aria-current] { color: var(--parch); }
 .tour-steps .step { flex: none; width: 1.4rem; height: 1.4rem; border: 1px solid var(--rim); border-radius: 50%; text-align: center; line-height: 1.3rem; font-size: .78rem; }
 .tour-steps button[aria-current] .step { border-color: var(--grace); color: var(--grace); }
+
+/* questions au lore (chat-ui.js) */
+.chat-model { margin: .3rem 0 .8rem; color: var(--faint); font-size: .85rem; }
+.chat-model button, .chat-error button {
+  padding: 0; border: 0; background: none; color: var(--moon); font: inherit; text-decoration: underline;
+  text-underline-offset: 3px; cursor: pointer;
+}
+.chat-examples { display: flex; flex-direction: column; gap: .4rem; margin-bottom: 1rem; }
+.chat-examples .example {
+  padding: .45rem .7rem; border: 1px solid var(--rim); border-radius: 6px; background: rgba(13, 18, 32, .55);
+  color: var(--parch); font: italic 1rem var(--body); text-align: left; cursor: pointer;
+}
+.chat-examples .example:hover, .chat-examples .example:focus-visible { border-color: var(--grace); }
+.chat-turns { list-style: none; margin: 0; padding: 0; }
+.chat-turn + .chat-turn { margin-top: 1.4rem; padding-top: 1rem; border-top: 1px solid var(--rim); }
+.chat-q { margin: 0 0 .6rem; padding: .5rem .8rem; border-left: 3px solid var(--grace); background: rgba(217, 196, 142, .07); font-style: italic; }
+.chat-a p { margin: 0 0 .7rem; line-height: 1.6; }
+.chat-wait { color: var(--faint); font-style: italic; }
+.chat-error { color: #e3a3a3; }
+.cites { white-space: nowrap; }
+.cite {
+  margin: 0 .1rem; padding: 0 .35rem; min-width: 1.4rem; border: 1px solid var(--rim-strong); border-radius: 999px;
+  background: rgba(217, 196, 142, .08); color: var(--grace); font: 600 .72rem/1.5 var(--body); vertical-align: .15em; cursor: pointer;
+}
+.cite:hover, .cite:focus-visible { border-color: var(--grace); background: rgba(217, 196, 142, .2); }
+.chat-sources { margin-top: .3rem; font-size: .9rem; }
+.chat-sources summary { color: var(--faint); cursor: pointer; }
+.chat-form {
+  position: sticky; bottom: -32px; display: flex; gap: .5rem; align-items: flex-end;
+  margin: 1.2rem -4px -32px; padding: .8rem 4px 32px; background: rgba(16, 21, 37, .97);
+}
+.chat-form textarea, .chat-settings input:not([type=checkbox]), .chat-settings select {
+  width: 100%; padding: .5rem .6rem; border: 1px solid var(--rim-strong); border-radius: 6px;
+  background: rgba(13, 18, 32, .8); color: var(--parch); font: 1rem var(--body);
+}
+.chat-form textarea { flex: 1; resize: vertical; min-height: 2.8rem; }
+.chat-form button, .chat-actions button {
+  padding: .5rem 1rem; border: 1px solid var(--grace); border-radius: 6px; cursor: pointer;
+  background: rgba(217, 196, 142, .1); color: var(--grace); font: 600 1rem var(--body);
+}
+.chat-form button:hover, .chat-actions button:hover { background: rgba(217, 196, 142, .2); }
+.chat-settings { display: flex; flex-direction: column; gap: .8rem; margin-top: 1rem; }
+.chat-settings label { display: flex; flex-direction: column; gap: .3rem; color: var(--faint); font-size: .9rem; }
+.chat-settings label.check { flex-direction: row; align-items: center; gap: .5rem; color: var(--parch); }
+.chat-settings a { color: var(--moon); }
+.chat-actions { display: flex; gap: .6rem; }
+.chat-actions .forget { border-color: var(--rim-strong); color: var(--moon); background: none; }
+@media (max-width: 760px) {
+  .chat-form { bottom: -24px; margin-bottom: -24px; padding-bottom: 24px; }
+}

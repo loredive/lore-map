@@ -70,6 +70,7 @@ export function backLabel() {
     case "dialogue": return `Back to the dialogue of ${e.speaker}`;
     case "trail": return "Back to your trail";
     case "tours": return "Back to the guided tours";
+    case "chat": return "Back to the conversation";
     case "tour": return `Back to “${S.tours.find(t => t.id === e.id)?.title || e.id}”, step ${e.k + 1}`;
     default: return null;                       // avant : le panneau fermé, « Fermer » suffit
   }

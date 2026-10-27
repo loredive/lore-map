@@ -10,6 +10,7 @@ import { openDialogue, dialogueButtons, bindDialogueButtons } from "./dialogue-u
 import { tipAtStar } from "./tip.js";
 import { showTrail } from "./trail-ui.js";
 import { showTours, openTour } from "./tours-ui.js";
+import { showChat } from "./chat-ui.js";
 
 // Mode lecture : le panneau s'élargit (environ la moitié de l'écran) ; retenu d'une visite à l'autre.
 const READING_KEY = "lore-map:reading";
@@ -266,6 +267,7 @@ setOpener(e => {
   else if (e.view === "trail") showTrail();
   else if (e.view === "tours") showTours();
   else if (e.view === "tour") openTour(e.id, e.k);
+  else if (e.view === "chat") showChat();
   else closePanel();
 });
 
