@@ -11,7 +11,6 @@ import { showTip } from "./tip.js";
 import { openEntity } from "./entities-ui.js";
 import { initTrail } from "./trail-ui.js";
 import { loadTours } from "./tours-ui.js";
-import "./chat-ui.js";
 
 // ------------------------------------------------------------------ jeu
 const optional = (f, empty) => fetch(f).then(r => r.ok ? r.json() : empty).catch(() => empty);

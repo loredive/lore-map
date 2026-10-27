@@ -26,11 +26,6 @@
    "exclude": "-Gehrman",
    "category": "in:notes"
   },
-  "chat_examples": [
-   "What is Paleblood?",
-   "Who was Laurence, and what became of him?",
-   "What happened at the Fishing Hamlet?"
-  ],
   "entity_examples": "Laurence or Byrgenwerth",
   "empty_hint": "Gehrman, Byrgenwerth",
   "dlc_label": "The Old Hunters"

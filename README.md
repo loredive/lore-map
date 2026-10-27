@@ -12,12 +12,6 @@ python -m http.server 8000 -d web    # then open http://localhost:8000
 
 The generated data is in `web/data/`. Icons are not versioned, and the page works without them.
 
-## Ask about the lore
-
-"Ask" answers questions from the game's own texts: the map's search picks the relevant texts and a
-language model answers from them, with numbered links to each one. It runs with the visitor's own
-API key (Anthropic, OpenAI or OpenRouter), which stays in the browser and is sent only to that provider.
-
 ## Rebuild the data
 
 ```bash
