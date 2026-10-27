@@ -3,3 +3,9 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 *:Zone.Identifier
+.cache/
+.mypy_cache/
+.claude/logs/
+.claude/settings.local.json
+web/img/
+.coverage

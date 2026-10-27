@@ -1,0 +1,30 @@
+[
+ {
+  "id": "story",
+  "title": "The story of the Lands Between",
+  "intro": "Start here: the whole story in order, from the age before the Erdtree to the Tarnished's return. The game tells it in fragments and never gives dates, so the order between some steps is an inference.",
+  "steps": [
+   {"text": "Remembrance of the Dragonlord", "note": "Before the Erdtree, dragons ruled. Dragonlord Placidusax \"is said to have been Elden Lord in the age before the Erdtree\". Then his god fled, and he \"continued to await its return\"."},
+   {"text": "Elden Stars", "note": "A new god's order arrived from the sky: \"long ago, the Greater Will sent a golden star bearing a beast into the Lands Between, which would later become the Elden Ring\"."},
+   {"text": "Elden Remembrance", "note": "That beast, the Elden Beast, was \"the vassal beast of the Greater Will and living incarnation of the concept of Order\"."},
+   {"text": "Elden Lord Crown", "note": "Queen Marika became the Ring's vessel, and Godfrey her first Elden Lord. \"The age of the Erdtree began amongst conflict\": Godfrey \"led the War against the Giants\", and when his last worthy enemy fell, \"the hue of Lord Godfrey's eyes faded\"."},
+   {"text": "Remembrance of the Fire Giant", "note": "The giants lost. Unable to put out their forge, Marika cursed the last of them to guard it: \"O trifling giant, mayest thou tend thy flame for eternity.\" That fire, the Flame of Ruin, returns at the end of this tour."},
+   {"text": "Remembrance of Hoarah Loux", "note": "Then Godfrey was \"robbed of his grace, becoming Tarnished\", and left the Lands Between with his kin. This is the origin of the Tarnished."},
+   {"text": "Melina — passage 7", "note": "Marika's words to those exiles: \"after thy death, I will give back what I once claimed. Return to the Lands Between, wage war, and brandish the Elden Ring.\" The promise you answer when you arrive."},
+   {"text": "Radagon Icon", "note": "Marika's second Elden Lord was Radagon, formerly husband of Rennala, queen of the Carian sorcerers. Their children, among them Radahn, became Marika's stepchildren."},
+   {"text": "Remembrance of the Black Blade", "note": "The Golden Order rested on a lock: Marika's shadow Maliketh served as \"a vessel to lock away Destined Death\". \"Even then, she betrayed him.\""},
+   {"text": "Black Knife", "note": "The lock broke. On the Night of the Black Knives, assassins murdered Godwyn the Golden with blades imbued with \"the stolen Rune of Death\". He was the first demigod to die."},
+   {"text": "Black Knife Armor", "note": "The assassins \"were all women, and rumored to be Numen who had close ties with Marika herself\". The Numen are Marika's own people."},
+   {"text": "Ranni the Witch — passage 7", "note": "Ranni, daughter of Rennala and Radagon, confesses: \"I stole a fragment of the Rune of Death, and used it to forge the godslaying black knives through fearsome rite. I did it all.\" She did it to escape the Two Fingers' plans for her."},
+   {"text": "Marika's Hammer", "note": "Then Marika herself broke the Ring. This is \"the tool with which Queen Marika shattered the Elden Ring and Radagon attempted to repair it\"."},
+   {"text": "Melina — passage 8", "note": "Marika's own words reveal why the two acted together: \"O Radagon, leal hound of the Golden Order. Thou'rt yet to become me. [...] Let us be shattered, both. Mine other self.\" Radagon and Marika are one being."},
+   {"text": "Narrator — passage 7", "note": "Her children, the demigods, took the shards and went to war: the Shattering, \"an internecine war between demigods\", and none came out the victor."},
+   {"text": "Map: Caelid", "note": "Its last great battle was between General Radahn and Malenia, Blade of Miquella. Caelid, where they fought, is now \"a vast land consummately marred by scarlet rot\"."},
+   {"text": "Remembrance of the Omen King", "note": "In Leyndell, Morgott, \"born one of the graceless Omen\", \"took it upon himself to become the Erdtree's protector\". \"He loved not in return, for he was never loved, but nevertheless, love it he did.\""},
+   {"text": "Finger Reader Enia — passage 2", "note": "Now grace calls the Tarnished back from exile: \"the Tarnished are guided by grace. Called to act.\" Collect Great Runes, \"become Elden Lord, and restore the Golden Order\". You are one of them."},
+   {"text": "Melina — passage 17", "note": "But the Erdtree is sealed by \"the mantle of barbs. The thorns are impenetrable.\" No one can reach the Elden Ring."},
+   {"text": "Melina — passage 18", "note": "Melina's answer is the giants' fire from step 5: \"To the flame of ruin, far above the clouds, upon the snowy mountaintops of the giants. Then I can set the Erdtree aflame.\""},
+   {"text": "Mending Rune of the Death-Prince", "note": "Beyond the flames lies the broken Ring, and the choice of what to mend it with. Each mending rune is one possible order. This one is \"Death restored\", since \"the Golden Order was created by confining Destined Death\". Which order you choose is decided in the ending, beyond this map."}
+  ]
+ }
+]

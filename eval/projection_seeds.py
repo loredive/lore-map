@@ -37,14 +37,17 @@ def main():
     from sklearn.manifold import TSNE
     from sklearn.neighbors import NearestNeighbors
 
+    from games import DEFAULT, load_game
     from prepare import dialog_docs, embed, item_docs
 
     p = argparse.ArgumentParser()
     p.add_argument("--source", default=str(HERE.parent.parent / "EldenRingTextExplorer" / "elden_ring_text.json"))
+    p.add_argument("--game", default=DEFAULT)
     p.add_argument("--seeds", type=int, default=5)
     a = p.parse_args()
+    game = load_game(a.game)
     data = json.loads(Path(a.source).read_text(encoding="utf-8"))
-    emb = embed(item_docs(data) + dialog_docs(data), "e5")
+    emb = embed(item_docs(data, game) + dialog_docs(data, game), "e5")
     true = NearestNeighbors(n_neighbors=K + 1, metric="cosine").fit(emb).kneighbors(emb, return_distance=False)[:, 1:]
     rng = np.random.default_rng(0)
     pairs = (rng.integers(0, len(emb), 4000), rng.integers(0, len(emb), 4000))

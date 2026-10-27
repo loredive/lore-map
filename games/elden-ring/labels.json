@@ -1,7 +1,7 @@
 [
   {
-    "title": "Les clochettes des défunts",
-    "description": "Bell Bearings trouvés sur la dépouille de marchands et de PNJ, à offrir aux Twin Maiden Husks de la Roundtable Hold pour obtenir de nouveaux objets.",
+    "title": "Bell Bearings of the departed",
+    "description": "Bell Bearings found on the remains of merchants and NPCs, given to the Twin Maiden Husks at Roundtable Hold for new wares.",
     "members": [
       "D's Bell Bearing",
       "Patches' Bell Bearing",
@@ -21,8 +21,8 @@
     ]
   },
   {
-    "title": "Notes de marchands nomades",
-    "description": "Notes vendues par les marchands nomades, conseils brefs sur les ennemis et les lieux, et les atours de ces marchands.",
+    "title": "Nomadic merchants' notes",
+    "description": "Notes sold by the nomadic merchants, short tips about foes and places, and the merchants' own attire.",
     "members": [
       "Note: Revenants",
       "Note: Great Coffins",
@@ -42,8 +42,8 @@
     ]
   },
   {
-    "title": "Yura, chasseur de Bloody Fingers",
-    "description": "Yura traque les Bloody Fingers, Tarnished envoûtés par le sang, met en garde contre le dragon d'Agheel et parle des Trois Doigts.",
+    "title": "Yura, hunter of Bloody Fingers",
+    "description": "Yura tracks the Bloody Fingers, Tarnished bewitched by blood, warns of the dragon Agheel and speaks of the Three Fingers.",
     "members": [
       "Yura, Hunter of Bloody Fingers — passage 7",
       "Yura, Hunter of Bloody Fingers — passage 1",
@@ -63,8 +63,8 @@
     ]
   },
   {
-    "title": "Jeu en ligne et doigts",
-    "description": "Objets et écrans d'aide du multijoueur : signes d'invocation, coopération, duels et invasions.",
+    "title": "Online play and fingers",
+    "description": "Multiplayer items and help screens: summon signs, cooperation, duels and invasions.",
     "members": [
       "About Invasion Multiplayer",
       "Furlcalling Finger Remedy",
@@ -84,8 +84,8 @@
     ]
   },
   {
-    "title": "Communion des dragons",
-    "description": "Incantations de la Communion draconique, qui changent le lanceur en dragon pour cracher feu, glace, magie ou pourriture.",
+    "title": "Dragon Communion",
+    "description": "Dragon Communion incantations, which turn the caster into a dragon breathing fire, ice, magic or rot.",
     "members": [
       "Dragonice",
       "Dragonfire",
@@ -105,8 +105,8 @@
     ]
   },
   {
-    "title": "Le culte des dragons anciens",
-    "description": "Incantations de foudre du culte des dragons anciens de la capitale, et ses livres de prières.",
+    "title": "The Ancient Dragon cult",
+    "description": "Lightning incantations of the capital's Ancient Dragon cult, and its prayerbooks.",
     "members": [
       "Lightning Spear",
       "Ancient Dragons' Lightning Strike",
@@ -126,8 +126,8 @@
     ]
   },
   {
-    "title": "Boc le couturier",
-    "description": "Demi-Human Boc, couturier comme sa mère, qui souffre de sa laideur, reçoit une aiguille d'or et veut renaître auprès de Rennala.",
+    "title": "Boc the seamster",
+    "description": "Demi-Human Boc, a seamster like his mother, who suffers from his ugliness, receives a gold needle and wishes to be reborn by Rennala.",
     "members": [
       "Demi-Human Boc — passage 14",
       "Demi-Human Boc — passage 9",
@@ -147,8 +147,8 @@
     ]
   },
   {
-    "title": "Fioles de larmes",
-    "description": "Les fioles sacrées de larmes cramoisies et céruléennes, qui rendent PV et PC, et les scarabées qui les remplissent.",
+    "title": "Flasks of tears",
+    "description": "The sacred flasks of Crimson and Cerulean Tears, which restore HP and FP, and the scarabs that fill them.",
     "members": [
       "Flask of Cerulean Tears",
       "Flask of Cerulean Tears +3",
@@ -168,8 +168,8 @@
     ]
   },
   {
-    "title": "Larmes de cristal",
-    "description": "Larmes cristallines formées là où tombe la manne de l'Erdtree, à mélanger dans la Flask of Wondrous Physick pour des effets temporaires.",
+    "title": "Crystal tears",
+    "description": "Crystal tears formed where the Erdtree's sap falls, mixed into the Flask of Wondrous Physick for temporary effects.",
     "members": [
       "Thorny Cracked Tear",
       "Magic-Shrouding Cracked Tear",
@@ -189,8 +189,8 @@
     ]
   },
   {
-    "title": "Alberich, Spellblade et Raging Wolf",
-    "description": "Armures de sorciers et de chevaliers : Alberich, les Spellblades, le Raging Wolf et le Consort's Mask.",
+    "title": "Alberich, Spellblades and the Raging Wolf",
+    "description": "Armor of sorcerers and knights: Alberich, the Spellblades, the Raging Wolf and the Consort's Mask.",
     "members": [
       "Alberich's Robe",
       "Alberich's Robe (Altered)",
@@ -210,8 +210,8 @@
     ]
   },
   {
-    "title": "Cendres d'esprits",
-    "description": "Restes cendreux où demeurent des esprits à invoquer, les clochettes qui les appellent et les matériaux liés aux esprits.",
+    "title": "Spirit ashes",
+    "description": "Ashen remains where summonable spirits dwell, the bells that call them, and spirit-related materials.",
     "members": [
       "Crystalian Ashes",
       "Radahn Soldier Ashes",
@@ -231,8 +231,8 @@
     ]
   },
   {
-    "title": "Ceux qui vivent dans la Mort",
-    "description": "D, chasseur des morts, Fia la compagne de lit et Gurranq, clerc bestial qui réclame la Deathroot : la mort, ceux qui y vivent et ceux qui les traquent.",
+    "title": "Those Who Live in Death",
+    "description": "D, Hunter of the Dead, Fia the Deathbed Companion, and Gurranq, the bestial cleric who craves Deathroot: death, those who live in it, and those who hunt them.",
     "members": [
       "D, Hunter of the Dead — passage 2",
       "D, Hunter of the Dead — passage 9",
@@ -252,8 +252,8 @@
     ]
   },
   {
-    "title": "Conseils de jeu",
-    "description": "Écrans de chargement et notices sur le combat, la garde, la posture, le cheval et les commandes du jeu.",
+    "title": "Gameplay tips",
+    "description": "Loading screens and notes on combat, guarding, stance, Torrent and the game's controls.",
     "members": [
       "Guarding",
       "Stance-Breaking",
@@ -273,8 +273,8 @@
     ]
   },
   {
-    "title": "Cendres de guerre et compétences",
-    "description": "Les compétences d'armes, les Cendres de guerre qui les confèrent, et des sorts de lames magiques de la famille royale carienne.",
+    "title": "Ashes of War and skills",
+    "description": "Weapon skills, the Ashes of War that grant them, and the Carian royal family's magic blade spells.",
     "members": [
       "Ash of War: Lightning Slash",
       "Ash of War: Torch Attack",
@@ -294,8 +294,8 @@
     ]
   },
   {
-    "title": "Kalé et les marchands nomades",
-    "description": "Le marchand Kalé et d'autres marchands nomades accueillent leurs clients ; Kalé parle de Blaidd et de son peuple de voyageurs.",
+    "title": "Kalé and the nomadic merchants",
+    "description": "Kalé and other nomadic merchants greet their customers; Kalé speaks of Blaidd and his people of travelers.",
     "members": [
       "Merchant Kalé — passage 1",
       "Merchant Kalé — passage 5",
@@ -315,8 +315,8 @@
     ]
   },
   {
-    "title": "Les ruses de Patches",
-    "description": "Patches the Untethered, marchand nomade qui piège les coffres, menace, se rend, puis propose de faire affaire.",
+    "title": "Patches' tricks",
+    "description": "Patches the Untethered, a merchant who traps chests, threatens, surrenders, then offers to do business.",
     "members": [
       "Patches — passage 3",
       "Patches — passage 10",
@@ -336,8 +336,8 @@
     ]
   },
   {
-    "title": "Alexander et les Jar-Bairn",
-    "description": "Iron Fist Alexander, coincé dans des trous ou en route vers le festival de combat, et les Jar-Bairn qui l'appellent « oncle ».",
+    "title": "Alexander and the Jar-Bairn",
+    "description": "Iron Fist Alexander, stuck in holes or on his way to the festival of combat, and the Jar-Bairn who call him “uncle”.",
     "members": [
       "Alexander, Warrior Jar — passage 19",
       "Alexander, Warrior Jar — passage 32",
@@ -357,8 +357,8 @@
     ]
   },
   {
-    "title": "Diallos et la maison Hoslow",
-    "description": "Le chevalier Diallos, fier de la maison Hoslow « dont l'histoire s'écrit dans le sang », venge sa servante Lanya puis défend les jarres.",
+    "title": "Diallos and House Hoslow",
+    "description": "Diallos, proud of House Hoslow “whose history is written in blood”, avenges his servant Lanya, then defends the jars.",
     "members": [
       "Knight Diallos — passage 3",
       "Knight Diallos — passage 5",
@@ -378,8 +378,8 @@
     ]
   },
   {
-    "title": "Boucliers et blasons",
-    "description": "Boucliers de bois et de métal, pavois et leurs emblèmes.",
+    "title": "Shields and crests",
+    "description": "Wooden and metal shields, greatshields and their emblems.",
     "members": [
       "Round Shield",
       "Scripture Wooden Shield",
@@ -399,8 +399,8 @@
     ]
   },
   {
-    "title": "Godfrey et les Crucible Knights",
-    "description": "Armures des Crucible Knights au service de Godfrey, premier Seigneur d'Elden, et celles de Godfrey lui-même.",
+    "title": "Godfrey and the Crucible Knights",
+    "description": "Armor of the Crucible Knights in the service of Godfrey, the first Elden Lord, and Godfrey's own.",
     "members": [
       "Crucible Tree Armor",
       "Cerulean Amber Medallion +1",
@@ -420,8 +420,8 @@
     ]
   },
   {
-    "title": "Varré, Mohg et les Grandes Runes",
-    "description": "White Mask Varré, qui recrute pour la dynastie de Mohg, les paroles de Mohg, et les Grandes Runes des demi-dieux.",
+    "title": "Varré, Mohg and the Great Runes",
+    "description": "White Mask Varré, who recruits for Mohg's dynasty, Mohg's words, and the demigods' Great Runes.",
     "members": [
       "White Mask Varré — passage 12",
       "White Mask Varré — passage 11",
@@ -441,8 +441,8 @@
     ]
   },
   {
-    "title": "Les Remembrances",
-    "description": "Les Remembrances des grands ennemis vaincus, gravées dans l'Erdtree, à échanger contre leur pouvoir ou des runes.",
+    "title": "The Remembrances",
+    "description": "Remembrances of great foes defeated, etched into the Erdtree, traded for their power or for runes.",
     "members": [
       "Remembrance of the Blasphemous",
       "Remembrance of the Grafted",
@@ -462,8 +462,8 @@
     ]
   },
   {
-    "title": "Le Manoir du Volcan",
-    "description": "Rya la messagère et Tanith, maîtresse du Volcano Manor, recrutent des Tarnished pour se dresser contre l'Erdtree.",
+    "title": "Volcano Manor",
+    "description": "Rya the messenger and Tanith, mistress of Volcano Manor, recruit Tarnished to rise against the Erdtree.",
     "members": [
       "Rya the Scout — passage 14",
       "Rya the Scout — passage 7",
@@ -483,8 +483,8 @@
     ]
   },
   {
-    "title": "Rennala, reine de la Pleine Lune",
-    "description": "Rennala, tête de l'Académie et de la famille royale carienne, qui a perdu Radagon : ses atours, sa lune et ce qu'on en dit.",
+    "title": "Rennala, Queen of the Full Moon",
+    "description": "Rennala, head of the Academy and of the Carian royal family, who lost Radagon: her regalia, her moon, and what is said of her.",
     "members": [
       "Queen's Bracelets",
       "Queen's Robe",
@@ -504,8 +504,8 @@
     ]
   },
   {
-    "title": "Maliketh et les Black Knives",
-    "description": "La Lame noire de Maliketh, le fragment de Mort volé et les Black Knives : armes, armures, empreintes et paroles de Fia et Rogier.",
+    "title": "Maliketh and the Black Knives",
+    "description": "Maliketh's Black Blade, the stolen rune of Death and the Black Knives: weapons, armor, prints, and the words of Fia and Rogier.",
     "members": [
       "Black Knifeprint",
       "Black Knife",
@@ -525,8 +525,8 @@
     ]
   },
   {
-    "title": "Hewg et la Heartbroken Maiden",
-    "description": "Le forgeron Hewg, prisonnier de la Roundtable Hold, et la Heartbroken Maiden qui apprend auprès de lui l'accord des esprits, jusqu'à l'incendie de la Table ronde.",
+    "title": "Hewg and the Heartbroken Maiden",
+    "description": "Hewg the smith, held prisoner at Roundtable Hold, and the Heartbroken Maiden who learns spirit tuning from him, until the Roundtable burns.",
     "members": [
       "Heartbroken Maiden — passage 10",
       "Smithing Master Hewg — passage 4",
@@ -546,8 +546,8 @@
     ]
   },
   {
-    "title": "Rogier, Blackguard et Dung Eater",
-    "description": "Le sorcier Rogier, qui enseigne des arts de combat, le Blackguard, et le Dung Eater qui veut maudire les morts.",
+    "title": "Rogier, Blackguard and the Dung Eater",
+    "description": "Rogier the sorcerer, who teaches combat arts, the Blackguard, and the Dung Eater who wants to curse the dead.",
     "members": [
       "Sorcerer Rogier — passage 16",
       "Sorcerer Rogier — passage 5",
@@ -567,8 +567,8 @@
     ]
   },
   {
-    "title": "Incantations et moines du feu",
-    "description": "Incantations des Fire Monks et des Géants de feu, tenues des moines et prélats, flamme noire et pierres de flamme.",
+    "title": "Fire Monk incantations",
+    "description": "Incantations of the Fire Monks and Fire Giants, monk and prelate garb, black flame and flame stones.",
     "members": [
       "Whirl, O Flame!",
       "O, Flame!",
@@ -588,8 +588,8 @@
     ]
   },
   {
-    "title": "Ranni, Blaidd et Iji",
-    "description": "Ranni la sorcière, son ombre Blaidd le demi-loup, le forgeron Iji et le châtelain Jerren : Radahn, l'étoile tombée, Nokron et le départ de Ranni.",
+    "title": "Ranni, Blaidd and Iji",
+    "description": "Ranni the Witch, her shadow Blaidd the half-wolf, Iji the smith and Castellan Jerren: Radahn, the fallen star, Nokron and Ranni's departure.",
     "members": [
       "Ranni the Witch — passage 12",
       "Ranni the Witch — passage 16",
@@ -609,8 +609,8 @@
     ]
   },
   {
-    "title": "Seluvis et ses marionnettes",
-    "description": "Le précepteur Seluvis, qui méprise le joueur, lui fait servir des potions à Nepheli et Ranni et collectionne les marionnettes.",
+    "title": "Seluvis and his puppets",
+    "description": "Preceptor Seluvis, who scorns the player, has them serve potions to Nepheli and Ranni, and collects puppets.",
     "members": [
       "Preceptor Seluvis — passage 3",
       "Preceptor Seluvis — passage 6",
@@ -630,8 +630,8 @@
     ]
   },
   {
-    "title": "Gowry et Millicent",
-    "description": "Le sage Gowry demande d'aider Millicent, atteinte de la pourriture : l'aiguille d'or pur, le secret de Sellia, puis son vœu qu'elle meure.",
+    "title": "Gowry and Millicent",
+    "description": "Sage Gowry asks for help with Millicent, stricken with rot: the unalloyed gold needle, Sellia's secret, then his wish that she die.",
     "members": [
       "Sage Gowry — passage 17",
       "Sage Gowry — passage 8",
@@ -651,8 +651,8 @@
     ]
   },
   {
-    "title": "Les leçons de Sellen",
-    "description": "La sorcière Sellen enseigne à son apprenti, cherche les corps des maîtres Azur et Lusat et veut restaurer le courant primordial à l'Académie.",
+    "title": "Sellen's lessons",
+    "description": "Sellen the witch teaches her apprentice, seeks the bodies of Master Azur and Master Lusat, and wants to restore the primeval current at the Academy.",
     "members": [
       "Sorceress Sellen — passage 21",
       "Sorceress Sellen — passage 1",
@@ -672,8 +672,8 @@
     ]
   },
   {
-    "title": "Brother Corhyn et Miriel",
-    "description": "Brother Corhyn enseigne des incantations, suit Goldmask puis doute de l'Ordre d'or ; Miriel, pasteur des vœux, répond aux questions du joueur.",
+    "title": "Brother Corhyn and Miriel",
+    "description": "Brother Corhyn teaches incantations, follows Goldmask, then doubts the Golden Order; Miriel, Pastor of Vows, answers the player's questions.",
     "members": [
       "Brother Corhyn — passage 15",
       "Brother Corhyn — passage 8",
@@ -693,29 +693,29 @@
     ]
   },
   {
-    "title": "Godrick et les fantômes",
-    "description": "Godrick le Greffé et des fantômes croisés en chemin, qui parlent de l'or, de la grâce et du retour au pays.",
+    "title": "Godrick and the ghosts",
+    "description": "Godrick the Grafted, and ghosts met along the way who speak of gold, grace and going home.",
     "members": [
       "Godrick the Grafted — passage 4",
       "Godrick the Grafted — passage 3",
-      "Fantôme — passage 15",
-      "Fantôme — passage 14",
+      "Ghost — passage 15",
+      "Ghost — passage 14",
       "Godrick the Grafted — passage 8",
-      "Fantôme — passage 16",
+      "Ghost — passage 16",
       "Godrick the Grafted — passage 9",
       "Godrick the Grafted — passage 7",
       "Godrick the Grafted — passage 10",
       "Godrick the Grafted — passage 2",
-      "Fantôme — passage 2",
-      "Fantôme — passage 22",
+      "Ghost — passage 2",
+      "Ghost — passage 22",
       "Godrick the Grafted — passage 5",
-      "Fantôme — passage 7",
+      "Ghost — passage 7",
       "Godrick the Grafted — passage 1"
     ]
   },
   {
-    "title": "Latenna et les médaillons",
-    "description": "L'albinaurique Latenna, le vieil Albus et les médaillons qui ouvrent la route vers le nord et l'Haligtree.",
+    "title": "Latenna and the medallions",
+    "description": "Latenna the Albinauric, old Albus, and the medallions that open the road north to the Haligtree.",
     "members": [
       "Latenna the Albinauric — passage 6",
       "Latenna the Albinauric — passage 3",
@@ -735,8 +735,8 @@
     ]
   },
   {
-    "title": "Malenia, lame de Miquella",
-    "description": "Malenia, lame de Miquella et déesse de la pourriture : son armure d'or pur, ses paroles, l'aiguille de Miquella et la fleur écarlate.",
+    "title": "Malenia, Blade of Miquella",
+    "description": "Malenia, Blade of Miquella and Goddess of Rot: her unalloyed gold armor, her words, Miquella's Needle and the scarlet flower.",
     "members": [
       "Malenia's Armor",
       "Malenia's Winged Helm",
@@ -756,8 +756,8 @@
     ]
   },
   {
-    "title": "Irina, Edgar et la frénésie",
-    "description": "Irina de Morne, le châtelain Edgar et Kalé : le père d'Irina, les raisins de son pèlerinage, puis la flamme du chaos et les Trois Doigts.",
+    "title": "Irina, Edgar and the Frenzy",
+    "description": "Irina of Morne, Castellan Edgar and Kalé: Irina's father, the raisins of her pilgrimage, then the flame of chaos and the Three Fingers.",
     "members": [
       "Irina of Morne — passage 14",
       "Irina of Morne — passage 2",
@@ -777,8 +777,8 @@
     ]
   },
   {
-    "title": "Incantations des Deux Doigts",
-    "description": "Incantations des fidèles des Deux Doigts : soins, protections contre les éléments, et l'obscurité de leurs anciens assassins.",
+    "title": "Two Fingers incantations",
+    "description": "Incantations of the Two Fingers' faithful: healing, protection from the elements, and the darkness of their former assassins.",
     "members": [
       "Heal",
       "Divine Fortification",
@@ -798,8 +798,8 @@
     ]
   },
   {
-    "title": "Talismans et charmes",
-    "description": "Talismans de combat, de dragons anciens, scarabées, charmes de scorpion et charmes d'arsenal.",
+    "title": "Talismans and charms",
+    "description": "Combat talismans, ancient dragon talismans, scarabs, scorpion charms and arsenal charms.",
     "members": [
       "Dragoncrest Shield Talisman",
       "Spelldrake Talisman",
@@ -819,8 +819,8 @@
     ]
   },
   {
-    "title": "Sang, pourriture et prothèses",
-    "description": "Incantations de flamme de sang et de pourriture, prothèses et insignes ailés liés à Malenia, et l'Exultation du Seigneur du Sang.",
+    "title": "Blood, rot and prostheses",
+    "description": "Bloodflame and rot incantations, prostheses and winged insignia tied to Malenia, and the Lord of Blood's Exultation.",
     "members": [
       "Kindred of Rot's Exultation",
       "Prosthesis-Wearer Heirloom",
@@ -840,8 +840,8 @@
     ]
   },
   {
-    "title": "Gideon, Latenna et les médaillons",
-    "description": "Sir Gideon Ofnir partage ce qu'il sait (médaillons secrets, Haligtree, Miquella, Mohg) ; avec l'albinaurique Latenna et ses médaillons.",
+    "title": "Gideon, Latenna and the medallions",
+    "description": "Sir Gideon Ofnir shares what he knows (secret medallions, the Haligtree, Miquella, Mohg), with Latenna the Albinauric and her medallions.",
     "members": [
       "Sir Gideon Ofnir, the All-Knowing — passage 15",
       "Sir Gideon Ofnir, the All-Knowing — passage 4",
@@ -861,8 +861,8 @@
     ]
   },
   {
-    "title": "Melina, l'accord et la flamme",
-    "description": "Melina guide le joueur selon leur accord, rapporte les paroles de Marika, mène à la flamme de ruine et met en garde contre la flamme de frénésie.",
+    "title": "Melina, the accord and the flame",
+    "description": "Melina guides the player by their accord, passes on Marika's words, leads to the flame of ruin and warns against the Frenzied Flame.",
     "members": [
       "Melina — passage 16",
       "Melina — passage 25",
@@ -882,8 +882,8 @@
     ]
   },
   {
-    "title": "Les liseuses de Doigts",
-    "description": "Enia et la vieille liseuse de Doigts, qui interprètent les paroles des Deux Doigts pour les Tarnished.",
+    "title": "The Finger Readers",
+    "description": "Enia and the old Finger Reader, who interpret the Two Fingers' words for the Tarnished.",
     "members": [
       "Finger Reader Enia — passage 1",
       "Finger Reader Enia — passage 6",
@@ -903,29 +903,29 @@
     ]
   },
   {
-    "title": "Narrateur, Margit, Godfrey et Morgott",
-    "description": "Le narrateur du prologue, les paroles de Margit, Godfrey et Morgott au combat, et la fin du jeu.",
+    "title": "Narrator, Margit, Godfrey and Morgott",
+    "description": "The prologue's narrator, the words of Margit, Godfrey and Morgott in battle, and the end of the game.",
     "members": [
-      "Fin du jeu (et Morgott) — passage 1",
-      "Narrateur — passage 4",
-      "Narrateur — passage 1",
-      "Fin du jeu (et Morgott) — passage 2",
+      "End of the game (and Morgott) — passage 1",
+      "Narrator — passage 4",
+      "Narrator — passage 1",
+      "End of the game (and Morgott) — passage 2",
       "Godfrey, First Elden Lord — passage 3",
       "Margit, the Fell Omen — passage 1",
-      "Narrateur — passage 2",
+      "Narrator — passage 2",
       "Margit, the Fell Omen — passage 2",
       "Margit, the Fell Omen — passage 3",
       "Godfrey, First Elden Lord — passage 4",
       "Godfrey, First Elden Lord — passage 1",
       "Morgott, the Omen King — passage 1",
       "Margit, the Fell Omen — passage 4",
-      "Narrateur — passage 3",
-      "Fin du jeu (et Morgott) — passage 3"
+      "Narrator — passage 3",
+      "End of the game (and Morgott) — passage 3"
     ]
   },
   {
-    "title": "Les Nox de la Cité éternelle",
-    "description": "Armures des moines et des épéistes de la Cité éternelle : les Nox, qui s'attirèrent la colère de la Volonté supérieure et furent bannis sous terre.",
+    "title": "The Nox of the Eternal City",
+    "description": "Armor of the Eternal City's monks and swordsmen: the Nox, who drew the wrath of the Greater Will and were banished underground.",
     "members": [
       "Nox Monk Armor",
       "Nox Swordstress Armor",
@@ -945,8 +945,8 @@
     ]
   },
   {
-    "title": "Sorts de Raya Lucaria",
-    "description": "Sorts de pierre étincelante (glintstone) enseignés à l'Académie de Raya Lucaria, et les parchemins qui les transmettent.",
+    "title": "Raya Lucaria sorceries",
+    "description": "Glintstone sorceries taught at the Academy of Raya Lucaria, and the scrolls that pass them on.",
     "members": [
       "Academy Scroll",
       "Great Glintstone Shard",
@@ -966,8 +966,8 @@
     ]
   },
   {
-    "title": "Tenues de Raya Lucaria",
-    "description": "Robes et armures des sorciers et soldats de l'Académie de Raya Lucaria, dont celles des maîtres Azur et Lusat.",
+    "title": "Raya Lucaria attire",
+    "description": "Robes and armor of the sorcerers and soldiers of the Academy of Raya Lucaria, including those of Masters Azur and Lusat.",
     "members": [
       "Cuckoo Knight Armor",
       "Raya Lucarian Helm",
@@ -987,8 +987,8 @@
     ]
   },
   {
-    "title": "Talismans des fidèles ancestraux",
-    "description": "Charmes de corne et colliers des fidèles ancestraux, qui renforcent immunité, robustesse ou concentration.",
+    "title": "Talismans of the Ancestral Followers",
+    "description": "Horn charms and necklaces of the Ancestral Followers, which boost immunity, robustness or focus.",
     "members": [
       "Clarifying Horn Charm +1",
       "Clarifying Horn Charm",
@@ -1008,8 +1008,8 @@
     ]
   },
   {
-    "title": "Bâtons, astres et pierre étincelante",
-    "description": "Bâtons de sorcellerie, sorts d'étoiles et de comètes, épées de cristal et de pierre étincelante, et objets liés au ciel nocturne.",
+    "title": "Staves, stars and glintstone",
+    "description": "Sorcery staves, star and comet sorceries, crystal and glintstone swords, and items tied to the night sky.",
     "members": [
       "Preceptor's Big Hat",
       "Staff of Loss",
@@ -1029,8 +1029,8 @@
     ]
   },
   {
-    "title": "Viandes séchées et foies",
-    "description": "Viandes et foies marinés dans des solutions médicinales, qui renforcent un temps une résistance ou la protection contre un élément.",
+    "title": "Cured meats and livers",
+    "description": "Meats and livers cured in medicinal solutions, which briefly raise a resistance or protection against an element.",
     "members": [
       "Invigorating Cured Meat",
       "Dappled Cured Meat",
@@ -1050,8 +1050,8 @@
     ]
   },
   {
-    "title": "Matériaux d'artisanat",
-    "description": "Plantes, champignons et fruits ramassés pour fabriquer des objets.",
+    "title": "Crafting materials",
+    "description": "Plants, mushrooms and fruit gathered to craft items.",
     "members": [
       "Mushroom",
       "Herba",
@@ -1071,8 +1071,8 @@
     ]
   },
   {
-    "title": "Graisses d'armes",
-    "description": "Graisses à appliquer sur une arme pour ajouter feu, magie, sang, poison ou givre à ses coups.",
+    "title": "Weapon greases",
+    "description": "Greases applied to a weapon to add fire, magic, blood, poison or frost to its blows.",
     "members": [
       "Fire Grease",
       "Magic Grease",
@@ -1092,8 +1092,8 @@
     ]
   },
   {
-    "title": "Armures de chevaliers et soldats",
-    "description": "Armures et boucliers des chevaliers et soldats de Radahn, de Leyndell, de l'Haligtree et d'autres armées.",
+    "title": "Knights' and soldiers' armor",
+    "description": "Armor and shields of the knights and soldiers of Radahn, Leyndell, the Haligtree and other armies.",
     "members": [
       "Haligtree Knight Greaves",
       "Redmane Knight Greaves",
@@ -1113,8 +1113,8 @@
     ]
   },
   {
-    "title": "Pots à lancer",
-    "description": "Pots fêlés remplis de feu, de poison, d'huile ou de magie, à lancer sur les ennemis.",
+    "title": "Throwing pots",
+    "description": "Cracked pots filled with fire, poison, oil or magic, to throw at foes.",
     "members": [
       "Fire Pot",
       "Poison Pot",
@@ -1134,8 +1134,8 @@
     ]
   },
   {
-    "title": "Fragments de ruines et éclats",
-    "description": "Fragments tombés avec les ruines du ciel, éclats de pierre étincelante et pierres bénies par les Doigts.",
+    "title": "Ruin fragments and shards",
+    "description": "Fragments that fell with the ruins from the sky, glintstone shards, and stones blessed by the Fingers.",
     "members": [
       "Glintstone Scrap",
       "Sanctuary Stone",
@@ -1155,8 +1155,8 @@
     ]
   },
   {
-    "title": "Banished Knights et armures d'écailles",
-    "description": "Armes et armures des Banished Knights, et armures d'écailles.",
+    "title": "Banished Knights and scale armor",
+    "description": "Weapons and armor of the Banished Knights, and scale armor.",
     "members": [
       "Banished Knight Armor",
       "Banished Knight Helm (Altered)",
@@ -1176,8 +1176,8 @@
     ]
   },
   {
-    "title": "Exilés, haillons et fantassins",
-    "description": "Tenues d'exilés, haillons, capuches et équipement de fantassins.",
+    "title": "Exiles, rags and foot soldiers",
+    "description": "Exiles' garb, rags, hoods and foot soldiers' gear.",
     "members": [
       "Foot Soldier Tabard",
       "Highwayman Hood",
@@ -1197,8 +1197,8 @@
     ]
   },
   {
-    "title": "Tenues de cuir et de tissu",
-    "description": "Tenues de cuir et de tissu : sages, guerriers des hautes terres, coupables et vagabonds.",
+    "title": "Leather and cloth attire",
+    "description": "Leather and cloth attire: sages, highland warriors, convicts and vagabonds.",
     "members": [
       "Brave's Leather Helm",
       "Brave's Battlewear (Altered)",
@@ -1218,8 +1218,8 @@
     ]
   },
   {
-    "title": "Armes des gargouilles",
-    "description": "Grandes armes des gargouilles et des golems.",
+    "title": "Gargoyle weapons",
+    "description": "Great weapons of the gargoyles and golems.",
     "members": [
       "Gargoyle's Blackblade",
       "Gargoyle's Black Axe",
@@ -1239,8 +1239,8 @@
     ]
   },
   {
-    "title": "Masques, chirurgiens et Silver Tears",
-    "description": "Masques, tenues de chirurgiens de guerre, et Asimi la Silver Tear.",
+    "title": "Masks, surgeons and Silver Tears",
+    "description": "Masks, battlefield surgeons' garb, and Asimi the Silver Tear.",
     "members": [
       "White Mask",
       "Bloodsoaked Mask",
@@ -1260,8 +1260,8 @@
     ]
   },
   {
-    "title": "Or de l'Erdtree et Tree Sentinels",
-    "description": "Armes, boucliers et arcs dorés de l'Erdtree, dont ceux des Tree Sentinels.",
+    "title": "Erdtree gold and Tree Sentinels",
+    "description": "Golden Erdtree weapons, shields and bows, including those of the Tree Sentinels.",
     "members": [
       "Tree Sentinel Armor (Altered)",
       "Tree Sentinel Armor",
@@ -1281,8 +1281,8 @@
     ]
   },
   {
-    "title": "Flèches, fléchettes et munitions",
-    "description": "Flèches et fléchettes en os, matériaux pour les fabriquer, et munitions plus lourdes.",
+    "title": "Arrows, darts and ammunition",
+    "description": "Bone arrows and darts, the materials to craft them, and heavier ammunition.",
     "members": [
       "Bone Arrow",
       "Firebone Arrow",
@@ -1302,8 +1302,8 @@
     ]
   },
   {
-    "title": "Armes de corps à corps",
-    "description": "Épées, haches, marteaux, lances et autres armes, avec leur maniement et parfois leur origine.",
+    "title": "Melee weapons",
+    "description": "Swords, axes, hammers, spears and other weapons, with how they are wielded and sometimes where they come from.",
     "members": [
       "Greatsword",
       "Shotel",
@@ -1323,8 +1323,8 @@
     ]
   },
   {
-    "title": "Arcs et arbalètes",
-    "description": "Arcs courts, longs et grands arcs, arbalètes et balistes.",
+    "title": "Bows and crossbows",
+    "description": "Shortbows, longbows and greatbows, crossbows and ballistas.",
     "members": [
       "Longbow",
       "Light Crossbow",

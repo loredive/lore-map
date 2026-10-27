@@ -1,0 +1,33 @@
+{
+ "id": "elden-ring",
+ "title": "Elden Ring",
+ "colors": {
+  "Items": "#d9c48e",
+  "Weapons": "#cf8e66",
+  "Armor": "#9db8a3",
+  "Talismans": "#c7a3d1",
+  "Ashes of War": "#7fc0cc",
+  "Skills": "#e3dcc0",
+  "Loading Screens": "#8394c4",
+  "Dialogue": "#a7b6d6"
+ },
+ "ui": {
+  "tagline": "Every star is a text from Elden Ring. The more two texts talk about the same things, the closer they sit.",
+  "aria": "Map of Elden Ring's texts: each star is a text, and texts close together talk about the same things. Arrow keys to move, plus and minus to zoom, Enter to open the targeted star.",
+  "credit": "Elden Ring texts © FromSoftware / Bandai Namco, extracted by the community; icons via the Elden Ring Fan API. Non-commercial fan project.",
+  "search_examples": [
+   "who killed Godwyn",
+   "Malenia"
+  ],
+  "precise": {
+   "phrase": "Destined Death",
+   "both": "Ranni + Blaidd",
+   "exclude": "-Malenia",
+   "category": "in:weapons"
+  },
+  "entity_examples": "Ranni or Leyndell",
+  "empty_hint": "Marika, Ranni"
+ },
+ "images": "fanapi",
+ "tours": true
+}

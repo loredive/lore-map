@@ -1,6 +1,7 @@
 // Évaluation de la recherche de la page : pour chaque requête de queries.json, rang du premier
 // texte attendu par mots-clés, par sens et après fusion, puis taux de réussite et MRR par lot.
-// Usage : node eval/search_eval.mjs   (après uv run python eval/embed_queries.py)
+// Usage : node eval/search_eval.mjs [jeu]   (après uv run python eval/embed_queries.py ; jeu : elden-ring)
+// Les requêtes sont dans games/<jeu>/eval/, les textes dans web/data/<jeu>/.
 // Aussi lancée par node --test (tests/search_eval.test.mjs).
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -8,14 +9,14 @@ import { BM25, corpusText, lexicalRanking, semanticRanking, hybridRanking } from
 
 const METHODS = ["mots-clés", "sens", "fusion"];
 
-export function evaluate() {
+export function evaluate(game = "elden-ring") {
   const root = new URL("..", import.meta.url);
   const read = p => readFileSync(new URL(p, root));
-  const lore = JSON.parse(read("web/data/lore.json"));
-  const meta = JSON.parse(read("web/data/meta.json"));
-  const { k, queries, min_hit_rate: minHit = 0 } = JSON.parse(read("eval/queries.json"));
-  const vectors = JSON.parse(read("eval/query_vectors.json"));
-  const buf = read("web/data/emb.bin");
+  const lore = JSON.parse(read(`web/data/${game}/lore.json`));
+  const meta = JSON.parse(read(`web/data/${game}/meta.json`));
+  const { k, queries, min_hit_rate: minHit = 0, min_mrr: minMrr = 0 } = JSON.parse(read(`games/${game}/eval/queries.json`));
+  const vectors = JSON.parse(read(`games/${game}/eval/query_vectors.json`));
+  const buf = read(`web/data/${game}/emb.bin`);
   const emb = new Int8Array(buf.buffer, buf.byteOffset, buf.byteLength);
 
   const nameAt = lore.fields.indexOf("name"), textAt = lore.fields.indexOf("text");
@@ -46,10 +47,10 @@ export function evaluate() {
   }));
   const splits = [...new Set(rows.map(r => r.split))];
   const summary = { tout: score(rows), ...Object.fromEntries(splits.map(s => [s, score(rows.filter(r => r.split === s))])) };
-  return { k, minHit, rows, summary };
+  return { k, minHit, minMrr, rows, summary };
 }
 
-function report({ k, minHit, rows, summary }) {
+function report({ k, minHit, minMrr, rows, summary }) {
   const show = r => (r === null ? "—" : r <= k ? String(r) : `(${r})`);
   console.log(`${"requête".padEnd(50)}${"lot".padEnd(6)}${METHODS.map(m => m.padStart(11)).join("")}`);
   for (const { query, split, ranks } of rows) {
@@ -63,6 +64,10 @@ function report({ k, minHit, rows, summary }) {
     console.error(`\nÉCHEC : réussite de la fusion ${(100 * summary.tout["fusion"].hit).toFixed(0)} % < seuil ${(100 * minHit).toFixed(0)} %`);
     process.exitCode = 1;
   }
+  if (summary.tout["fusion"].mrr < minMrr) {
+    console.error(`\nÉCHEC : MRR de la fusion ${summary.tout["fusion"].mrr.toFixed(3)} < seuil ${minMrr.toFixed(3)}`);
+    process.exitCode = 1;
+  }
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) report(evaluate());
+if (process.argv[1] === fileURLToPath(import.meta.url)) report(evaluate(process.argv[2]));

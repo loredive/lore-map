@@ -1,0 +1,185 @@
+{
+  "id": "elden-ring",
+  "title": "Elden Ring",
+  "source": "EldenRingTextExplorer : https://github.com/EldenRingExplorer/EldenRingTextExplorer (elden_ring_text.json)",
+  "categories": {
+    "goods": {
+      "label": "Items",
+      "text_fields": [
+        "caption_en"
+      ],
+      "jp_field": "caption_jp"
+    },
+    "weapon": {
+      "label": "Weapons",
+      "text_fields": [
+        "caption_en"
+      ],
+      "jp_field": "caption_jp"
+    },
+    "protector": {
+      "label": "Armor",
+      "text_fields": [
+        "caption_en"
+      ],
+      "jp_field": "caption_jp"
+    },
+    "accessories": {
+      "label": "Talismans",
+      "text_fields": [
+        "caption_en"
+      ],
+      "jp_field": "caption_jp"
+    },
+    "gems": {
+      "label": "Ashes of War",
+      "text_fields": [
+        "caption_en"
+      ],
+      "jp_field": "caption_jp"
+    },
+    "arts": {
+      "label": "Skills",
+      "text_fields": [
+        "caption_en"
+      ],
+      "jp_field": "caption_jp"
+    },
+    "loading": {
+      "label": "Loading Screens",
+      "text_fields": [
+        "caption_en"
+      ],
+      "jp_field": "caption_jp"
+    }
+  },
+  "dialog_label": "Dialogue",
+  "colors": {
+    "Items": "#d9c48e",
+    "Weapons": "#cf8e66",
+    "Armor": "#9db8a3",
+    "Talismans": "#c7a3d1",
+    "Ashes of War": "#7fc0cc",
+    "Skills": "#e3dcc0",
+    "Loading Screens": "#8394c4",
+    "Dialogue": "#a7b6d6"
+  },
+  "junk": [
+    "%null%",
+    "(dummyText)",
+    "[ERROR]",
+    "dummy"
+  ],
+  "extra_stop": [
+    "thou",
+    "thee",
+    "thy",
+    "thine",
+    "thyself",
+    "hath",
+    "doth",
+    "art",
+    "ye",
+    "upon",
+    "shall",
+    "unto",
+    "also",
+    "used",
+    "use",
+    "uses",
+    "using",
+    "increases",
+    "increase",
+    "increased",
+    "boosts",
+    "boost",
+    "raises",
+    "raise",
+    "greatly",
+    "slightly",
+    "temporarily",
+    "attack",
+    "attacks",
+    "attacking",
+    "damage",
+    "fp",
+    "hp",
+    "stamina",
+    "skill",
+    "skills",
+    "armament",
+    "armaments",
+    "effect",
+    "effects",
+    "equipped",
+    "wearer",
+    "foes",
+    "foe",
+    "enemies",
+    "enemy",
+    "item",
+    "items",
+    "one",
+    "two",
+    "may",
+    "can",
+    "will",
+    "would",
+    "could",
+    "said",
+    "known",
+    "weapon",
+    "weapons",
+    "armor",
+    "set",
+    "sets",
+    "ash",
+    "war",
+    "affinity",
+    "following",
+    "grants",
+    "performs",
+    "allows",
+    "additional",
+    "input",
+    "charge",
+    "charged",
+    "held",
+    "hold",
+    "time",
+    "times",
+    "well",
+    "even",
+    "still",
+    "yet",
+    "like",
+    "whose",
+    "within",
+    "among"
+  ],
+  "speaker_names": {
+    "Narator": "Narrator",
+    "End of Game Dialog + Extra Morgott": "End of the game (and Morgott)",
+    "Unknown NPC 2029": "Unknown NPC"
+  },
+  "min_cluster": 15,
+  "min_samples": 5,
+  "images": "fanapi",
+  "ui": {
+    "tagline": "Every star is a text from Elden Ring. The more two texts talk about the same things, the closer they sit.",
+    "aria": "Map of Elden Ring's texts: each star is a text, and texts close together talk about the same things. Arrow keys to move, plus and minus to zoom, Enter to open the targeted star.",
+    "credit": "Elden Ring texts © FromSoftware / Bandai Namco, extracted by the community; icons via the Elden Ring Fan API. Non-commercial fan project.",
+    "search_examples": [
+      "who killed Godwyn",
+      "Malenia"
+    ],
+    "precise": {
+      "phrase": "Destined Death",
+      "both": "Ranni + Blaidd",
+      "exclude": "-Malenia",
+      "category": "in:weapons"
+    },
+    "entity_examples": "Ranni or Leyndell",
+    "empty_hint": "Marika, Ranni"
+  }
+}

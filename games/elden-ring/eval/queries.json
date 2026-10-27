@@ -1,10 +1,10 @@
 {
  "k": 10,
- "min_hit_rate": 0.78,
- "note": "Une requête réussit si au moins un texte attendu est dans les k premiers résultats. « expect_prefix » accepte tout texte dont le nom commence ainsi (passages d'un PNJ). « split » : dev = requêtes qui ont servi à régler la recherche (poids de la fusion) ; test = requêtes écrites à part et jamais utilisées pour régler quoi que ce soit, pour juger honnêtement les changements à venir (dont les fonctions LLM).",
+ "min_hit_rate": 0.85,
+ "note": "A query succeeds if at least one expected text is in the top k results. \"expect_prefix\" accepts any text whose name starts with it (an NPC's passages). \"split\": dev = queries used to tune the search (fusion weights); test = queries written separately and never used to tune anything, to judge future changes honestly (including LLM features). The queries were written in French and translated faithfully to English on 2026-10-25; the fusion weight was tuned on the French dev set. On 2026-10-25, 14 harder test queries were added (\"hard\": true): they describe the lore without the target texts' names or key words, since the translated queries had saturated the eval.",
  "queries": [
   {
-   "query": "qui a assassiné Godwyn",
+   "query": "who assassinated Godwyn",
    "expect": [
     "Black Knife",
     "Black Knife Tiche",
@@ -14,7 +14,7 @@
    "split": "dev"
   },
   {
-   "query": "le cheval spectral",
+   "query": "the spectral horse",
    "expect": [
     "Spectral Steed Whistle",
     "About Horseback Riding"
@@ -23,7 +23,7 @@
    "split": "dev"
   },
   {
-   "query": "les fioles qui rendent la vie",
+   "query": "the flasks that restore life",
    "expect": [
     "Flask of Crimson Tears",
     "Flask of Crimson Tears +1",
@@ -35,7 +35,7 @@
    "split": "dev"
   },
   {
-   "query": "la flamme de la frénésie",
+   "query": "the flame of frenzy",
    "expect": [
     "The Flame of Frenzy",
     "Note: The Lord of Frenzied Flame",
@@ -48,7 +48,7 @@
    "split": "dev"
   },
   {
-   "query": "le dragon de foudre lié à Godwyn",
+   "query": "the lightning dragon bound to Godwyn",
    "expect": [
     "Remembrance of the Lichdragon",
     "Death Lightning",
@@ -60,7 +60,7 @@
    "split": "dev"
   },
   {
-   "query": "l'anneau destiné à l'époux de Ranni",
+   "query": "the ring meant for Ranni's spouse",
    "expect": [
     "Dark Moon Ring"
    ],
@@ -68,7 +68,7 @@
    "split": "dev"
   },
   {
-   "query": "invoquer d'autres joueurs",
+   "query": "summon other players",
    "expect": [
     "About Summoning Other Players",
     "Tarnished's Furled Finger",
@@ -81,7 +81,7 @@
    "split": "dev"
   },
   {
-   "query": "la lame de la Mort destinée",
+   "query": "the blade of Destined Death",
    "expect": [
     "Maliketh's Black Blade",
     "Remembrance of the Black Blade",
@@ -92,7 +92,7 @@
    "split": "dev"
   },
   {
-   "query": "l'aiguille d'or de Millicent",
+   "query": "Millicent's gold needle",
    "expect": [
     "Unalloyed Gold Needle",
     "Miquella's Needle"
@@ -101,7 +101,7 @@
    "split": "dev"
   },
   {
-   "query": "améliorer ses armes",
+   "query": "upgrade your weapons",
    "expect": [
     "About Strengthening Armaments",
     "Smithing Stone",
@@ -111,7 +111,7 @@
    "split": "dev"
   },
   {
-   "query": "viande séchée",
+   "query": "dried meat",
    "expect": [
     "Immunizing Cured Meat",
     "Invigorating Cured Meat",
@@ -122,7 +122,7 @@
    "split": "dev"
   },
   {
-   "query": "le marchand qui piège les coffres",
+   "query": "the merchant who traps chests",
    "expect": [
     "Patches — passage 7",
     "Patches — passage 8",
@@ -132,7 +132,7 @@
    "split": "dev"
   },
   {
-   "query": "se rebeller contre l'Erdtree",
+   "query": "rebel against the Erdtree",
    "expect": [],
    "expect_prefix": [
     "Tanith, Volcano Manor Proprietress — "
@@ -140,7 +140,7 @@
    "split": "dev"
   },
   {
-   "query": "la reine de la Pleine Lune",
+   "query": "the queen of the Full Moon",
    "expect": [
     "Remembrance of the Full Moon Queen",
     "Queen's Crescent Crown",
@@ -153,7 +153,7 @@
    "split": "dev"
   },
   {
-   "query": "Radagon a quitté Rennala",
+   "query": "Radagon left Rennala",
    "expect": [
     "Miriel, Pastor of Vows — passage 12",
     "Queen's Robe",
@@ -166,7 +166,7 @@
    "split": "dev"
   },
   {
-   "query": "la jarre guerrière",
+   "query": "the warrior jar",
    "expect": [
     "Warrior Jar Shard",
     "Shard of Alexander",
@@ -178,7 +178,7 @@
    "split": "dev"
   },
   {
-   "query": "les Empyréens choisis par les Doigts",
+   "query": "the Empyreans chosen by the Fingers",
    "expect": [
     "Ranni the Witch — passage 5",
     "Ranni the Witch — passage 21"
@@ -187,7 +187,7 @@
    "split": "dev"
   },
   {
-   "query": "sorts de pierre étincelante de l'académie",
+   "query": "the academy's glintstone spells",
    "expect": [
     "Glintstone Pebble",
     "Great Glintstone Shard",
@@ -201,7 +201,7 @@
    "split": "dev"
   },
   {
-   "query": "le masque blanc qui recrute pour Mohg",
+   "query": "the white mask who recruits for Mohg",
    "expect": [],
    "expect_prefix": [
     "White Mask Varré — "
@@ -209,7 +209,7 @@
    "split": "dev"
   },
   {
-   "query": "les chevaliers du creuset de Godfrey",
+   "query": "Godfrey's crucible knights",
    "expect": [
     "Crucible Tree Armor",
     "Crucible Axe Armor",
@@ -329,7 +329,7 @@
    "split": "dev"
   },
   {
-   "query": "la dynastie de Mohg",
+   "query": "Mohg's dynasty",
    "expect": [
     "Map: Mohgwyn Palace",
     "Lord of Blood's Exultation",
@@ -345,7 +345,7 @@
    "split": "test"
   },
   {
-   "query": "le corps de poupée de Ranni",
+   "query": "Ranni's doll body",
    "expect": [
     "Ranni the Witch — passage 15"
    ],
@@ -353,7 +353,7 @@
    "split": "test"
   },
   {
-   "query": "des épées magiques qui flottent au-dessus de la tête",
+   "query": "magic swords that float above the head",
    "expect": [
     "Glintblade Phalanx",
     "Carian Phalanx",
@@ -364,7 +364,7 @@
    "split": "test"
   },
   {
-   "query": "nourrir le cheval spectral",
+   "query": "feed the spectral horse",
    "expect": [
     "Rowa Raisin",
     "Sweet Raisin",
@@ -374,7 +374,7 @@
    "split": "test"
   },
   {
-   "query": "le géant de feu",
+   "query": "the fire giant",
    "expect": [
     "Remembrance of the Fire Giant",
     "Giant's Prayerbook",
@@ -386,7 +386,7 @@
    "split": "test"
   },
   {
-   "query": "chasser ceux qui vivent dans la mort",
+   "query": "hunt those who live in death",
    "expect": [],
    "expect_prefix": [
     "D, Hunter of the Dead — "
@@ -394,7 +394,7 @@
    "split": "test"
   },
   {
-   "query": "le forgeron prisonnier de la Table ronde",
+   "query": "the smith imprisoned at the Roundtable",
    "expect": [],
    "expect_prefix": [
     "Smithing Master Hewg — "
@@ -402,7 +402,7 @@
    "split": "test"
   },
   {
-   "query": "le combat entre Malenia et Radahn",
+   "query": "the battle between Malenia and Radahn",
    "expect": [
     "Map: Caelid",
     "Sir Gideon Ofnir, the All-Knowing — passage 5",
@@ -413,7 +413,7 @@
    "split": "test"
   },
   {
-   "query": "l'armure du premier Seigneur d'Elden",
+   "query": "the armor of the first Elden Lord",
    "expect": [
     "Elden Lord Crown",
     "Elden Lord Armor",
@@ -424,7 +424,7 @@
    "split": "test"
   },
   {
-   "query": "le couturier demi-humain",
+   "query": "the demi-human tailor",
    "expect": [],
    "expect_prefix": [
     "Demi-Human Boc — "
@@ -432,7 +432,7 @@
    "split": "test"
   },
   {
-   "query": "soigner la pourriture écarlate",
+   "query": "cure scarlet rot",
    "expect": [
     "Preserving Boluses",
     "Flame, Cleanse Me"
@@ -451,6 +451,166 @@
    ],
    "expect_prefix": [],
    "split": "test"
+  },
+  {
+   "query": "the general who held the stars in place",
+   "expect": [
+    "Remembrance of the Starscourge",
+    "Radahn's Great Rune",
+    "Starscourge Greatsword",
+    "Radahn's Redmane Helm",
+    "Radahn's Lion Armor"
+   ],
+   "expect_prefix": [],
+   "split": "test",
+   "hard": true
+  },
+  {
+   "query": "the lord who became one with a giant snake",
+   "expect": [
+    "Remembrance of the Blasphemous",
+    "Rykard's Great Rune",
+    "Rykard's Rancor",
+    "Blasphemous Blade",
+    "Blasphemous Claw"
+   ],
+   "expect_prefix": [
+    "Rykard, Lord of Blasphemy — "
+   ],
+   "split": "test",
+   "hard": true
+  },
+  {
+   "query": "the lord who stitched other people's limbs onto his body",
+   "expect": [
+    "Remembrance of the Grafted",
+    "Godrick's Great Rune",
+    "Grafted Blade Greatsword",
+    "Axe of Godrick",
+    "Grafted Dragon"
+   ],
+   "expect_prefix": [],
+   "split": "test",
+   "hard": true
+  },
+  {
+   "query": "a charm that makes attacks from the air hit harder",
+   "expect": [
+    "Claw Talisman"
+   ],
+   "expect_prefix": [],
+   "split": "test",
+   "hard": true
+  },
+  {
+   "query": "the hidden king with horns who defended the capital",
+   "expect": [
+    "Remembrance of the Omen King",
+    "Morgott's Great Rune",
+    "Morgott's Cursed Sword"
+   ],
+   "expect_prefix": [],
+   "split": "test",
+   "hard": true
+  },
+  {
+   "query": "the weapon used to break the ring",
+   "expect": [
+    "Marika's Hammer"
+   ],
+   "expect_prefix": [],
+   "split": "test",
+   "hard": true
+  },
+  {
+   "query": "a whistle to summon your horse",
+   "expect": [
+    "Spectral Steed Whistle"
+   ],
+   "expect_prefix": [],
+   "split": "test",
+   "hard": true
+  },
+  {
+   "query": "a spirit that copies you exactly",
+   "expect": [
+    "Mimic Tear Ashes"
+   ],
+   "expect_prefix": [],
+   "split": "test",
+   "hard": true
+  },
+  {
+   "query": "the moon of the witch that guides her age",
+   "expect": [
+    "Ranni's Dark Moon",
+    "Dark Moon Ring",
+    "Dark Moon Greatsword"
+   ],
+   "expect_prefix": [],
+   "split": "test",
+   "hard": true
+  },
+  {
+   "query": "the woman who holds the dead to her breast",
+   "expect": [
+    "Fia's Mist",
+    "Fia's Hood",
+    "Fia's Robe"
+   ],
+   "expect_prefix": [
+    "Fia, Deathbed Companion — "
+   ],
+   "split": "test",
+   "hard": true
+  },
+  {
+   "query": "the knights of the sacred tree in the frozen north",
+   "expect": [
+    "Haligtree Knight Helm",
+    "Haligtree Knight Armor",
+    "Haligtree Soldier Ashes",
+    "Haligtree Crest Greatshield",
+    "Haligtree Crest Surcoat"
+   ],
+   "expect_prefix": [],
+   "split": "test",
+   "hard": true
+  },
+  {
+   "query": "the all-knowing leader of the hold who collects information",
+   "expect": [],
+   "expect_prefix": [
+    "Sir Gideon Ofnir, the All-Knowing — "
+   ],
+   "split": "test",
+   "hard": true
+  },
+  {
+   "query": "the wolf-man who serves the witch as her shadow",
+   "expect": [
+    "Blaidd's Armor",
+    "Blaidd's Gauntlets",
+    "Blaidd's Greaves"
+   ],
+   "expect_prefix": [
+    "Blaidd the Half-Wolf — "
+   ],
+   "split": "test",
+   "hard": true
+  },
+  {
+   "query": "the eternal child of Marika and the lily he gave",
+   "expect": [
+    "Miquella's Lily",
+    "Miquella's Needle",
+    "Miquella's Ring of Light",
+    "Note: Miquella's Needle"
+   ],
+   "expect_prefix": [],
+   "split": "test",
+   "hard": true
   }
- ]
+ ],
+ "min_mrr": 0.6
 }

@@ -289,8 +289,9 @@
  {
   "name": "Lands Between",
   "kind": "lieu",
-  "aliases": [],
-  "label": "Entre-terre",
+  "aliases": [
+   "Entre-terre"
+  ],
   "broad": true
  },
  {
@@ -438,26 +439,31 @@
  {
   "name": "Two Fingers",
   "kind": "faction",
-  "aliases": [],
-  "label": "Deux Doigts"
+  "aliases": [
+   "Deux Doigts"
+  ]
  },
  {
   "name": "Three Fingers",
   "kind": "faction",
-  "aliases": [],
-  "label": "Trois Doigts"
+  "aliases": [
+   "Trois Doigts"
+  ]
  },
  {
   "name": "Greater Will",
   "kind": "faction",
-  "aliases": [],
-  "label": "Volonté supérieure"
+  "aliases": [
+   "Volonté supérieure"
+  ]
  },
  {
   "name": "Carian",
   "kind": "faction",
-  "aliases": [],
-  "label": "Cariens"
+  "aliases": [
+   "Cariens"
+  ],
+  "label": "Carians"
  },
  {
   "name": "Fire Monks",
@@ -501,8 +507,9 @@
  {
   "name": "Those Who Live in Death",
   "kind": "faction",
-  "aliases": [],
-  "label": "Ceux qui vivent dans la Mort"
+  "aliases": [
+   "Ceux qui vivent dans la Mort"
+  ]
  },
  {
   "name": "Nox",
@@ -543,17 +550,18 @@
  {
   "name": "Fire Giants",
   "kind": "faction",
-  "aliases": [],
-  "label": "Géants de feu"
+  "aliases": [
+   "Géants de feu"
+  ]
  },
  {
   "name": "Ancient Dragons",
   "kind": "faction",
   "aliases": [
    "ancient dragons",
-   "ancient dragon"
-  ],
-  "label": "Dragons anciens"
+   "ancient dragon",
+   "Dragons anciens"
+  ]
  },
  {
   "name": "Night's Cavalry",
@@ -585,40 +593,45 @@
  {
   "name": "Golden Order",
   "kind": "notion",
-  "aliases": [],
-  "label": "Ordre d'or"
+  "aliases": [
+   "Ordre d'or"
+  ]
  },
  {
   "name": "Shattering",
   "kind": "notion",
-  "aliases": [],
-  "label": "La Fracture"
+  "aliases": [
+   "La Fracture"
+  ]
  },
  {
   "name": "Destined Death",
   "kind": "notion",
-  "aliases": [],
-  "label": "Mort destinée"
+  "aliases": [
+   "Mort destinée"
+  ]
  },
  {
   "name": "Rune of Death",
   "kind": "notion",
-  "aliases": [],
-  "label": "Rune de la Mort"
+  "aliases": [
+   "Rune de la Mort"
+  ]
  },
  {
   "name": "Great Rune",
   "kind": "notion",
   "aliases": [
-   "Great Runes"
-  ],
-  "label": "Grandes Runes"
+   "Great Runes",
+   "Grandes Runes"
+  ]
  },
  {
   "name": "Elden Lord",
   "kind": "notion",
-  "aliases": [],
-  "label": "Seigneur d'Elden",
+  "aliases": [
+   "Seigneur d'Elden"
+  ],
   "broad": true
  },
  {
@@ -631,64 +644,68 @@
   "kind": "notion",
   "aliases": [
    "frenzied flame",
-   "flame of frenzy"
-  ],
-  "label": "Flamme de frénésie"
+   "flame of frenzy",
+   "Flamme de frénésie"
+  ]
  },
  {
   "name": "Scarlet Rot",
   "kind": "notion",
   "aliases": [
-   "scarlet rot"
-  ],
-  "label": "Pourriture écarlate"
+   "scarlet rot",
+   "Pourriture écarlate"
+  ]
  },
  {
   "name": "Dragon Communion",
   "kind": "notion",
-  "aliases": [],
-  "label": "Communion draconique"
+  "aliases": [
+   "Communion draconique"
+  ]
  },
  {
   "name": "Flame of Ruin",
   "kind": "notion",
   "aliases": [
-   "flame of ruin"
-  ],
-  "label": "Flamme de ruine"
+   "flame of ruin",
+   "Flamme de ruine"
+  ]
  },
  {
   "name": "Primeval Current",
   "kind": "notion",
   "aliases": [
-   "primeval current"
-  ],
-  "label": "Courant primordial"
+   "primeval current",
+   "Courant primordial"
+  ]
  },
  {
   "name": "Full Moon",
   "kind": "notion",
-  "aliases": [],
-  "label": "Pleine Lune"
+  "aliases": [
+   "Pleine Lune"
+  ]
  },
  {
   "name": "Dark Moon",
   "kind": "notion",
-  "aliases": [],
-  "label": "Lune noire"
+  "aliases": [
+   "Lune noire"
+  ]
  },
  {
   "name": "Minor Erdtrees",
   "kind": "notion",
   "aliases": [
-   "Minor Erdtree"
-  ],
-  "label": "Erdtrees mineurs"
+   "Minor Erdtree",
+   "Erdtrees mineurs"
+  ]
  },
  {
   "name": "Night of the Black Knives",
   "kind": "notion",
-  "aliases": [],
-  "label": "Nuit des Black Knives"
+  "aliases": [
+   "Nuit des Black Knives"
+  ]
  }
 ]
