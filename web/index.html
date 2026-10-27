@@ -15,22 +15,38 @@
 <body>
   <canvas id="sky" tabindex="0" aria-label="Map of Bloodborne's texts: each star is a text, and texts close together talk about the same things. Arrow keys to move, plus and minus to zoom, Enter to open the targeted star."></canvas>
 
-  <header class="masthead">
-    <h1>The Lore Map</h1>
-    <p>Every star is a text from Bloodborne. The more two texts talk about the same things, the closer they sit.</p>
-    <nav class="links">
-      <button type="button" id="tours" class="help-btn" hidden>Guided tours</button>
-      <button type="button" id="index" class="help-btn">Characters and places</button>
-      <button type="button" id="help" class="help-btn">Help</button>
-    </nav>
+  <!-- tout ce qu'on peut faire, dans une barre : le jeu, la recherche, les pages, la vue et les catégories ;
+       au téléphone, la recherche reste visible et le reste s'ouvre par « Menu » -->
+  <header class="topbar">
+    <div class="brand">
+      <h1>The Lore Map</h1>
+    </div>
+    <button type="button" class="menu-btn" aria-expanded="false" aria-controls="bar-drawer">Menu</button>
+    <form class="seek" role="search" onsubmit="return false">
+      <label for="q" class="visually-hidden">Search the texts</label>
+      <input id="q" type="search" placeholder="Search for a name, a place, a theme…" autocomplete="off" spellcheck="false">
+    </form>
+    <!-- grand écran : ses éléments se rangent dans la barre (display: contents) ; téléphone : le menu déroulant -->
+    <div class="drawer" id="bar-drawer">
+      <nav class="links" aria-label="Explore">
+        <button type="button" id="tours" class="nav-btn" hidden>Guided tours</button>
+        <button type="button" id="index" class="nav-btn">Characters and places</button>
+        <button type="button" id="help" class="nav-btn">Help</button>
+      </nav>
+      <div class="tools">
+        <nav class="legend" id="legend" aria-label="Show or hide a category"></nav>
+        <div id="views" class="views" role="group" aria-label="Choose the map layout" hidden
+             title="Two ways of laying out the same texts: only closeness means something, not position."></div>
+      </div>
+    </div>
   </header>
+  <p class="tagline visually-hidden">Every star is a text from Bloodborne. The more two texts talk about the same things, the closer they sit.</p>
 
-  <form class="seek" role="search" onsubmit="return false">
-    <label for="q" class="visually-hidden">Search the texts</label>
-    <input id="q" type="search" placeholder="Search for a name, a place, a theme…" autocomplete="off" spellcheck="false">
+  <!-- sous la barre : l'état de la recherche et le parcours de lecture -->
+  <div class="under-bar">
     <span id="mode" aria-live="polite"></span>
     <nav id="trail" class="trail" aria-label="Your trail" hidden></nav>
-  </form>
+  </div>
 
   <div id="pathbar" class="pathbar" role="status" hidden>
     Path from “<span class="from"></span>”: click a star or search for the destination text.
@@ -43,11 +59,6 @@
     <aside id="panel" aria-label="Details" hidden></aside>
   </main>
   <div id="announce" class="visually-hidden" role="status"></div>
-
-  <nav class="legend" id="legend" aria-label="Show or hide a category"></nav>
-
-  <div id="views" class="views" role="group" aria-label="Choose the map layout" hidden
-       title="Two ways of laying out the same texts: only closeness means something, not position."></div>
 
   <div id="tip" role="tooltip" hidden></div>
   <div id="chooser" class="chooser" role="dialog" aria-label="Several texts here" hidden></div>

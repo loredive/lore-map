@@ -33,64 +33,83 @@ body {
 :focus-visible { outline: 2px solid var(--grace); outline-offset: 2px; }
 
 /* textes posés sur le ciel : un halo sombre les garde lisibles devant les étoiles qui brillent */
-.masthead, #mode, .legend, .views, .credit { text-shadow: 0 0 3px var(--night), 0 0 8px var(--night), 0 0 14px var(--night); }
+#mode, .credit, .under-bar .trail { text-shadow: 0 0 3px var(--night), 0 0 8px var(--night), 0 0 14px var(--night); }
 
-/* ---------- titre ---------- */
-.masthead {
-  position: fixed; top: 22px; left: 28px; max-width: 30ch;
-  pointer-events: none;
+/* ---------- barre du haut : le jeu, la recherche, les pages, puis les catégories et la vue ---------- */
+.topbar {
+  position: fixed; z-index: 5; top: 0; left: 0; right: 0;
+  display: flex; flex-wrap: wrap; align-items: center; gap: .55rem 1.4rem;
+  padding: .7rem 24px .6rem;
+  background: rgba(13, 18, 32, .9); border-bottom: 1px solid var(--rim);
+  backdrop-filter: blur(6px);
 }
-.masthead h1 {
-  margin: 0; font: italic 600 2.1rem/1 var(--display);
-  color: var(--grace); letter-spacing: .01em;
+.brand { order: 1; }
+.brand h1 { margin: 0; font: italic 600 1.8rem/1 var(--display); color: var(--grace); white-space: nowrap; cursor: default; }
+.drawer { display: contents; }
+.games { order: 2; display: flex; gap: 2px; padding: 2px; border: 1px solid var(--rim); border-radius: 999px; }
+.games a {
+  padding: .2rem .8rem; border-radius: 999px; color: var(--moon); font-size: .95rem; text-decoration: none; white-space: nowrap;
 }
-.masthead p { margin: .5rem 0 0; font-size: .92rem; line-height: 1.45; color: var(--faint); }
-.help-btn {
-  margin: .45rem 0 0; padding: .2rem 0; min-height: 24px; border: 0; background: none; pointer-events: auto;
-  color: var(--moon); font: italic .9rem var(--body); cursor: pointer; text-decoration: underline;
-  text-decoration-color: var(--rim); text-underline-offset: 3px;
-}
-.help-btn:hover { color: var(--parch); text-decoration-color: var(--moon); }
-/* sélecteur de jeu (seulement quand plusieurs jeux ont leurs données) */
-.masthead .games { margin: .3rem 0 0; font-size: .85rem; pointer-events: auto; }
-.masthead .games a { color: var(--moon); text-underline-offset: 3px; text-decoration-color: var(--rim); }
-.masthead .games a:hover { color: var(--parch); }
-.masthead .games a[aria-current] { color: var(--grace); text-decoration: none; font-style: italic; }
-.masthead .games .sep { margin: 0 .4rem; color: var(--dim); }
-
-/* ---------- recherche ---------- */
-.seek {
-  position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
-  width: min(460px, calc(100vw - 32px));
-}
+.games a:hover { color: var(--parch); background: rgba(167, 182, 214, .08); }
+.games a[aria-current] { background: rgba(217, 196, 142, .16); color: var(--grace); }
+.games .sep { display: none; }
+.seek { order: 3; flex: 1 1 260px; max-width: 520px; margin: 0 auto; }
 .seek input {
-  width: 100%; padding: .55rem .2rem .45rem; border: 0;
-  border-bottom: 1px solid var(--rim-strong); background: transparent; color: var(--parch);
-  font: italic 500 1.35rem/1.2 var(--display); text-align: center;
+  width: 100%; padding: .45rem 1rem; border: 1px solid var(--rim-strong); border-radius: 999px;
+  background: rgba(13, 18, 32, .75); color: var(--parch); font: italic 500 1.15rem/1.2 var(--display);
   transition: border-color .2s;
 }
 .seek input::placeholder { color: var(--dim); }
-.seek input:focus { outline: none; border-bottom-color: var(--grace); box-shadow: 0 1px 0 var(--grace); }
+.seek input:focus { outline: none; border-color: var(--grace); box-shadow: 0 0 0 1px var(--grace); }
 .seek input::-webkit-search-cancel-button { filter: grayscale(1) brightness(1.6); }
-#mode { display: block; margin-top: .3rem; text-align: center; font-size: .8rem; color: var(--faint); min-height: 1.2em; }
-#mode:empty { display: none; }
+.links { order: 4; display: flex; gap: .2rem; }
+.nav-btn {
+  padding: .35rem .75rem; min-height: 36px; border: 0; border-radius: 6px; background: none; cursor: pointer;
+  color: var(--moon); font: 1rem var(--body); white-space: nowrap;
+}
+.nav-btn:hover, .nav-btn:focus-visible { background: rgba(167, 182, 214, .1); color: var(--parch); }
+.menu-btn {
+  display: none; order: 2; padding: .3rem .9rem; min-height: 36px; border: 1px solid var(--rim-strong); border-radius: 999px;
+  background: none; color: var(--moon); font: 1rem var(--body); cursor: pointer;
+}
+.menu-btn[aria-expanded="true"] { border-color: var(--grace); color: var(--grace); }
+.tools { order: 5; flex-basis: 100%; display: flex; align-items: center; justify-content: space-between; gap: 1.4rem; min-width: 0; }
 
-/* ---------- légende ---------- */
+/* écran moyen : la première ligne se resserre pour tenir sur une ligne */
+@media (min-width: 761px) and (max-width: 1180px) {
+  .topbar { gap: .5rem 1rem; }
+  .seek { flex-basis: 180px; }
+  .nav-btn { padding: .35rem .5rem; }
+  .games a { padding: .2rem .6rem; }
+}
+
+/* catégories : des pastilles qui servent aussi de légende des couleurs */
+/* une seule ligne : si les catégories débordent, elles défilent de côté (le bord s'estompe pour le dire) */
 .legend {
-  position: fixed; left: 24px; bottom: 44px;
-  display: flex; flex-direction: column; gap: 2px;
+  display: flex; gap: .3rem; min-width: 0; overflow-x: auto; scrollbar-width: none;
 }
+.legend.scrolls:not(.at-end) { mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); }
+.legend::-webkit-scrollbar { display: none; }
+.legend button { flex: none; }
 .legend button {
-  display: flex; align-items: center; gap: .55rem;
-  padding: .2rem .4rem; border: 0; border-radius: 4px; background: none;
-  color: var(--parch); font: .9rem/1.3 var(--body); text-align: left; cursor: pointer;
+  display: flex; align-items: center; gap: .45rem; padding: .2rem .7rem; min-height: 30px;
+  border: 1px solid var(--rim); border-radius: 999px; background: rgba(13, 18, 32, .6);
+  color: var(--parch); font: .92rem/1.2 var(--body); cursor: pointer;
 }
-.legend button:hover { background: rgba(167, 182, 214, .08); }
-.legend button[aria-pressed="false"] { color: var(--dim); text-decoration: line-through; }
+.legend button:hover { border-color: var(--moon); }
+.legend button[aria-pressed="false"] { color: var(--dim); text-decoration: line-through; border-style: dashed; }
 .legend button[aria-pressed="false"] .dot { opacity: .25; }
 .legend .n { color: var(--faint); font-size: .8rem; }
-.legend .legend-toggle { display: none; color: var(--moon); font-style: italic; text-decoration: underline; text-underline-offset: 3px; }
-.legend .legend-toggle[aria-expanded="true"] { text-decoration: none; }
+
+/* sous la barre : l'état de la recherche et le parcours de lecture, au-dessus de la carte visible */
+.under-bar {
+  position: fixed; z-index: 4; top: calc(var(--bar-h, 100px) + 8px); left: 0; right: 0;
+  display: flex; flex-direction: column; align-items: center; gap: .3rem; pointer-events: none;
+}
+.under-bar > * { pointer-events: auto; }
+@media (min-width: 761px) { body:has(#panel:not([hidden])) .under-bar { right: var(--panel-w); } }
+#mode { font-size: .85rem; color: var(--faint); }
+#mode:empty { display: none; }
 
 .dot {
   flex: none; width: 8px; height: 8px; border-radius: 50%;
@@ -99,8 +118,8 @@ body {
 
 /* ---------- panneau ---------- */
 #panel {
-  position: fixed; z-index: 3; top: 0; right: 0; bottom: 0; width: var(--panel-w);
-  padding: 92px 28px 32px; overflow-y: auto;
+  position: fixed; z-index: 3; top: var(--bar-h, 100px); right: 0; bottom: 0; width: var(--panel-w);
+  padding: 20px 28px 32px; overflow-y: auto;
   background: linear-gradient(90deg, rgba(18, 24, 41, 0) 0%, rgba(18, 24, 41, .94) 9%, rgba(16, 21, 37, .97) 100%);
   scrollbar-width: thin; scrollbar-color: var(--rim) transparent;
 }
@@ -198,7 +217,7 @@ ol.script .text { margin: 0; white-space: pre-line; line-height: 1.6; }
   font: italic 600 1rem var(--display);
 }
 .pathbar {
-  position: fixed; z-index: 4; top: 140px; left: 50%; transform: translateX(-50%);
+  position: fixed; z-index: 4; top: calc(var(--bar-h, 100px) + 52px); left: 50%; transform: translateX(-50%);
   width: min(560px, calc(100vw - 32px)); padding: .5rem .9rem; text-align: center;
   background: rgba(13, 18, 32, .94); border: 1px solid var(--grace); border-radius: 4px;
   color: var(--parch); font-size: .92rem; line-height: 1.4;
@@ -210,21 +229,16 @@ ol.script .text { margin: 0; white-space: pre-line; line-height: 1.6; }
   color: var(--moon); font: italic .92rem var(--body); text-decoration: underline; text-underline-offset: 3px;
 }
 
-/* ---------- projections ---------- */
-.views {
-  position: fixed; z-index: 2; right: 24px; bottom: 12px;
-  display: flex; align-items: baseline; gap: .15rem; font-size: .85rem;
-}
+/* ---------- projections : un interrupteur dans la barre ---------- */
+.views { flex: none; display: flex; align-items: center; gap: 2px; padding: 2px; border: 1px solid var(--rim); border-radius: 999px; }
 .views[hidden] { display: none; }
-.views .label { margin-right: .35rem; color: var(--faint); }
+.views .label { display: none; }          /* « by meaning | by category » se suffit ; le groupe garde son nom (aria-label) */
 .views button {
-  padding: .3rem .5rem; min-height: 28px; border: 0; border-radius: 4px; background: none; cursor: pointer;
-  color: var(--faint); font: .88rem var(--body);
+  padding: .2rem .8rem; min-height: 28px; border: 0; border-radius: 999px; background: none; cursor: pointer;
+  color: var(--moon); font: .92rem var(--body); white-space: nowrap;
 }
 .views button:hover { color: var(--parch); }
-.views button[aria-pressed="true"] { color: var(--grace); text-decoration: underline; text-underline-offset: 3px; }
-/* le panneau ouvert ne doit pas cacher le sélecteur */
-body:has(#panel:not([hidden])) .views { right: calc(var(--panel-w) + 16px); }
+.views button[aria-pressed="true"] { background: rgba(217, 196, 142, .16); color: var(--grace); }
 
 /* ---------- divers ---------- */
 #tip {
@@ -262,15 +276,10 @@ body:has(#panel:not([hidden])) .views { right: calc(var(--panel-w) + 16px); }
 
 .credit { position: fixed; z-index: 1; left: 28px; bottom: 12px; margin: 0; font-size: .75rem; color: var(--dim); }
 
-/* tablette et petit écran de bureau : la recherche se place au-dessus de la colonne du panneau,
-   qui commence sous elle (sinon elle chevauche le titre, ou le panneau la recouvre) */
-/* (jusqu'à 1359 px : en dessous, la recherche centrée et le panneau de 420 px se touchent) */
+/* tablette et petit écran de bureau : un panneau un peu plus large */
 @media (min-width: 761px) and (max-width: 1359px) {
   :root { --panel-w: clamp(420px, 38vw, 480px); }
-  .seek { left: auto; right: 24px; transform: none; width: min(calc(var(--panel-w) - 24px), calc(100vw - 340px)); }
-  #panel { top: 104px; padding-top: 12px; }
   .credit { max-width: 44ch; }
-  .legend { bottom: 80px; }      /* au-dessus du crédit, qui tient sur trois lignes à cette largeur */
   body:has(#panel:not([hidden])) .credit { display: none; }
 }
 
@@ -279,44 +288,34 @@ body:has(#panel:not([hidden])) .views { right: calc(var(--panel-w) + 16px); }
   :root { --panel-w: clamp(420px, 32vw, 560px); }
 }
 
-/* mode lecture (« Agrandir ») : le panneau prend à peu près la moitié de l'écran, la recherche passe
-   au-dessus de lui comme sur tablette, et les textes s'étalent davantage */
+/* mode lecture (« Agrandir ») : le panneau prend à peu près la moitié de l'écran, et les textes s'étalent davantage */
 @media (min-width: 761px) {
   body.reading { --panel-w: clamp(480px, 52vw, 920px); }
-  body.reading:has(#panel:not([hidden])) .seek {
-    left: auto; right: 24px; transform: none; width: min(calc(var(--panel-w) - 24px), calc(100vw - 340px));
-  }
-  body.reading #panel { top: 104px; padding-top: 12px; }
   body.reading:has(#panel:not([hidden])) .credit { display: none; }
   body.reading .card .text, body.reading ol.script .text { max-width: 70ch; font-size: 1.06rem; }
 }
 
 @media (max-width: 760px) {
   body { font-size: 16px; }
-  .masthead { top: 14px; left: 16px; }
-  .masthead h1 { font-size: 1.5rem; }
-  .masthead p { display: none; }
-  .seek { top: 72px; }
-  .help-btn { font-size: .82rem; margin-top: .3rem; }
-  .masthead { max-width: none; right: 16px; }
-  .masthead .links { flex-wrap: nowrap; gap: .9rem; margin-top: .3rem; }
-  /* téléphone : pas la place pour une ligne de plus ; seul l'autre jeu, à droite des liens */
-  .masthead .games { position: absolute; right: 0; bottom: .1rem; margin: 0; font-size: .82rem; }
-  .masthead .games a[aria-current], .masthead .games .sep { display: none; }
-  .views, body:has(#panel:not([hidden])) .views { top: 14px; right: 12px; bottom: auto; }
-  .views .label { display: none; }
-  .pathbar { top: 186px; }
-  /* titre et recherche tiennent sur le haut de la carte : un voile les détache des étoiles qui brillent */
-  body::after {
-    content: ""; position: fixed; z-index: 0; top: 0; left: 0; right: 0; height: 170px; pointer-events: none;
-    background: linear-gradient(rgba(13, 18, 32, .92) 0%, rgba(13, 18, 32, .8) 65%, rgba(13, 18, 32, 0) 100%);
+  /* le titre et « Menu » sur une ligne, la recherche dessous ; le reste dans le menu, par-dessus la carte */
+  .topbar { padding: .55rem 12px .6rem; gap: .5rem .6rem; }
+  .brand { flex: 1; }
+  .brand h1 { font-size: 1.4rem; }
+  .menu-btn { display: block; }
+  .seek { flex-basis: 100%; max-width: none; }
+  .seek input { font-size: 1.05rem; }
+  .drawer {
+    display: none; position: absolute; top: 100%; left: 0; right: 0;
+    max-height: calc(100vh - var(--bar-h, 110px) - 16px); overflow-y: auto;
+    flex-direction: column; gap: 1rem; padding: 1rem 16px 1.2rem;
+    background: rgba(16, 21, 37, .98); border-bottom: 1px solid var(--rim);
   }
-  .masthead, .seek, .views { z-index: 1; }
-  .legend { left: 10px; bottom: 48px; }      /* au-dessus du crédit, qui tient sur deux lignes */
-  /* repliée derrière « Categories » ; ouverte, la liste complète sur un fond qui la détache des étoiles */
-  .legend .legend-toggle { display: flex; }
-  .legend:not(.open) button:not(.legend-toggle) { display: none; }
-  .legend.open { padding: .4rem; border: 1px solid var(--rim); border-radius: 8px; background: rgba(16, 21, 37, .95); }
+  .topbar.open .drawer { display: flex; }
+  .games { align-self: flex-start; }
+  .links { flex-direction: column; align-items: stretch; gap: 0; }
+  .nav-btn { text-align: left; min-height: 44px; font-size: 1.05rem; }
+  .tools { flex-direction: column-reverse; align-items: flex-start; gap: 1rem; }
+  .legend { flex-wrap: wrap; overflow: visible; mask-image: none; }
   .legend button { min-height: 36px; }      /* cibles tactiles */
   .credit { left: 16px; bottom: 8px; font-size: .68rem; }
   #panel {
@@ -330,8 +329,6 @@ body:has(#panel:not([hidden])) .views { right: calc(var(--panel-w) + 16px); }
 }
 
 /* ---------- personnages et lieux ---------- */
-.masthead .links { display: flex; flex-wrap: wrap; gap: .1rem 1rem; margin-top: .45rem; }
-.masthead .links .help-btn { margin: 0; }
 .chips { display: flex; flex-wrap: wrap; gap: .35rem .4rem; margin: .4rem 0 .2rem; }
 .chip {
   padding: .12rem .6rem .16rem; border: 1px solid var(--rim); border-radius: 999px;

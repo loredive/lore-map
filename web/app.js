@@ -28,7 +28,7 @@ async function chooseGame() {
   S.hasImages = !!g.images;
   S.hasTours = !!g.tours;
   S.ui = g.ui || {};
-  if (S.ui.tagline) $(".masthead p").textContent = S.ui.tagline;
+  if (S.ui.tagline) { $(".tagline").textContent = S.ui.tagline; $(".brand h1").title = S.ui.tagline; }
   if (S.ui.aria) canvas.setAttribute("aria-label", S.ui.aria);
   if (S.ui.credit) $(".credit").textContent = S.ui.credit;
   if (S.games.length > 1) {
@@ -45,7 +45,7 @@ function buildGameSwitch() {
   nav.innerHTML = S.games.map(g => g.id === S.game
     ? `<a aria-current="page">${esc(g.title)}</a>`
     : `<a href="?game=${encodeURIComponent(g.id)}">${esc(g.title)}</a>`).join('<span class="sep" aria-hidden="true">·</span>');
-  $(".masthead h1").after(nav);
+  $(".drawer").prepend(nav);
 }
 
 // ------------------------------------------------------------------ données
@@ -94,6 +94,7 @@ async function load() {
   buildDialogues();
   buildSprites();
   buildLegend();
+  legendFade();
   buildViewSwitch();
   initTrail();                                  // avant openFromHash : le lien collé est un premier pas
   await loadTours();                            // data/<jeu>/tours.json, s'il y en a
@@ -221,6 +222,24 @@ canvas.addEventListener("wheel", e => {
 }, { passive: false });
 canvas.addEventListener("dblclick", e => zoomAt(e.clientX, e.clientY, 2.2));
 addEventListener("resize", resize);
+// la barre du haut change de hauteur (largeur de fenêtre, polices chargées) : la carte se recale sous elle
+new ResizeObserver(() => { resize(); legendFade(); }).observe($(".topbar"));
+// catégories trop nombreuses pour la ligne : le bord droit s'estompe, sauf une fois arrivé au bout
+function legendFade() {
+  const l = $("#legend");
+  l.classList.toggle("scrolls", l.scrollWidth > l.clientWidth + 1);
+  l.classList.toggle("at-end", l.scrollLeft + l.clientWidth >= l.scrollWidth - 1);
+}
+$("#legend").addEventListener("scroll", legendFade, { passive: true });
+// téléphone : « Menu » ouvre le reste de la barre par-dessus la carte ; un choix fait, il se referme
+const menuBtn = $(".menu-btn"), topbar = $(".topbar");
+function setMenu(open) {
+  topbar.classList.toggle("open", open);
+  menuBtn.setAttribute("aria-expanded", String(open));
+}
+menuBtn.addEventListener("click", () => setMenu(!topbar.classList.contains("open")));
+topbar.querySelectorAll(".links button, .games a").forEach(b => b.addEventListener("click", () => setMenu(false)));
+canvas.addEventListener("pointerdown", () => setMenu(false));
 // les images ne sont pas versionnées (images.py, icons.py) : une icône absente disparaît,
 // et sa fiche reprend la mise en page sans image
 addEventListener("error", e => {
@@ -233,6 +252,7 @@ addEventListener("error", e => {
 addEventListener("keydown", e => {
   const typing = document.activeElement === input;
   if (e.key === "/" && !typing && !e.target.closest?.("textarea, input, select")) { e.preventDefault(); input.focus(); input.select(); return; }
+  if (e.key === "Escape" && topbar.classList.contains("open")) { setMenu(false); menuBtn.focus(); return; }
   if (e.key === "Escape") {
     // Échap défait la dernière chose en cours : un chemin à choisir, une recherche, la fiche ouverte
     if (!chooser.hidden) closeChooser();
@@ -245,8 +265,8 @@ addEventListener("keydown", e => {
   if (e.key === "Enter" && document.activeElement === canvas && S.hover >= 0) { e.preventDefault(); select(S.hover); return; }
   const step = 80 / (S.cam.s * S.base);
   const keys = {
-    "+": () => zoomAt(S.W / 2, S.H / 2, 1.3), "=": () => zoomAt(S.W / 2, S.H / 2, 1.3),
-    "-": () => zoomAt(S.W / 2, S.H / 2, 1 / 1.3),
+    "+": () => zoomAt(S.W / 2, S.cy, 1.3), "=": () => zoomAt(S.W / 2, S.cy, 1.3),
+    "-": () => zoomAt(S.W / 2, S.cy, 1 / 1.3),
     ArrowLeft: () => { S.cam.x -= step; draw(); }, ArrowRight: () => { S.cam.x += step; draw(); },
     ArrowUp: () => { S.cam.y += step; draw(); }, ArrowDown: () => { S.cam.y -= step; draw(); },
     "0": () => flyTo(0, 0, 1),
@@ -283,21 +303,13 @@ function buildLegend() {
   const counts = new Map();
   for (const d of S.docs) counts.set(d.cat, (counts.get(d.cat) || 0) + 1);
   const nav = $("#legend");
-  // téléphone : la légende est repliée derrière ce bouton (style.css le cache sur grand écran)
-  const toggle = document.createElement("button");
-  toggle.type = "button";
-  toggle.className = "legend-toggle";
-  toggle.setAttribute("aria-expanded", "false");
+  // téléphone : la légende est dans le menu replié ; le bouton dit combien de catégories sont masquées
+  const menu = $(".menu-btn");
   const label = () => {
     const off = S.hidden.size + (S.hideDlc ? 1 : 0);
-    toggle.textContent = off ? `Categories · ${off} hidden` : "Categories";
+    menu.textContent = off ? `Menu · ${off} hidden` : "Menu";
   };
   label();
-  toggle.addEventListener("click", () => {
-    const open = nav.classList.toggle("open");
-    toggle.setAttribute("aria-expanded", String(open));
-  });
-  nav.append(toggle);
   S.cats.forEach((c, i) => {
     const b = document.createElement("button");
     b.type = "button";

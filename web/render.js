@@ -38,7 +38,7 @@ export function nearest(wx, wy, wr) {
 export function starsNear(sx, sy, px) {
   if (S.morphing) return [];
   const k = S.cam.s * S.base, wr = px / k;
-  const wx = S.cam.x + (sx - S.W / 2) / k, wy = S.cam.y - (sy - S.H / 2) / k;
+  const wx = S.cam.x + (sx - S.W / 2) / k, wy = S.cam.y - (sy - S.cy) / k;
   const r = Math.ceil(wr / CELL), cx = Math.floor(wx / CELL), cy = Math.floor(wy / CELL);
   const out = [];
   for (let i = cx - r; i <= cx + r; i++) for (let j = cy - r; j <= cy + r; j++) {
@@ -148,17 +148,21 @@ export function resize() {
   S.dpr = Math.min(devicePixelRatio || 1, 2);
   S.W = innerWidth; S.H = innerHeight;
   canvas.width = S.W * S.dpr; canvas.height = S.H * S.dpr;
-  S.base = Math.min(S.W, S.H) * 0.44;
+  // la barre du haut couvre le haut du ciel : la carte se centre et se dimensionne sur ce qui reste visible
+  S.top = $(".topbar")?.getBoundingClientRect().bottom || 0;
+  S.cy = (S.top + S.H) / 2;
+  document.documentElement.style.setProperty("--bar-h", `${S.top}px`);
+  S.base = Math.min(S.W, S.H - S.top) * 0.44;
   draw();
 }
 
 export const toScreen = (x, y) => [
   S.W / 2 + (x - S.cam.x) * S.cam.s * S.base,
-  S.H / 2 - (y - S.cam.y) * S.cam.s * S.base,
+  S.cy - (y - S.cam.y) * S.cam.s * S.base,
 ];
 export const toWorld = (sx, sy) => [
   S.cam.x + (sx - S.W / 2) / (S.cam.s * S.base),
-  S.cam.y - (sy - S.H / 2) / (S.cam.s * S.base),
+  S.cam.y - (sy - S.cy) / (S.cam.s * S.base),
 ];
 
 let frame = 0;
@@ -367,7 +371,7 @@ function drawShelfHeaders() {
 
 function drawClusterLabels() {
   // le titre, la recherche et la légende comptent comme déjà occupés : pas de nom dessous
-  const placed = [".masthead", ".seek", "#legend"].map(s => {
+  const placed = [".topbar", ".under-bar", ".credit"].map(s => {
     const r = $(s).getBoundingClientRect();
     return [r.left, r.top, r.right, r.bottom];
   });
@@ -448,10 +452,9 @@ export function fitPoints(points, trim = 0.1, maxScale = 12) {
 export function frameFrom(points) {
   const pts = S.cameFrom >= 0 ? [...points, S.docs[S.cameFrom]] : points;
   if (!pts.length) return;
-  const right = !panel.hidden && innerWidth > 760 ? panel.getBoundingClientRect().left : S.W;
-  const bottom = !panel.hidden && innerWidth <= 760 ? S.H * 0.44 : S.H;   // téléphone : panneau en bas
+  const { right, top, bottom } = visibleBox();
   const m = 24;
-  const seen = p => { const [x, y] = toScreen(p.x, p.y); return x > m && x < right - m && y > m && y < bottom - m; };
+  const seen = p => { const [x, y] = toScreen(p.x, p.y); return x > m && x < right - m && y > top + m && y < bottom - m; };
   if (pts.every(seen)) { draw(); return; }
   fitPoints(pts, 0, S.cam.s);
 }
@@ -464,16 +467,25 @@ export function setHover(i) {
   draw();
 }
 
-// Centre de la partie visible de la carte (à gauche du panneau ouvert, sur grand écran)
-export function viewCenter() {
-  const wide = innerWidth > 760 && !panel.hidden;
-  return [wide ? panel.getBoundingClientRect().left / 2 : S.W / 2, innerWidth <= 760 && !panel.hidden ? S.H * 0.22 : S.H / 2];
+// Partie visible de la carte : sous la barre du haut, à gauche du panneau ouvert (grand écran) ou
+// au-dessus de lui (téléphone, où il monte du bas)
+function visibleBox() {
+  const phone = innerWidth <= 760, open = !panel.hidden;
+  return {
+    top: S.top,
+    right: open && !phone ? panel.getBoundingClientRect().left : S.W,
+    bottom: open && phone ? panel.getBoundingClientRect().top : S.H,
+  };
 }
 
-// Centre la vue sur un point en tenant compte du panneau ouvert à droite
+export function viewCenter() {
+  const { top, right, bottom } = visibleBox();
+  return [right / 2, (top + bottom) / 2];
+}
+
+// Amène un point au centre de la partie visible
 export function focusDoc(d, s) {
-  const offset = panel.hidden || innerWidth <= 760 ? 0 : panel.getBoundingClientRect().width / 2 / (s * S.base);
-  const yOff = innerWidth <= 760 ? -innerHeight * 0.22 / (s * S.base) : 0;
-  flyTo(d.x + offset, d.y + yOff, s);
+  const [cx, cy] = viewCenter(), k = s * S.base;
+  flyTo(d.x + (S.W / 2 - cx) / k, d.y - (S.cy - cy) / k, s);
 }
 
