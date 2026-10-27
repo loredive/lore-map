@@ -1,7 +1,7 @@
 {
  "k": 10,
  "min_hit_rate": 0.85,
- "note": "A query succeeds if at least one expected text is in the top k results. \"expect_prefix\" accepts any text whose name starts with it (an NPC's passages). \"split\": dev = queries used to tune the search (fusion weights); test = queries written separately and never used to tune anything, to judge future changes honestly (including LLM features). The queries were written in French and translated faithfully to English on 2026-10-25; the fusion weight was tuned on the French dev set. On 2026-10-25, 14 harder test queries were added (\"hard\": true): they describe the lore without the target texts' names or key words, since the translated queries had saturated the eval.",
+ "note": "A query succeeds if at least one expected text is in the top k results. \"expect_prefix\" accepts any text whose name starts with it (an NPC's passages). \"split\": dev = queries used to tune the search (fusion weights); test = queries written separately and never used to tune anything, to judge future changes honestly. The queries were written in French and translated faithfully to English on 2026-10-25; the fusion weight was tuned on the French dev set. On 2026-10-25, 14 harder test queries were added (\"hard\": true): they describe the lore without the target texts' names or key words, since the translated queries had saturated the eval.",
  "queries": [
   {
    "query": "who assassinated Godwyn",

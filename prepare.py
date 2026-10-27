@@ -1,5 +1,5 @@
 """
-La carte du lore — préparation des données (V1, sans LLM).
+La carte du lore — préparation des données.
 
 Lit le JSON d'EldenRingTextExplorer, construit les documents (descriptions
 d'objets + dialogues découpés), calcule les embeddings, la projection 2D, les
