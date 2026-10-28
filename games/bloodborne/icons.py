@@ -18,9 +18,8 @@ import struct
 from collections import Counter
 from pathlib import Path
 
-from PIL import Image
-
 from extract import HERE, read_bnd4, read_dcx
+from PIL import Image
 
 ROOT = HERE.parent.parent
 DATA, IMG = ROOT / "web" / "data" / "bloodborne", ROOT / "web" / "img" / "bloodborne"

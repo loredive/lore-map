@@ -135,7 +135,7 @@ def build(tables: dict, speakers: dict, base: dict[str, set[int]] | None = None)
     out = {}
     for key, (_archive, names, lore, keep) in TABLES.items():
         recs = {}
-        for i, caption in en[lore].items():
+        for i in en[lore]:
             name = en[names].get(i, "")
             if (keep and not keep(i)) or name.strip() in PLACEHOLDERS:
                 continue                  # prototypes et variantes sans nom propre
@@ -170,7 +170,8 @@ def drop_repeated_runs(ids: list[int], tables: dict) -> list[int]:
     """Le jeu range certaines conversations plusieurs fois (une par situation) : une suite d'au
     moins deux répliques déjà dites par le même personnage est retirée ; une réplique isolée
     déjà dite (« Oh... ») reste à sa place. Comparées dans la langue affichée (l'anglais)."""
-    text = lambda i: tables["en"]["会話"][i]
+    def text(i):
+        return tables["en"]["会話"][i]
     seen, repeat = set(), []
     for i in ids:
         repeat.append(text(i) in seen)

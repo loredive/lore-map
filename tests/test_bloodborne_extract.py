@@ -6,7 +6,7 @@ import zlib
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "games" / "bloodborne"))
-from extract import build, note_title, read_bnd4, read_dcx, read_fmg, speaker_for, unwrap, drop_repeated_runs  # noqa: E402
+from extract import build, drop_repeated_runs, note_title, read_bnd4, read_dcx, read_fmg, speaker_for, unwrap  # noqa: E402
 
 
 def make_fmg(entries):

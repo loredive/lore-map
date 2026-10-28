@@ -186,7 +186,7 @@ def label_clusters(docs, labels, extra_stop=(), top=3, lang="en"):
     """Étiquettes par c-TF-IDF : les mots les plus distinctifs de chaque cluster.
     En anglais, mots vides de scikit-learn et lettres ASCII ; sinon, lettres accentuées comprises,
     et les mots vides viennent tous de game.json (extra_stop)."""
-    from sklearn.feature_extraction.text import CountVectorizer, ENGLISH_STOP_WORDS
+    from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS, CountVectorizer
     ids = sorted(set(labels) - {-1})
     corpus = [" ".join(f"{docs[i]['name']} {docs[i]['text']}"
                        for i in np.where(labels == c)[0]) for c in ids]
