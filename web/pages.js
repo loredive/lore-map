@@ -125,6 +125,12 @@ export function openFromAddress(hash) {
   return false;
 }
 
+// Au chargement : la page de l'adresse, ou sinon le premier état, la carte seule (panneau fermé),
+// pour que Retour depuis la page suivante y revienne.
+export function openFirstPage(hash) {
+  if (!openFromAddress(hash) && !current()) record({ page: "none" });
+}
+
 // History : le pas qu'ajoute une entrée, et l'entrée que rouvre un pas (null : pas de page enregistrée).
 export function stepOf(e) { return kinds.get(e.page)?.step?.(argsOf(e)) ?? null; }
 export function pageOfStep(s) {

@@ -2,7 +2,7 @@
 // factice et un historique de navigateur factice (pas de DOM).
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { registerPage, startPages, openPage, rerenderPage, closePage, currentPage, backLabel, goBack, openFromAddress, stepOf, pageOfStep, openStep, onStep } from "../web/pages.js";
+import { registerPage, startPages, openPage, rerenderPage, closePage, currentPage, backLabel, goBack, openFromAddress, openFirstPage, stepOf, pageOfStep, openStep, onStep } from "../web/pages.js";
 
 // historique du navigateur : une liste d'adresses, Retour prévient l'écouteur comme popstate
 function fakeBrowser() {
@@ -292,4 +292,19 @@ test("a page is told which page the reader came from, on opening and on Back", (
   openPage("stop", { id: "c" });
   openPage("stop", { id: "d" });
   assert.deepEqual(from, [{ page: "stop", id: "a", q: "" }, { page: "stop", id: "c", q: "" }]);
+});
+
+test("the first page is the address's, or else the closed panel, which Back from the next page returns to", () => {
+  const { panel, urls } = start();
+  openFirstPage("#nowhere=x");
+  assert.equal(panel.hidden, true);
+  assert.deepEqual(currentPage(), { page: "none", q: "" });
+  openPage("note", { id: "a" });
+  assert.deepEqual(urls(), ["/", "#note=a"]);
+  goBack();
+  assert.deepEqual(currentPage(), { page: "none", q: "" });
+  start();
+  openFirstPage("#note=b");
+  assert.deepEqual(currentPage(), { page: "note", id: "b", q: "" });
+  assert.equal(backLabel(), null);
 });
