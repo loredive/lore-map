@@ -3,7 +3,7 @@
 // en cours entourée ; le panneau lit l'étape, avec Précédent / Suivant.
 import { S, $, esc, colorOf, portrait, dataPath, nameOf, textOf, textLang } from "./state.js";
 import { fitPoints, frameFrom } from "./render.js";
-import { registerPage, openPage, currentPage } from "./pages.js";
+import { registerPage, openPage } from "./pages.js";
 import { linkText, bindEntityButtons, dlcBadge } from "./links.js";
 
 const button = $("#tours");
@@ -30,7 +30,7 @@ function stepArgs(id, k) {
   k = Math.max(0, Math.min(t.steps.length - 1, k));
   return { id, k, i: t.steps[k].i };
 }
-const openStep = (id, k) => openPage("tour", stepArgs(id, k));
+const openTourStep = (id, k) => openPage("tour", stepArgs(id, k));
 
 registerPage({
   name: "tours",
@@ -44,7 +44,7 @@ registerPage({
       <span class="name">${esc(t.title)}</span> <span class="n">${t.steps.length} steps</span>
       <span class="snip">${esc(t.intro)}</span></button></li>`).join("")}</ol>
   </article>`,
-    bind: p => p.querySelectorAll("button[data-t]").forEach(b => b.addEventListener("click", () => openStep(b.dataset.t, 0))),
+    bind: p => p.querySelectorAll("button[data-t]").forEach(b => b.addEventListener("click", () => openTourStep(b.dataset.t, 0))),
   }),
 });
 
@@ -57,11 +57,10 @@ registerPage({
   },
   backLabel: a => `Back to “${tourById(a.id)?.title || a.id}”, step ${a.k + 1}`,
   step: a => ({ kind: "doc", key: S.docs[a.i].name }),          // une étape de visite : un texte lu
-  render: ({ id, k }) => {
+  render: ({ id, k }, { from }) => {
     const t = tourById(id);
-    // la page d'avant (pas encore remplacée) était-elle déjà cette visite ?
-    const was = currentPage();
-    const fresh = !(was && was.page === "tour" && was.id === id);
+    // on arrive dans la visite (d'ailleurs, Retour compris) ou on y passe d'une étape à l'autre ?
+    const fresh = !(from?.page === "tour" && from.id === id);
     S.tour = t; S.tourStep = k;
     S.path = t.steps.map(s => s.i); S.pathSet = new Set(S.path);
     const step = t.steps[k], d = S.docs[step.i];
@@ -93,9 +92,9 @@ registerPage({
       bind: p => {
         bindEntityButtons(p);
         p.querySelector(".topen").addEventListener("click", () => openPage("doc", { i: d.i }));
-        p.querySelector(".tprev").addEventListener("click", () => openStep(id, k - 1));
-        p.querySelector(".tnext").addEventListener("click", () => (last ? openPage("tours") : openStep(id, k + 1)));
-        p.querySelectorAll(".tour-steps button").forEach(b => b.addEventListener("click", () => openStep(id, +b.dataset.k)));
+        p.querySelector(".tprev").addEventListener("click", () => openTourStep(id, k - 1));
+        p.querySelector(".tnext").addEventListener("click", () => (last ? openPage("tours") : openTourStep(id, k + 1)));
+        p.querySelectorAll(".tour-steps button").forEach(b => b.addEventListener("click", () => openTourStep(id, +b.dataset.k)));
       },
     };
   },

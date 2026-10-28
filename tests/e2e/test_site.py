@@ -241,6 +241,27 @@ def test_back_from_a_tour_step_names_the_step(browser, site, game):
     assert problems == []
 
 
+def camera(page):
+    return page.evaluate("async () => { const { S } = await import('./state.js'); return { ...S.cam }; }")
+
+
+@pytest.mark.parametrize("game", GAMES)
+def test_back_to_a_tour_from_another_page_shows_the_whole_tour(browser, site, game):
+    tour, title = TOURS[game]
+    page, problems = open_page(browser, f"{site}?game={game}#tour={tour}/3", DESKTOP)
+    page.wait_for_timeout(1200)                     # le vol d'ouverture : toute la visite à l'écran
+    whole = camera(page)
+    page.click("#help")
+    wait_shown(page, ("help", "How to read this map"))
+    page.evaluate("async () => { const { S } = await import('./state.js'); S.cam.x += 3; S.cam.y -= 2; S.cam.s *= 6; }")
+    page.go_back()
+    wait_shown(page, ("tour", title))
+    page.wait_for_timeout(1200)
+    back = camera(page)
+    assert back == pytest.approx(whole, rel=1e-3, abs=1e-3)
+    assert problems == []
+
+
 @pytest.mark.parametrize("game", GAMES)
 def test_links_between_characters_index_and_dialogues(browser, site, game):
     name = ENTITIES[game]

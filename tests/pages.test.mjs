@@ -268,3 +268,19 @@ test("re-render keeps the panel's scroll position, even when the page scrolls it
   rerenderPage();
   assert.equal(panel.scrollTop, 80);
 });
+
+test("a page is told which page the reader came from, on opening and on Back", () => {
+  start();
+  const from = [];
+  registerPage({ name: "stop", render: (a, how) => { from.push(how.from && { ...how.from }); return { html: `<h2>${a.id}</h2>` }; } });
+  openPage("stop", { id: "a" });
+  openPage("list");
+  openPage("stop", { id: "b" });
+  goBack();                                         // Retour à la liste : pas une page « stop »
+  goBack();                                         // Retour à « a », depuis la liste
+  assert.deepEqual(from, [null, { page: "list", q: "" }, { page: "list", q: "" }]);
+  from.length = 0;
+  openPage("stop", { id: "c" });
+  openPage("stop", { id: "d" });
+  assert.deepEqual(from, [{ page: "stop", id: "a", q: "" }, { page: "stop", id: "c", q: "" }]);
+});

@@ -22,8 +22,9 @@
 //   onOpen(args)      ce qu'elle fait en s'ouvrant, hors de la carte et du panneau (annuler un chemin en
 //                     attente) ; pas refait quand on la réaffiche
 //   panel             false : la page « panneau fermé »
-//   render(args)      allume ce qu'il faut sur la carte et rend { html, bind(panel), announce, frame } ;
-//                     frame : les étoiles à cadrer (deps.frame), ou une fonction qui cadre elle-même (le chemin)
+//   render(args, { from })  allume ce qu'il faut sur la carte et rend { html, bind(panel), announce, frame } ;
+//                     frame : les étoiles à cadrer (deps.frame), ou une fonction qui cadre elle-même (le chemin) ;
+//                     from : l'entrée d'où l'on vient (la page quittée, Retour compris), ou null
 import { startNav, record, current, previous, goBack as navBack, onRecord } from "./nav.js";
 
 const kinds = new Map();
@@ -49,15 +50,15 @@ function replaces(a, b) {
   return JSON.stringify(a) === JSON.stringify(b);
 }
 
-// La séquence d'ouverture, écrite une seule fois. e : une entrée {page, …args}.
-function show(e, { rerender = false, fly = true } = {}) {
+// La séquence d'ouverture, écrite une seule fois. e : une entrée {page, …args} ; from : l'entrée quittée.
+function show(e, { rerender = false, fly = true, from = current() } = {}) {
   const name = e.page, args = argsOf(e);
   const kind = kinds.get(name), { panel } = deps;
   if (!kind) return;
   if (!kind.keepsFocus) deps.resetFocus();
   if (!rerender && kind.clearsSearch) deps.clearSearch?.();
   if (!rerender) kind.onOpen?.(args);
-  const page = kind.render(args) || {};
+  const page = kind.render(args, { from }) || {};
   panel.hidden = kind.panel === false;
   panel.dataset.page = kind.panel === false ? "" : name;
   if (!rerender) record({ page: name, ...args });
@@ -91,9 +92,9 @@ export function closePage() { show({ page: "none" }); }
 
 // Rouvre une entrée de l'historique : Retour (nav.js n'enregistre alors rien), ou un pas d'History
 // repris comme un nouveau pas.
-export function reopen(e) {
+export function reopen(e, from = current()) {
   deps.onReopen?.(e);
-  show(e);
+  show(e, { from });
 }
 
 export function currentPage() { return current(); }
