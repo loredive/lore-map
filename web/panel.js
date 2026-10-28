@@ -3,12 +3,11 @@ import { tokenize } from "./search.js";
 import { S, $, panel, input, esc, colorOf, resetContext, clusterById, docRow, focusPanel, portrait, isHidden, nameOf, textOf, textLang, groupName, groupDesc } from "./state.js";
 import { draw, focusDoc, fitPoints, frameFrom, setHover } from "./render.js";
 import { echoGraph, echoPath } from "./graph.js";
-import { runSearch, resetSearch } from "./search-ui.js";
+import { resetSearch } from "./search-ui.js";
 import { entityChips, bindEntityButtons, linkText, dialogueButtons, bindDialogueButtons, snippet, dlcBadge } from "./links.js";
 import { record, poppedHere } from "./nav.js";
-import { backLabel, goBack, closePage, openFromAddress } from "./pages.js";
+import { registerPage, backLabel, goBack, closePage, openFromAddress } from "./pages.js";
 import { tipAtStar } from "./tip.js";
-import { showTrail } from "./trail-ui.js";
 
 // Mode lecture : le panneau s'élargit (environ la moitié de l'écran) ; retenu d'une visite à l'autre.
 const READING_KEY = "lore-map:reading";
@@ -149,15 +148,9 @@ export function openCluster(c, { fly = true, focus = true } = {}) {
   draw();
 }
 
-export function closePanel() {
-  resetContext();
-  cancelPath();
-  S.selected = -1;
-  panel.hidden = true;
-  panel.dataset.view = "";
-  record({ view: "none" });       // fermer est une étape : Retour rouvre ce qu'on vient de fermer
-  draw();
-}
+// Le panneau fermé est une page : fermer est une étape, Retour rouvre ce qu'on vient de fermer.
+registerPage({ name: "none", panel: false, render: () => { cancelPath(); return {}; } });
+export const closePanel = closePage;
 
 
 // ------------------------------------------------------------------ pages pas encore enregistrées
@@ -178,9 +171,7 @@ function oldBackLabel(e) {
   switch (e.view) {
     case "doc": return `Back to “${nameOf(S.docs[e.i])}”`;
     case "cluster": { const c = S.clusters.find(x => x.label === e.label); return `Back to the group “${c ? groupName(c) : e.label}”`; }
-    case "results": return `Back to the results for “${e.q}”`;
     case "path": return "Back to the path";
-    case "trail": return "Back to your history";
     default: return null;                       // avant : le panneau fermé, « Fermer » suffit
   }
 }
@@ -216,12 +207,9 @@ function reopen(e) {
   if (e.view === "doc") select(e.i);
   else if (e.view === "cluster") { const c = clusterById(e.id) || S.clusters.find(x => x.label === e.label); if (c) openCluster(c); }
   else if (e.view === "path") showPath(e.a, e.b);
-  else if (e.view === "results") { input.value = e.q; runSearch(); }
-  else if (e.view === "trail") showTrail();
-  else closePanel();
 }
 
-export const oldPages = { address, backLabel: oldBackLabel, replaces: a => a.view === "results", reopen, readAddress, close: closePanel };
+export const oldPages = { address, backLabel: oldBackLabel, reopen, readAddress };
 
 
 // ------------------------------------------------------------------ groupe d'un texte

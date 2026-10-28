@@ -1,10 +1,11 @@
 // L'historique de lecture : enregistré par jeu dans le navigateur, montré sur la carte (sky.js :
 // drawTrail, les textes déjà lus) et en entier dans le panneau « History » (bouton de la barre).
 // Chaque fiche ouverte (texte, entité, groupe, dialogue) est un pas ; nav.js nous les signale.
-import { S, $, panel, esc, colorOf, resetContext, focusPanel, nameOf, textOf, groupName } from "./state.js";
+import { S, $, panel, esc, colorOf, nameOf, textOf, groupName } from "./state.js";
 import { draw } from "./render.js";
-import { panelTop, bindPanelTop, snippet } from "./panel.js";
-import { record, onRecord, openEntry } from "./nav.js";
+import { snippet } from "./panel.js";
+import { onRecord, openEntry } from "./nav.js";
+import { registerPage, openPage, rerenderPage } from "./pages.js";
 import { KIND_LABELS } from "./links.js";
 import { push, previousDoc, docKeys, recentDocs, serialize, parse } from "./trail.js";
 
@@ -82,9 +83,9 @@ function clearTrail() {
   steps = [];
   S.cameFrom = -1;
   clearTimeout(undoTimer);
-  undoTimer = setTimeout(() => { cleared = null; if (panel.dataset.view === "trail") showTrail(); }, UNDO_MS);
+  undoTimer = setTimeout(() => { cleared = null; if (panel.dataset.view === "history") rerenderPage(); }, UNDO_MS);
   update();
-  if (panel.dataset.view === "trail") showTrail();
+  if (panel.dataset.view === "history") rerenderPage();
   panel.querySelector(".tundo")?.focus();
   draw();
 }
@@ -94,16 +95,18 @@ function undoClear() {
   cleared = null;
   clearTimeout(undoTimer);
   update();
-  if (panel.dataset.view === "trail") showTrail();
+  if (panel.dataset.view === "history") rerenderPage();
   draw();
 }
 
-export function showTrail() {
-  resetContext();
-  S.selected = -1;
-  panel.hidden = false;
-  panel.dataset.view = "trail";
-  record({ view: "trail" });
+// La page History : tout ce qu'on a ouvert, du plus récent au plus ancien.
+registerPage({
+  name: "history",
+  backLabel: () => "Back to your history",
+  render: historyPage,
+});
+
+function historyPage() {
   const rows = steps.map((s, k) => [s, k]).reverse().map(([s, k]) => {
     const d = s.kind === "doc" ? S.docs[docIndex.get(s.key)] : null;
     return `<li><button type="button" data-k="${k}">
@@ -111,7 +114,7 @@ export function showTrail() {
       ${d ? `<span class="snip">${esc(snippet(textOf(d), [], 110))}</span>` : ""}</button></li>`;
   }).join("");
   const last = steps.at(-1);
-  panel.innerHTML = `${panelTop()}<article class="card">
+  const html = `<article class="card">
     <h2>History</h2>
     <p class="count">${S.visited.size} of ${S.docs.length} texts read, in ${steps.length} ${steps.length === 1 ? "step" : "steps"}.</p>
     ${last ? `<button type="button" class="entity-link tcontinue">Continue where you left off: ${esc(labelOf(last))}</button>` : ""}
@@ -123,7 +126,10 @@ export function showTrail() {
       named. Kept in this browser, one history per game.</p>
     ${steps.length ? `<ol class="results trail-list">${rows}</ol>` : '<p class="text">Nothing read yet: open a star to start.</p>'}
   </article>`;
-  bindPanelTop();
+  return { html, announce: `History: ${steps.length} steps`, bind: panel => bindHistory(panel, last) };
+}
+
+function bindHistory(panel, last) {
   panel.querySelectorAll(".trail-list button[data-k]").forEach(b =>
     b.addEventListener("click", () => openEntry(entryOf(steps[+b.dataset.k]))));
   panel.querySelector(".tcontinue")?.addEventListener("click", () => openEntry(entryOf(last)));
@@ -135,9 +141,6 @@ export function showTrail() {
   });
   panel.querySelector(".tclear")?.addEventListener("click", clearTrail);
   panel.querySelector(".tundo")?.addEventListener("click", undoClear);
-  panel.scrollTop = 0;
-  focusPanel(`History: ${steps.length} steps`);
-  draw();
 }
 
-$("#history").addEventListener("click", showTrail);
+$("#history").addEventListener("click", () => openPage("history"));
