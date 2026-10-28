@@ -30,7 +30,10 @@ registerPage({
   },
   backLabel: a => `Back to the dialogue of ${a.speaker}`,
   step: a => ({ kind: "dialogue", key: a.speaker }),
-  fromStep: { kind: "dialogue", page: key => (S.dialogues.has(key) ? { speaker: key } : null) },
+  fromStep: {
+    kind: "dialogue", page: key => (S.dialogues.has(key) ? { speaker: key } : null),
+    label: key => `Dialogue: ${key}`, kindLabel: () => "Dialogue",
+  },
   render: ({ speaker, focusOn = -1 }) => {
     const list = S.dialogues.get(speaker);
     S.lit = new Set(list);

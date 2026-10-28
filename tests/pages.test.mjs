@@ -2,7 +2,7 @@
 // factice et un historique de navigateur factice (pas de DOM).
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { registerPage, startPages, openPage, rerenderPage, closePage, currentPage, backLabel, goBack, openFromAddress, openFirstPage, stepOf, pageOfStep, openStep, onStep } from "../web/pages.js";
+import { registerPage, startPages, openPage, rerenderPage, closePage, currentPage, backLabel, goBack, openFromAddress, openFirstPage, stepOf, pageOfStep, describeStep, openStep, onStep } from "../web/pages.js";
 
 // historique du navigateur : une liste d'adresses, Retour prévient l'écouteur comme popstate
 function fakeBrowser() {
@@ -44,7 +44,7 @@ registerPage({
   backLabel: a => `Back to note ${a.id}`,
   keepsFocus: true,
   step: a => ({ kind: "page", key: a.id }),
-  fromStep: { kind: "page", page: key => key === "gone" ? null : { id: key } },
+  fromStep: { kind: "page", page: key => key === "gone" ? null : { id: key }, label: key => `Note ${key}`, kindLabel: () => "Note" },
   render: a => ({ html: `<h2>${a.id}</h2>`, announce: `Note ${a.id}`, frame: [a.id] }),
 });
 registerPage({
@@ -201,6 +201,12 @@ test("a History step maps to its page and back", () => {
   assert.deepEqual(pageOfStep({ kind: "page", key: "a" }), { page: "note", id: "a" });
   assert.equal(pageOfStep({ kind: "page", key: "gone" }), null);
   assert.equal(pageOfStep({ kind: "other", key: "a" }), null);
+});
+
+test("a History step is named by the page kind it reopens", () => {
+  start();
+  assert.deepEqual(describeStep({ kind: "page", key: "a" }), { label: "Note a", kind: "Note" });
+  assert.equal(describeStep({ kind: "other", key: "a" }), null);
 });
 
 test("a History step reopens its page as a new entry", () => {

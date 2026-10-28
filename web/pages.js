@@ -12,7 +12,8 @@
 //                     entière et n'est essayé qu'en dernier (un nom de texte).
 //   backLabel(args)   « Back to … » quand cette page est la précédente
 //   step(args)        le pas d'History qu'elle ajoute, {kind, key}, ou null
-//   fromStep          { kind, page(key) -> args | null } : les pas de cette sorte rouvrent cette page
+//   fromStep          { kind, page(key) -> args | null, label(key), kindLabel(key) } : les pas de cette sorte
+//                     rouvrent cette page ; label et kindLabel les nomment dans la page History
 //   replacesPrevious  true : une nouvelle entrée remplace la précédente de la même sorte (les résultats) ;
 //                     sinon seule une entrée identique se remplace
 //   keepsFocus        true : garde le focus de la carte (le texte) ; sinon on repart d'un focus neuf
@@ -133,13 +134,16 @@ export function openFirstPage(hash) {
 
 // History : le pas qu'ajoute une entrée, et l'entrée que rouvre un pas (null : pas de page enregistrée).
 export function stepOf(e) { return kinds.get(e.page)?.step?.(argsOf(e)) ?? null; }
+const kindOfStep = s => [...kinds.values()].find(k => k.fromStep?.kind === s.kind);
 export function pageOfStep(s) {
-  for (const kind of kinds.values()) {
-    if (kind.fromStep?.kind !== s.kind) continue;
-    const args = kind.fromStep.page(s.key);
-    return args ? { page: kind.name, ...args } : null;
-  }
-  return null;
+  const kind = kindOfStep(s);
+  const args = kind?.fromStep.page(s.key);
+  return args ? { page: kind.name, ...args } : null;
+}
+// Le nom d'un pas et sa sorte (« Dialogue », « Group of texts »…), donnés par la page qu'il rouvre.
+export function describeStep(s) {
+  const from = kindOfStep(s)?.fromStep;
+  return from ? { label: from.label(s.key), kind: from.kindLabel(s.key) } : null;
 }
 // Prévient f du pas d'History de chaque page ouverte, Retour compris (null : une page qui n'en ajoute pas).
 export function onStep(f) { onRecord(e => f(stepOf(e))); }

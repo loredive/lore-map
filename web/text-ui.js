@@ -9,6 +9,8 @@ import { startPath } from "./pathbar.js";
 import { entityChips, bindEntityButtons, linkText, dialogueButtons, bindDialogueButtons, dlcBadge, groupOf } from "./links.js";
 import { tipAtStar } from "./tip.js";
 
+const docNamed = name => S.docs.find(x => x.name === name);
+
 registerPage({
   name: "doc",
   address: {
@@ -17,7 +19,10 @@ registerPage({
   },
   backLabel: ({ i }) => `Back to “${nameOf(S.docs[i])}”`,
   step: ({ i }) => ({ kind: "doc", key: S.docs[i].name }),
-  fromStep: { kind: "doc", page: key => { const d = S.docs.find(x => x.name === key); return d ? { i: d.i } : null; } },
+  fromStep: {
+    kind: "doc", page: key => { const d = docNamed(key); return d ? { i: d.i } : null; },
+    label: key => nameOf(docNamed(key)), kindLabel: key => S.cats[docNamed(key).cat],
+  },
   keepsFocus: true,
   // un chemin attend son second texte (pathbar.js) : choisir un texte ouvre plutôt le chemin
   divert: ({ i }) => (S.pathFrom >= 0 && i !== S.pathFrom ? { page: "path", a: S.pathFrom, b: i } : null),

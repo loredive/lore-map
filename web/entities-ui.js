@@ -35,7 +35,10 @@ registerPage({
   },
   backLabel: a => `Back to “${entityNamed(a.name)?.label || a.name}”`,
   step: a => ({ kind: "entity", key: a.name }),
-  fromStep: { kind: "entity", page: key => (entityNamed(key) ? { name: key } : null) },
+  fromStep: {
+    kind: "entity", page: key => (entityNamed(key) ? { name: key } : null),
+    label: key => entityNamed(key)?.label || key, kindLabel: key => KIND_LABELS[entityNamed(key).kind][0],
+  },
   render: ({ name }) => {
     const e = entityNamed(name);
     S.entity = e;
