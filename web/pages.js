@@ -113,7 +113,8 @@ export function openFromAddress(hash) {
     const key = kind.address?.keys?.find(k => name.startsWith(k + "="));
     if (key === undefined) continue;
     const args = kind.address.read(name.slice(key.length + 1), hash.slice(hash.indexOf("=") + 1));
-    if (args) show({ page: kind.name, ...args });
+    if (!args) return false;                     // #group=Nope : une clé connue, mais rien à ouvrir
+    show({ page: kind.name, ...args });
     return true;
   }
   for (const kind of kinds.values()) {

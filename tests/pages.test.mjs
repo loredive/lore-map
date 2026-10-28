@@ -184,6 +184,15 @@ test("an unknown address is ignored", () => {
   assert.equal(currentPage(), null);
 });
 
+test("an address with a known key but an unknown value opens nothing", () => {
+  const { panel } = start();
+  registerPage({ name: "shelf", address: { keys: ["shelf"], read: v => (v === "top" ? { at: v } : null) }, render: () => ({ html: "" }) });
+  assert.equal(openFromAddress("#shelf=nope"), false);
+  assert.equal(panel.hidden, true);
+  assert.equal(currentPage(), null);
+  assert.equal(openFromAddress("#shelf=top"), true);
+});
+
 test("a History step maps to its page and back", () => {
   start();
   assert.deepEqual(stepOf({ page: "note", id: "a", q: "" }), { kind: "page", key: "a" });
