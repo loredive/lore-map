@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v10
+      - uses: astral-sh/setup-uv@v10.3.3    # no moving major tag since v8
       # the tests don't need the embedding model, only these
       - run: uv run --no-project --with pytest --with numpy --with scikit-learn --with pillow pytest
       - run: node --test tests/*.test.mjs
@@ -41,7 +41,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v10
+      - uses: astral-sh/setup-uv@v10.3.3    # no moving major tag since v8
 
       # Elden Ring icons come from the Fan API; cached so a deploy doesn't download them all again
       - uses: actions/cache@v6
