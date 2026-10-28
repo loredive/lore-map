@@ -167,6 +167,17 @@ def test_address_opens_its_page(browser, site, game, kind):
     assert shown(page) == [view, title]
     if view == "tour":
         assert "step 3 of" in page.text_content("#panel .cat")
+    # Retour depuis une autre page rouvre celle de l'adresse ; Retour depuis elle quitte le site (voulu)
+    page.click("#help")
+    wait_shown(page, ("help", "How to read this map"))
+    page.go_back()
+    wait_shown(page, (view, title))
+    if view == "tour":
+        assert "step 3 of" in page.text_content("#panel .cat")
+    english = address.replace("#groupe=", "#group=").replace("#entite=", "#entity=")   # réécrite en anglais
+    assert page.url.endswith(english.replace("'", "%27")) or page.url.endswith(english)
+    page.go_back()
+    page.wait_for_url("about:blank")
     assert problems == []
 
 
