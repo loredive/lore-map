@@ -7,12 +7,11 @@ import { buildDialogues } from "./dialogue-ui.js";
 import { buildIndex, runSearch, resetSearch } from "./search-ui.js";
 import { panelTop, bindPanelTop } from "./panel.js";
 import { cancelPath } from "./pathbar.js";
-import { record } from "./nav.js";
 import { showTip } from "./tip.js";
 import "./entities-ui.js";
 import { initHistory } from "./history-ui.js";
 import { loadTours } from "./tours-ui.js";
-import { startPages, openFromAddress, rerenderPage, openPage, closePage, currentPage } from "./pages.js";
+import { startPages, openFirstPage, rerenderPage, openPage, closePage } from "./pages.js";
 import "./help-ui.js";
 import "./text-ui.js";
 import "./group-ui.js";
@@ -128,13 +127,12 @@ async function load() {
   legendFade();
   buildViewSwitch();
   buildLangSwitch();
-  initHistory();                                // avant openFromAddress : le lien collé est un premier pas
+  initHistory();                                // avant openFirstPage : le lien collé est un premier pas
   await loadTours();                            // data/<jeu>/tours.json, s'il y en a
   status.textContent = "";
   mode.textContent = "";                       // la ligne d'état ne parle que quand il y a du nouveau
   resize();
-  openFromAddress(location.hash);
-  if (!currentPage()) record({ page: "none" });   // premier état : la carte seule, panneau fermé
+  openFirstPage(location.hash);                 // la page du lien collé, ou la carte seule
 }
 
 

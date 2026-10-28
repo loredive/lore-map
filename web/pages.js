@@ -12,7 +12,8 @@
 //                     entière et n'est essayé qu'en dernier (un nom de texte).
 //   backLabel(args)   « Back to … » quand cette page est la précédente
 //   step(args)        le pas d'History qu'elle ajoute, {kind, key}, ou null
-//   fromStep          { kind, page(key) -> args | null } : les pas de cette sorte rouvrent cette page
+//   fromStep          { kind, page(key) -> args | null, label(key), kindLabel(key) } : les pas de cette sorte
+//                     rouvrent cette page ; label et kindLabel les nomment dans la page History
 //   replacesPrevious  true : une nouvelle entrée remplace la précédente de la même sorte (les résultats) ;
 //                     sinon seule une entrée identique se remplace
 //   keepsFocus        true : garde le focus de la carte (le texte) ; sinon on repart d'un focus neuf
@@ -22,8 +23,9 @@
 //   onOpen(args)      ce qu'elle fait en s'ouvrant, hors de la carte et du panneau (annuler un chemin en
 //                     attente) ; pas refait quand on la réaffiche
 //   panel             false : la page « panneau fermé »
-//   render(args)      allume ce qu'il faut sur la carte et rend { html, bind(panel), announce, frame } ;
-//                     frame : les étoiles à cadrer (deps.frame), ou une fonction qui cadre elle-même (le chemin)
+//   render(args, { from })  allume ce qu'il faut sur la carte et rend { html, bind(panel), announce, frame } ;
+//                     frame : les étoiles à cadrer (deps.frame), ou une fonction qui cadre elle-même (le chemin) ;
+//                     from : l'entrée d'où l'on vient (la page quittée, Retour compris), ou null
 import { startNav, record, current, previous, goBack as navBack, onRecord } from "./nav.js";
 
 const kinds = new Map();
@@ -49,15 +51,15 @@ function replaces(a, b) {
   return JSON.stringify(a) === JSON.stringify(b);
 }
 
-// La séquence d'ouverture, écrite une seule fois. e : une entrée {page, …args}.
-function show(e, { rerender = false, fly = true } = {}) {
+// La séquence d'ouverture, écrite une seule fois. e : une entrée {page, …args} ; from : l'entrée quittée.
+function show(e, { rerender = false, fly = true, from = current() } = {}) {
   const name = e.page, args = argsOf(e);
   const kind = kinds.get(name), { panel } = deps;
   if (!kind) return;
   if (!kind.keepsFocus) deps.resetFocus();
   if (!rerender && kind.clearsSearch) deps.clearSearch?.();
   if (!rerender) kind.onOpen?.(args);
-  const page = kind.render(args) || {};
+  const page = kind.render(args, { from }) || {};
   panel.hidden = kind.panel === false;
   panel.dataset.page = kind.panel === false ? "" : name;
   if (!rerender) record({ page: name, ...args });
@@ -91,9 +93,9 @@ export function closePage() { show({ page: "none" }); }
 
 // Rouvre une entrée de l'historique : Retour (nav.js n'enregistre alors rien), ou un pas d'History
 // repris comme un nouveau pas.
-export function reopen(e) {
+export function reopen(e, from = current()) {
   deps.onReopen?.(e);
-  show(e);
+  show(e, { from });
 }
 
 export function currentPage() { return current(); }
@@ -112,7 +114,8 @@ export function openFromAddress(hash) {
     const key = kind.address?.keys?.find(k => name.startsWith(k + "="));
     if (key === undefined) continue;
     const args = kind.address.read(name.slice(key.length + 1), hash.slice(hash.indexOf("=") + 1));
-    if (args) show({ page: kind.name, ...args });
+    if (!args) return false;                     // #group=Nope : une clé connue, mais rien à ouvrir
+    show({ page: kind.name, ...args });
     return true;
   }
   for (const kind of kinds.values()) {
@@ -123,15 +126,24 @@ export function openFromAddress(hash) {
   return false;
 }
 
+// Au chargement : la page de l'adresse, ou sinon le premier état, la carte seule (panneau fermé),
+// pour que Retour depuis la page suivante y revienne.
+export function openFirstPage(hash) {
+  if (!openFromAddress(hash) && !current()) record({ page: "none" });
+}
+
 // History : le pas qu'ajoute une entrée, et l'entrée que rouvre un pas (null : pas de page enregistrée).
 export function stepOf(e) { return kinds.get(e.page)?.step?.(argsOf(e)) ?? null; }
+const kindOfStep = s => [...kinds.values()].find(k => k.fromStep?.kind === s.kind);
 export function pageOfStep(s) {
-  for (const kind of kinds.values()) {
-    if (kind.fromStep?.kind !== s.kind) continue;
-    const args = kind.fromStep.page(s.key);
-    return args ? { page: kind.name, ...args } : null;
-  }
-  return null;
+  const kind = kindOfStep(s);
+  const args = kind?.fromStep.page(s.key);
+  return args ? { page: kind.name, ...args } : null;
+}
+// Le nom d'un pas et sa sorte (« Dialogue », « Group of texts »…), donnés par la page qu'il rouvre.
+export function describeStep(s) {
+  const from = kindOfStep(s)?.fromStep;
+  return from ? { label: from.label(s.key), kind: from.kindLabel(s.key) } : null;
 }
 // Prévient f du pas d'History de chaque page ouverte, Retour compris (null : une page qui n'en ajoute pas).
 export function onStep(f) { onRecord(e => f(stepOf(e))); }

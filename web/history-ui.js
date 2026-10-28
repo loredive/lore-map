@@ -1,11 +1,11 @@
 // L'History : les pages ouvertes, enregistrées par jeu dans le navigateur, montrées sur la carte
 // (sky.js : drawTrail, les textes déjà lus) et en entier dans la page « History » (bouton de la barre).
 // Les sortes de pages déclarent le pas qu'elles ajoutent (texte, entité, groupe, dialogue ; une étape
-// de visite compte comme son texte) et la page que rouvre un pas ; pages.js nous signale chaque pas.
-import { S, $, panel, esc, colorOf, nameOf, textOf, groupName } from "./state.js";
+// de visite compte comme son texte), la page que rouvre un pas et son nom ; pages.js nous signale chaque pas.
+import { S, $, panel, esc, colorOf, textOf } from "./state.js";
 import { draw } from "./render.js";
-import { registerPage, openPage, rerenderPage, onStep, openStep, pageOfStep } from "./pages.js";
-import { KIND_LABELS, snippet } from "./links.js";
+import { registerPage, openPage, rerenderPage, onStep, openStep, pageOfStep, describeStep } from "./pages.js";
+import { snippet } from "./links.js";
 import { push, previousDoc, docKeys, recentDocs, serialize, parse } from "./trail.js";
 
 const UNDO_MS = 10000;           // « Undo » reste proposé après « Clear »
@@ -13,17 +13,7 @@ const storeKey = () => `lore-map:trail:${S.game}`;   // clé d'avant le nom Hist
 let steps = [], docIndex = new Map();
 let cleared = null, undoTimer = 0;   // History effacée, récupérable quelques secondes
 
-const entityOf = name => S.entities.find(e => e.name === name);
-const clusterOf = label => S.clusters.find(c => c.label === label);
-
-function labelOf(s) {
-  return s.kind === "entity" ? entityOf(s.key)?.label || s.key : s.kind === "dialogue" ? `Dialogue: ${s.key}`
-    : s.kind === "doc" ? nameOf(S.docs[docIndex.get(s.key)]) : groupName(clusterOf(s.key));
-}
-function kindOf(s) {
-  return s.kind === "doc" ? S.cats[S.docs[docIndex.get(s.key)].cat] : s.kind === "entity"
-    ? KIND_LABELS[entityOf(s.key).kind][0] : s.kind === "cluster" ? "Group of texts" : "Dialogue";
-}
+const labelOf = s => describeStep(s).label;
 
 export function initHistory() {
   docIndex = new Map(S.docs.map(d => [d.name, d.i]));
@@ -85,7 +75,7 @@ function historyPage() {
   const rows = steps.map((s, k) => [s, k]).reverse().map(([s, k]) => {
     const d = s.kind === "doc" ? S.docs[docIndex.get(s.key)] : null;
     return `<li><button type="button" data-k="${k}">
-      <span class="head">${d ? `<span class="dot" style="--c:${colorOf(d.cat)}"></span>` : `<span class="kind">${esc(kindOf(s))}</span>`}<span class="name">${esc(labelOf(s))}</span></span>
+      <span class="head">${d ? `<span class="dot" style="--c:${colorOf(d.cat)}"></span>` : `<span class="kind">${esc(describeStep(s).kind)}</span>`}<span class="name">${esc(labelOf(s))}</span></span>
       ${d ? `<span class="snip">${esc(snippet(textOf(d), [], 110))}</span>` : ""}</button></li>`;
   }).join("");
   const last = steps.at(-1);

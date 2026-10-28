@@ -5,6 +5,8 @@ import { snippet } from "./links.js";
 
 const groupOfArgs = ({ id, label }) => clusterById(id) || S.clusters.find(x => x.label === label);
 
+const clusterNamed = label => S.clusters.find(x => x.label === label);
+
 registerPage({
   name: "cluster",
   address: {
@@ -14,7 +16,10 @@ registerPage({
   },
   backLabel: ({ label }) => { const c = S.clusters.find(x => x.label === label); return `Back to the group “${c ? groupName(c) : label}”`; },
   step: ({ label }) => ({ kind: "cluster", key: label }),
-  fromStep: { kind: "cluster", page: key => { const c = S.clusters.find(x => x.label === key); return c ? { id: c.id, label: c.label } : null; } },
+  fromStep: {
+    kind: "cluster", page: key => { const c = clusterNamed(key); return c ? { id: c.id, label: c.label } : null; },
+    label: key => groupName(clusterNamed(key)), kindLabel: () => "Group of texts",
+  },
   render: args => {
     const c = groupOfArgs(args);
     if (!c) return { html: "" };

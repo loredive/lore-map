@@ -10,7 +10,7 @@ let pos = -1;
 let restoring = false;   // pendant qu'on rejoue une entrée : ne rien enregistrer
 let popped = null;       // adresse rétablie par popstate (le hashchange qui suit n'est pas un lien collé)
 let browser = null;      // l'historique du navigateur : push, replace, back, href, plain, onPop
-let pages = null;        // addressOf(e), replaces(a, b), query(), reopen(e) : fournis par pages.js
+let pages = null;        // addressOf(e), replaces(a, b), query(), reopen(e, from) : fournis par pages.js
 let watcher = null;      // prévenu de chaque entrée ouverte (pages.js, pour l'History)
 
 export function startNav(b, p) {
@@ -63,8 +63,9 @@ function restore(state) {
   const k = state?.k;
   if (k === undefined || !stack[k]) return;    // entrée d'une visite précédente : hashchange s'en charge
   popped = browser.href();
+  const left = stack[pos];       // la page qu'on quitte : celle d'où l'on vient
   pos = k;
   watcher?.(stack[k]);           // revenir à une page, c'est aussi la relire (avant : la caméra en dépend)
   restoring = true;
-  try { pages.reopen(stack[k]); } finally { restoring = false; }
+  try { pages.reopen(stack[k], left); } finally { restoring = false; }
 }

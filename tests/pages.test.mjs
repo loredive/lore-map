@@ -2,7 +2,7 @@
 // factice et un historique de navigateur factice (pas de DOM).
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { registerPage, startPages, openPage, rerenderPage, closePage, currentPage, backLabel, goBack, openFromAddress, stepOf, pageOfStep, openStep, onStep } from "../web/pages.js";
+import { registerPage, startPages, openPage, rerenderPage, closePage, currentPage, backLabel, goBack, openFromAddress, openFirstPage, stepOf, pageOfStep, describeStep, openStep, onStep } from "../web/pages.js";
 
 // historique du navigateur : une liste d'adresses, Retour prévient l'écouteur comme popstate
 function fakeBrowser() {
@@ -44,7 +44,7 @@ registerPage({
   backLabel: a => `Back to note ${a.id}`,
   keepsFocus: true,
   step: a => ({ kind: "page", key: a.id }),
-  fromStep: { kind: "page", page: key => key === "gone" ? null : { id: key } },
+  fromStep: { kind: "page", page: key => key === "gone" ? null : { id: key }, label: key => `Note ${key}`, kindLabel: () => "Note" },
   render: a => ({ html: `<h2>${a.id}</h2>`, announce: `Note ${a.id}`, frame: [a.id] }),
 });
 registerPage({
@@ -184,6 +184,15 @@ test("an unknown address is ignored", () => {
   assert.equal(currentPage(), null);
 });
 
+test("an address with a known key but an unknown value opens nothing", () => {
+  const { panel } = start();
+  registerPage({ name: "shelf", address: { keys: ["shelf"], read: v => (v === "top" ? { at: v } : null) }, render: () => ({ html: "" }) });
+  assert.equal(openFromAddress("#shelf=nope"), false);
+  assert.equal(panel.hidden, true);
+  assert.equal(currentPage(), null);
+  assert.equal(openFromAddress("#shelf=top"), true);
+});
+
 test("a History step maps to its page and back", () => {
   start();
   assert.deepEqual(stepOf({ page: "note", id: "a", q: "" }), { kind: "page", key: "a" });
@@ -192,6 +201,12 @@ test("a History step maps to its page and back", () => {
   assert.deepEqual(pageOfStep({ kind: "page", key: "a" }), { page: "note", id: "a" });
   assert.equal(pageOfStep({ kind: "page", key: "gone" }), null);
   assert.equal(pageOfStep({ kind: "other", key: "a" }), null);
+});
+
+test("a History step is named by the page kind it reopens", () => {
+  start();
+  assert.deepEqual(describeStep({ kind: "page", key: "a" }), { label: "Note a", kind: "Note" });
+  assert.equal(describeStep({ kind: "other", key: "a" }), null);
 });
 
 test("a History step reopens its page as a new entry", () => {
@@ -267,4 +282,35 @@ test("re-render keeps the panel's scroll position, even when the page scrolls it
   panel.scrollTop = 80;
   rerenderPage();
   assert.equal(panel.scrollTop, 80);
+});
+
+test("a page is told which page the reader came from, on opening and on Back", () => {
+  start();
+  const from = [];
+  registerPage({ name: "stop", render: (a, how) => { from.push(how.from && { ...how.from }); return { html: `<h2>${a.id}</h2>` }; } });
+  openPage("stop", { id: "a" });
+  openPage("list");
+  openPage("stop", { id: "b" });
+  goBack();                                         // Retour à la liste : pas une page « stop »
+  goBack();                                         // Retour à « a », depuis la liste
+  assert.deepEqual(from, [null, { page: "list", q: "" }, { page: "list", q: "" }]);
+  from.length = 0;
+  openPage("stop", { id: "c" });
+  openPage("stop", { id: "d" });
+  assert.deepEqual(from, [{ page: "stop", id: "a", q: "" }, { page: "stop", id: "c", q: "" }]);
+});
+
+test("the first page is the address's, or else the closed panel, which Back from the next page returns to", () => {
+  const { panel, urls } = start();
+  openFirstPage("#nowhere=x");
+  assert.equal(panel.hidden, true);
+  assert.deepEqual(currentPage(), { page: "none", q: "" });
+  openPage("note", { id: "a" });
+  assert.deepEqual(urls(), ["/", "#note=a"]);
+  goBack();
+  assert.deepEqual(currentPage(), { page: "none", q: "" });
+  start();
+  openFirstPage("#note=b");
+  assert.deepEqual(currentPage(), { page: "note", id: "b", q: "" });
+  assert.equal(backLabel(), null);
 });
