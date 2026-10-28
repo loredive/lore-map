@@ -256,6 +256,38 @@ def test_saved_history_reopens_its_steps(browser, site, game):
     assert problems == []
 
 
+# ------------------------------------------------------------------ focus de la carte, chemin d'échos
+ENTITY = {"bloodborne": "Gehrman", "elden-ring": "Marika"}
+
+
+def focus(page):
+    """Ce qui est allumé sur la carte : le groupe, l'entité et le texte ouvert."""
+    return page.evaluate("""async () => { const { S } = await import('./state.js');
+        return { group: S.cluster?.label ?? null, entity: S.entity?.name ?? null, selected: S.selected }; }""")
+
+
+@pytest.mark.parametrize("game", GAMES)
+def test_a_text_keeps_the_focus_and_a_group_starts_fresh(browser, site, game):
+    _, address, _, group = ADDRESSES[game][1]
+    page, problems = open_page(browser, f"{site}?game={game}{address}", DESKTOP)
+    name = page.text_content("#panel .results button .name").strip()
+    page.click("#panel .results button")
+    wait_shown(page, ("doc", name))
+    assert focus(page)["group"] == group                    # le groupe reste allumé sous le texte
+    assert page.text_content("#panel .panel-top .back").strip() == f"Back to the group “{group}”"
+    entity = ENTITY[game]
+    page.goto(f"{site}?game={game}#entity={entity}")
+    page.wait_for_function("() => document.querySelector('#panel').dataset.view === 'entity'")
+    page.click("#panel .results button")
+    page.wait_for_function("() => document.querySelector('#panel').dataset.view === 'doc'")
+    assert focus(page)["entity"] == entity                  # l'entité aussi
+    page.click("#panel .glink")
+    page.wait_for_function("() => document.querySelector('#panel').dataset.view === 'cluster'")
+    f = focus(page)
+    assert f["entity"] is None and f["selected"] == -1 and f["group"] is not None
+    assert problems == []
+
+
 @pytest.mark.parametrize("game", GAMES)
 def test_back_to_the_results(browser, site, game):
     page, _ = open_page(browser, f"{site}?game={game}", DESKTOP)
@@ -269,3 +301,27 @@ def test_back_to_the_results(browser, site, game):
     page.click("#panel .panel-top .back")
     page.wait_for_function("() => document.querySelector('#panel').dataset.view === 'results'")
     assert page.input_value("#q") == "blood"
+
+
+@pytest.mark.parametrize("game", GAMES)
+def test_old_french_path_address(browser, site, game):
+    _, address, view, title = ADDRESSES[game][4]
+    page, problems = open_page(browser, f"{site}?game={game}{address.replace('#path=', '#chemin=')}", DESKTOP)
+    assert shown(page) == [view, title]
+    assert problems == []
+
+
+@pytest.mark.parametrize("game", GAMES)
+def test_tracing_a_path_from_a_text(browser, site, game):
+    first = FIRST_TEXT[game]
+    page, problems = open_page(browser, f"{site}?game={game}{ADDRESSES[game][0][1]}", DESKTOP)
+    echo = page.text_content("#panel .echoes button .name").strip()
+    page.click("#panel .tpath")
+    assert page.is_visible("#pathbar")
+    page.click("#panel .echoes button")
+    wait_shown(page, ("path", f"{first} → {echo}"))
+    assert page.is_hidden("#pathbar")
+    assert page.text_content("#panel .panel-top .back").strip() == f"Back to “{first}”"
+    page.go_back()
+    wait_shown(page, ("doc", first))
+    assert problems == []

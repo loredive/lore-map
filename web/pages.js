@@ -17,7 +17,8 @@
 //                     sinon seule une entrée identique se remplace
 //   keepsFocus        true : garde le focus de la carte (le texte) ; sinon on repart d'un focus neuf
 //   panel             false : la page « panneau fermé »
-//   render(args)      allume ce qu'il faut sur la carte et rend { html, bind(panel), announce, frame }
+//   render(args)      allume ce qu'il faut sur la carte et rend { html, bind(panel), announce, frame } ;
+//                     frame : les étoiles à cadrer (deps.frame), ou une fonction qui cadre elle-même (le chemin)
 import { startNav, record, current, previous, goBack as navBack, replay } from "./nav.js";
 
 const kinds = new Map();
@@ -62,7 +63,7 @@ function show(name, args, { rerender = false, fly = true } = {}) {
     page.bind?.(panel);
     panel.scrollTop = 0;
     if (!rerender) deps.focus(page.announce);
-    if (!rerender && fly && page.frame) deps.frame(page.frame);
+    if (!rerender && fly && page.frame) typeof page.frame === "function" ? page.frame() : deps.frame(page.frame);
   }
   deps.draw();
 }
