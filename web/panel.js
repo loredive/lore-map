@@ -4,13 +4,11 @@ import { S, $, panel, input, esc, colorOf, resetContext, clusterById, docRow, fo
 import { draw, focusDoc, fitPoints, frameFrom, setHover } from "./render.js";
 import { echoGraph, echoPath } from "./graph.js";
 import { runSearch, resetSearch } from "./search-ui.js";
-import { entityChips, bindEntityButtons, openEntity, showIndex, linkText } from "./entities-ui.js";
+import { entityChips, bindEntityButtons, linkText, dialogueButtons, bindDialogueButtons, snippet, dlcBadge } from "./links.js";
 import { record, poppedHere } from "./nav.js";
 import { backLabel, goBack, closePage, openFromAddress } from "./pages.js";
-import { openDialogue, dialogueButtons, bindDialogueButtons } from "./dialogue-ui.js";
 import { tipAtStar } from "./tip.js";
 import { showTrail } from "./trail-ui.js";
-import { showTours, openTour } from "./tours-ui.js";
 
 // Mode lecture : le panneau s'élargit (environ la moitié de l'écran) ; retenu d'une visite à l'autre.
 const READING_KEY = "lore-map:reading";
@@ -39,29 +37,10 @@ export function bindPanelTop() {
   panel.querySelector(".panel-top .close").addEventListener("click", closePage);
 }
 
-export function snippet(text, terms, len = 150) {
-  const flat = text.replace(/\s+/g, " ");
-  const low = flat.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
-  let at = -1;
-  for (const t of terms) { at = low.indexOf(t); if (at >= 0) break; }
-  if (at < 0) return flat.length > len ? flat.slice(0, len) + "…" : flat;
-  const start = Math.max(0, flat.lastIndexOf(" ", Math.max(0, at - 50)));
-  const s = flat.slice(start, start + len).trim();
-  return (start > 0 ? "…" : "") + s + (start + len < flat.length ? "…" : "");
-}
-export function mark(html, terms) {
-  if (!terms.length) return html;
-  const re = new RegExp(`\\b(${terms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})\\w*`, "gi");
-  return html.replace(re, "<mark>$&</mark>");
-}
+export { snippet, mark, dlcBadge } from "./links.js";     // pour search-ui, trail-ui, tip
 
 
 // ------------------------------------------------------------------ fiche d'un texte
-// « The Old Hunters » à côté de la catégorie d'un texte ajouté par le DLC (game.json : ui.dlc_label)
-export function dlcBadge(d) {
-  return d.dlc ? `<span class="dlc-badge" title="Added with ${esc(S.ui.dlc_label || "the DLC")}">${esc(S.ui.dlc_label || "DLC")}</span>` : "";
-}
-
 export function select(i, { fly = true } = {}) {
   if (S.pathFrom >= 0 && i !== S.pathFrom) { showPath(S.pathFrom, i); return; }
   S.selected = i;
@@ -190,10 +169,7 @@ function address(e) {
   switch (e.view) {
     case "doc": return "#" + encodeURIComponent(S.docs[e.i].name);
     case "cluster": return "#group=" + encodeURIComponent(e.label);
-    case "entity": return "#entity=" + encodeURIComponent(e.name);
     case "path": return "#path=" + encodeURIComponent(S.docs[e.a].name) + "&" + encodeURIComponent(S.docs[e.b].name);
-    case "dialogue": return "#dialogue=" + encodeURIComponent(e.speaker);
-    case "tour": return `#tour=${encodeURIComponent(e.id)}/${e.k + 1}`;
     default: return null;
   }
 }
@@ -202,14 +178,9 @@ function oldBackLabel(e) {
   switch (e.view) {
     case "doc": return `Back to “${nameOf(S.docs[e.i])}”`;
     case "cluster": { const c = S.clusters.find(x => x.label === e.label); return `Back to the group “${c ? groupName(c) : e.label}”`; }
-    case "entity": return `Back to “${S.entities.find(x => x.name === e.name)?.label || e.name}”`;
     case "results": return `Back to the results for “${e.q}”`;
-    case "index": return "Back to characters and places";
     case "path": return "Back to the path";
-    case "dialogue": return `Back to the dialogue of ${e.speaker}`;
     case "trail": return "Back to your history";
-    case "tours": return "Back to the guided tours";
-    case "tour": return `Back to “${S.tours.find(t => t.id === e.id)?.title || e.id}”, step ${e.k + 1}`;
     default: return null;                       // avant : le panneau fermé, « Fermer » suffit
   }
 }
@@ -220,7 +191,7 @@ function readAddress(hash) {
   if (!name) return false;
   // liens anglais (#group=…) et anciens liens français (#groupe=…), toujours reconnus
   const arg = (...keys) => { const k = keys.find(p => name.startsWith(p + "=")); return k === undefined ? null : name.slice(k.length + 1); };
-  const group = arg("group", "groupe"), path = arg("path", "chemin"), entity = arg("entity", "entite");
+  const group = arg("group", "groupe"), path = arg("path", "chemin");
   if (group !== null) {
     const c = S.clusters.find(x => x.label === group);
     if (c) openCluster(c);
@@ -230,20 +201,6 @@ function readAddress(hash) {
     const [a, b] = hash.slice(hash.indexOf("=") + 1).split("&").map(decodeURIComponent)
       .map(n => S.docs.findIndex(x => x.name === n));
     if (a >= 0 && b >= 0) showPath(a, b);
-    return true;
-  }
-  if (name.startsWith("tour=")) {                 // #tour=paleblood/3
-    const [id, k] = name.slice(5).split("/");
-    openTour(id, (+k || 1) - 1);
-    return true;
-  }
-  if (name.startsWith("dialogue=")) {
-    openDialogue(name.slice(9));
-    return true;
-  }
-  if (entity !== null) {
-    const e = S.entities.find(x => x.name === entity);
-    if (e) openEntity(e);
     return true;
   }
   const d = S.docs.find(x => x.name === name);
@@ -258,14 +215,9 @@ addEventListener("hashchange", () => { if (S.docs.length && !poppedHere()) openF
 function reopen(e) {
   if (e.view === "doc") select(e.i);
   else if (e.view === "cluster") { const c = clusterById(e.id) || S.clusters.find(x => x.label === e.label); if (c) openCluster(c); }
-  else if (e.view === "entity") { const x = S.entities.find(y => y.name === e.name); if (x) openEntity(x); }
-  else if (e.view === "index") showIndex();
   else if (e.view === "path") showPath(e.a, e.b);
-  else if (e.view === "dialogue") openDialogue(e.speaker);
   else if (e.view === "results") { input.value = e.q; runSearch(); }
   else if (e.view === "trail") showTrail();
-  else if (e.view === "tours") showTours();
-  else if (e.view === "tour") openTour(e.id, e.k);
   else closePanel();
 }
 

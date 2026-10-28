@@ -5,7 +5,7 @@ import { S, panel, input, mode, esc, fold, resetContext, docRow, announce, dataP
 import { draw } from "./render.js";
 import { select, snippet, mark, panelTop, bindPanelTop } from "./panel.js";
 import { record, current, goBack } from "./nav.js";
-import { bindEntityButtons } from "./entities-ui.js";
+import { bindEntityButtons } from "./links.js";
 
 const TRANSFORMERS_URL = "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1";   // version exacte : une nouvelle version ne peut pas entrer dans la page à notre insu
 

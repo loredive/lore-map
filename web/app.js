@@ -8,10 +8,10 @@ import { buildIndex, runSearch, renderResults, resetSearch } from "./search-ui.j
 import { select, openCluster, closePanel, cancelPath, panelTop, bindPanelTop, oldPages } from "./panel.js";
 import { record, current, openEntry } from "./nav.js";
 import { showTip } from "./tip.js";
-import { openEntity } from "./entities-ui.js";
+import "./entities-ui.js";
 import { initTrail } from "./trail-ui.js";
 import { loadTours } from "./tours-ui.js";
-import { startPages, openFromAddress } from "./pages.js";
+import { startPages, openFromAddress, rerenderPage } from "./pages.js";
 import "./help-ui.js";
 
 // ------------------------------------------------------------------ pages du panneau
@@ -402,7 +402,7 @@ function buildLegend() {
 function refreshVisible() {
   if (S.results.length && S.selected < 0) renderResults();
   else if (S.cluster && S.selected < 0) openCluster(S.cluster, { fly: false, focus: false });
-  else if (S.entity && S.selected < 0) openEntity(S.entity, { fly: false, focus: false });
+  else if (S.entity && S.selected < 0) rerenderPage();
   draw();
 }
 

@@ -5,7 +5,7 @@ import { S, $, panel, esc, colorOf, resetContext, focusPanel, nameOf, textOf, gr
 import { draw } from "./render.js";
 import { panelTop, bindPanelTop, snippet } from "./panel.js";
 import { record, onRecord, openEntry } from "./nav.js";
-import { KIND_LABELS } from "./entities-ui.js";
+import { KIND_LABELS } from "./links.js";
 import { push, previousDoc, docKeys, recentDocs, serialize, parse } from "./trail.js";
 
 const UNDO_MS = 10000;           // « Undo » reste proposé après « Clear »

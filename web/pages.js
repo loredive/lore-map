@@ -18,6 +18,7 @@
 //   keepsFocus        true : garde le focus de la carte (le texte) ; sinon on repart d'un focus neuf
 //   panel             false : la page « panneau fermé »
 //   render(args)      allume ce qu'il faut sur la carte et rend { html, bind(panel), announce, frame }
+//                     (frame : les étoiles à cadrer, ou une fonction qui cadre elle-même)
 import { startNav, record, current, previous, goBack as navBack, replay } from "./nav.js";
 
 const kinds = new Map();
@@ -59,16 +60,20 @@ function show(name, args, { rerender = false, fly = true } = {}) {
   if (kind.panel !== false) {
     panel.innerHTML = deps.top(backLabel()) + page.html;
     deps.bindTop();
-    page.bind?.(panel);
     panel.scrollTop = 0;
+    page.bind?.(panel);                 // après : bind peut faire défiler jusqu'à un passage
     if (!rerender) deps.focus(page.announce);
-    if (!rerender && fly && page.frame) deps.frame(page.frame);
+    if (!rerender && fly && page.frame) typeof page.frame === "function" ? page.frame() : deps.frame(page.frame);
   }
   deps.draw();
 }
 
 // Ouvre une page : openPage("help"), openPage("cluster", { id, label }, { fly: false }).
-export function openPage(name, args = {}, opts = {}) { show(name, args, opts); }
+// Une sorte pas encore enregistrée passe par l'ancien code.
+export function openPage(name, args = {}, opts = {}) {
+  if (kinds.has(name)) show(name, args, opts);
+  else deps.fallback.reopen?.({ view: name, ...args });
+}
 
 // Réaffiche la page ouverte telle quelle (langue, catégories masquées).
 export function rerenderPage() {
