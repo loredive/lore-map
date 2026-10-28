@@ -135,6 +135,18 @@ test("re-render redraws in place: no record, no framing, no focus move", () => {
   assert.deepEqual(urls(), ["/", "#note=a"]);
 });
 
+test("a page can frame the camera itself, but not on re-render or when asked not to fly", () => {
+  const { log } = start();
+  const framed = [];
+  registerPage({ name: "route", render: a => ({ html: "<h2>Route</h2>", frame: () => framed.push(a.id) }) });
+  openPage("route", { id: "a" });
+  assert.deepEqual(framed, ["a"]);
+  assert.ok(!log.some(x => x.startsWith("frame")));   // pas le cadrage commun
+  rerenderPage();
+  openPage("route", { id: "b" }, { fly: false });
+  assert.deepEqual(framed, ["a"]);
+});
+
 test("a page keeps the focus only if it says so", () => {
   const { log } = start();
   openPage("note", { id: "a" });
