@@ -1,6 +1,6 @@
 """La page dans un vrai navigateur : chaque jeu se charge sans erreur ni ressource bloquée, la barre
 reste compacte, les nuages des groupes sont là même si les données arrivent lentement, et le menu du
-téléphone montre les catégories. Lancé par la CI avant chaque déploiement.
+téléphone montre les catégories, chaque adresse ouvre sa page et Retour mène où il faut. Lancé par la CI avant chaque déploiement.
 
     uv run --no-project --with pytest --with playwright==1.64.0 pytest tests/e2e
     (PLAYWRIGHT_CHROMIUM=<chemin d'un chromium> pour réutiliser un navigateur déjà installé)
@@ -103,3 +103,114 @@ def test_views_and_language_switch(browser, site):
     english = page.evaluate("async () => (await import('./state.js')).S.clusters[0].label")
     assert title != english
     assert problems == []
+
+
+# ------------------------------------------------------------------ adresses et Retour
+# Ce que montre chaque adresse d'aujourd'hui, et où mène Retour : le filet de sécurité avant de
+# déplacer le code des pages. Les noms viennent des données de chaque jeu (web/data/<jeu>/).
+ADDRESSES = {
+    "bloodborne": [
+        ("text", "#Hunter's%20Mark", "doc", "Hunter's Mark"),
+        ("group", "#group=Valtr%20and%20the%20League", "cluster", "Valtr and the League"),
+        ("old-french-group", "#groupe=Valtr%20and%20the%20League", "cluster", "Valtr and the League"),
+        ("entity", "#entity=Gehrman", "entity", "Gehrman"),
+        ("path", "#path=Hunter's%20Mark&Bold%20Hunter's%20Mark", "path", "Hunter's Mark → Bold Hunter's Mark"),
+        ("dialogue", "#dialogue=Chapel%20Dweller", "dialogue", "Chapel Dweller"),
+        ("tour", "#tour=paleblood/3", "tour", "Paleblood and the Moon"),
+    ],
+    "elden-ring": [
+        ("text", "#Tarnished's%20Furled%20Finger", "doc", "Tarnished's Furled Finger"),
+        ("group", "#group=Bell%20Bearings%20of%20the%20departed", "cluster", "Bell Bearings of the departed"),
+        ("old-french-group", "#groupe=Bell%20Bearings%20of%20the%20departed", "cluster", "Bell Bearings of the departed"),
+        ("entity", "#entity=Marika", "entity", "Marika"),
+        ("path", "#path=Tarnished's%20Furled%20Finger&About%20Cooperative%20Multiplayer", "path",
+         "Tarnished's Furled Finger → About Cooperative Multiplayer"),
+        ("dialogue", "#dialogue=Ranni%20the%20Witch", "dialogue", "Ranni the Witch"),
+        ("tour", "#tour=story/3", "tour", "The story of the Lands Between"),
+    ],
+}
+FIRST_TEXT = {"bloodborne": "Hunter's Mark", "elden-ring": "Tarnished's Furled Finger"}
+
+
+def shown(page):
+    """La page du panneau : [sorte de page, titre], ou None quand le panneau est fermé."""
+    return page.evaluate("""() => { const p = document.querySelector('#panel');
+        return p.hidden ? null : [p.dataset.view, p.querySelector('h2')?.textContent.trim() ?? null]; }""")
+
+
+def wait_shown(page, expected):
+    """Attend que le panneau montre `expected` (Retour et la recherche sont asynchrones), puis le vérifie."""
+    want = list(expected) if expected else None
+    try:
+        page.wait_for_function("""w => { const p = document.querySelector('#panel');
+            return w === null ? p.hidden
+                 : !p.hidden && p.dataset.view === w[0] && p.querySelector('h2')?.textContent.trim() === w[1]; }""",
+                               arg=want, timeout=5000)
+    except sync_api.TimeoutError:
+        pass
+    assert shown(page) == want
+
+
+@pytest.mark.parametrize("game", GAMES)
+@pytest.mark.parametrize("kind", range(7), ids=[a[0] for a in ADDRESSES["bloodborne"]])
+def test_address_opens_its_page(browser, site, game, kind):
+    _, address, view, title = ADDRESSES[game][kind]
+    page, problems = open_page(browser, f"{site}?game={game}{address}", DESKTOP)
+    assert shown(page) == [view, title]
+    if view == "tour":
+        assert "step 3 of" in page.text_content("#panel .cat")
+    assert problems == []
+
+
+@pytest.mark.parametrize("game", GAMES)
+def test_back_label_names_the_previous_page(browser, site, game):
+    first = FIRST_TEXT[game]
+    page, _ = open_page(browser, f"{site}?game={game}{ADDRESSES[game][0][1]}", DESKTOP)
+    assert shown(page) == ["doc", first]
+    assert page.query_selector("#panel .panel-top .back") is None      # premier pas : pas de Retour
+    echo = page.text_content("#panel .echoes button .name").strip()
+    page.click("#panel .echoes button")
+    wait_shown(page, ("doc", echo))
+    assert page.text_content("#panel .panel-top .back").strip() == f"Back to “{first}”"
+    page.go_back()
+    wait_shown(page, ("doc", first))
+    page.go_forward()
+    wait_shown(page, ("doc", echo))
+    page.click("#panel .panel-top .back")                               # « Retour à … » fait pareil
+    wait_shown(page, ("doc", first))
+
+
+@pytest.mark.parametrize("game", GAMES)
+def test_back_from_the_first_page_closes_the_panel(browser, site, game):
+    page, _ = open_page(browser, f"{site}?game={game}", DESKTOP)
+    assert shown(page) is None
+    page.click("#help")
+    wait_shown(page, ("help", "How to read this map"))
+    page.go_back()
+    wait_shown(page, None)
+    assert page.url.startswith(site), page.url                         # toujours sur le site
+
+
+@pytest.mark.parametrize("game", GAMES)
+def test_back_after_closing_reopens_the_page(browser, site, game):
+    first = FIRST_TEXT[game]
+    page, _ = open_page(browser, f"{site}?game={game}{ADDRESSES[game][0][1]}", DESKTOP)
+    page.click("#panel .panel-top .close")
+    wait_shown(page, None)
+    page.go_back()
+    wait_shown(page, ("doc", first))
+
+
+@pytest.mark.parametrize("game", GAMES)
+def test_typing_a_search_is_one_step(browser, site, game):
+    first = FIRST_TEXT[game]
+    page, _ = open_page(browser, f"{site}?game={game}{ADDRESSES[game][0][1]}", DESKTOP)
+    # la recherche par le sens téléchargerait un modèle : sans réseau, elle se rabat sur les mots
+    page.route(lambda url: not url.startswith(site), lambda route: route.abort())
+    page.click("#q")
+    page.keyboard.type("blood", delay=300)          # plus lent que l'attente de la recherche : un rendu par lettre
+    page.wait_for_function("() => document.querySelector('#panel').dataset.view === 'results'")
+    page.wait_for_timeout(500)
+    page.go_back()
+    wait_shown(page, ("doc", first))
+    assert page.input_value("#q") == ""
