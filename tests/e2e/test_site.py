@@ -192,6 +192,25 @@ def test_back_from_the_first_page_closes_the_panel(browser, site, game):
 
 
 @pytest.mark.parametrize("game", GAMES)
+def test_back_to_and_from_help(browser, site, game):
+    first = FIRST_TEXT[game]
+    page, problems = open_page(browser, f"{site}?game={game}{ADDRESSES[game][0][1]}", DESKTOP)
+    page.click("#help")
+    wait_shown(page, ("help", "How to read this map"))
+    assert page.text_content("#panel .panel-top .back").strip() == f"Back to “{first}”"
+    page.click("#history")
+    wait_shown(page, ("trail", "History"))
+    assert page.text_content("#panel .panel-top .back").strip() == "Back to help"
+    page.click("#panel .panel-top .back")
+    wait_shown(page, ("help", "How to read this map"))
+    page.go_back()
+    wait_shown(page, ("doc", first))
+    page.go_forward()
+    wait_shown(page, ("help", "How to read this map"))
+    assert problems == []
+
+
+@pytest.mark.parametrize("game", GAMES)
 def test_back_after_closing_reopens_the_page(browser, site, game):
     first = FIRST_TEXT[game]
     page, _ = open_page(browser, f"{site}?game={game}{ADDRESSES[game][0][1]}", DESKTOP)
