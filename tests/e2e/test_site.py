@@ -5,6 +5,7 @@ téléphone montre les catégories, chaque adresse ouvre sa page et Retour mène
     uv run --no-project --with pytest --with playwright==1.64.0 pytest tests/e2e
     (PLAYWRIGHT_CHROMIUM=<chemin d'un chromium> pour réutiliser un navigateur déjà installé)
 """
+import json
 import os
 import socket
 import subprocess
@@ -49,10 +50,13 @@ def browser():
         b.close()
 
 
-def open_page(browser, url, device, slow_data=False):
+def open_page(browser, url, device, slow_data=False, storage=None):
     """La page chargée, avec la liste de ce qui a mal tourné : erreurs JavaScript, ressources refusées par
     la politique de sécurité, requêtes en échec (sauf les icônes, absentes avant le déploiement)."""
     context = browser.new_context(**device)
+    if storage:     # localStorage du site avant tout chargement (une History enregistrée lors d'une visite passée)
+        context.add_init_script("".join(f"localStorage.setItem({json.dumps(k)}, {json.dumps(v)});"
+                                        for k, v in storage.items()))
     page = context.new_page()
     problems = []
     page.on("pageerror", lambda e: problems.append(f"page error: {e}"))
@@ -199,7 +203,7 @@ def test_back_to_and_from_help(browser, site, game):
     wait_shown(page, ("help", "How to read this map"))
     assert page.text_content("#panel .panel-top .back").strip() == f"Back to “{first}”"
     page.click("#history")
-    wait_shown(page, ("trail", "History"))
+    wait_shown(page, ("history", "History"))
     assert page.text_content("#panel .panel-top .back").strip() == "Back to help"
     page.click("#panel .panel-top .back")
     wait_shown(page, ("help", "How to read this map"))
@@ -233,3 +237,35 @@ def test_typing_a_search_is_one_step(browser, site, game):
     page.go_back()
     wait_shown(page, ("doc", first))
     assert page.input_value("#q") == ""
+
+
+@pytest.mark.parametrize("game", GAMES)
+def test_saved_history_reopens_its_steps(browser, site, game):
+    first = FIRST_TEXT[game]
+    # le format enregistré d'aujourd'hui, sous la même clé : une History d'une visite passée se relit telle quelle
+    saved = json.dumps({"v": 2, "steps": [{"kind": "doc", "key": first}], "shown": False})
+    page, problems = open_page(browser, f"{site}?game={game}", DESKTOP, storage={f"lore-map:trail:{game}": saved})
+    page.click("#history")
+    wait_shown(page, ("history", "History"))
+    assert page.text_content("#panel .trail-list .name").strip() == first
+    page.click("#panel .tcontinue")
+    wait_shown(page, ("doc", first))
+    assert page.text_content("#panel .panel-top .back").strip() == "Back to your history"
+    page.go_back()
+    wait_shown(page, ("history", "History"))
+    assert problems == []
+
+
+@pytest.mark.parametrize("game", GAMES)
+def test_back_to_the_results(browser, site, game):
+    page, _ = open_page(browser, f"{site}?game={game}", DESKTOP)
+    page.route(lambda url: not url.startswith(site), lambda route: route.abort())
+    page.fill("#q", "blood")
+    page.wait_for_function("() => document.querySelector('#panel').dataset.view === 'results'")
+    name = page.text_content("#panel .results button .name").strip()
+    page.click("#panel .results button")
+    wait_shown(page, ("doc", name))
+    assert page.text_content("#panel .panel-top .back").strip() == "Back to the results for “blood”"
+    page.click("#panel .panel-top .back")
+    page.wait_for_function("() => document.querySelector('#panel').dataset.view === 'results'")
+    assert page.input_value("#q") == "blood"
