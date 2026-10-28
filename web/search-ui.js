@@ -100,7 +100,6 @@ function offerOrApply(hybrid, q) {
   } else {
     showRefined(hybrid, q);
     panel.querySelector(".count")?.insertAdjacentHTML("beforeend", ' <span class="refined">List refined by meaning.</span>');
-    announce("List refined by meaning");
   }
 }
 
@@ -159,6 +158,8 @@ export function applyResults(ranked, q) {
 function showRefined(ranked, q) {
   keepResults(ranked, q);
   rerenderPage();
+  const found = S.results.filter(i => !isHidden(S.docs[i])).length;
+  if (found) announce(`${found} texts found`);       // comme la première liste
 }
 
 export async function embedQuery(q) {
