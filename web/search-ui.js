@@ -30,6 +30,8 @@ for (const ev of ["wheel", "touchmove", "pointerdown", "keydown"]) {
   panel.addEventListener(ev, () => { if (panel.dataset.page === "results") touched = true; }, { passive: true });
 }
 input.addEventListener("input", () => { clearTimeout(debounce); debounce = setTimeout(runSearch, 180); });
+// le formulaire n'est jamais envoyé (la touche « OK » d'un clavier de téléphone aussi)
+input.form.addEventListener("submit", e => e.preventDefault());
 // Entrée : la recherche part tout de suite et le focus passe au premier résultat
 input.addEventListener("keydown", e => {
   if (e.key !== "Enter") return;
