@@ -22,8 +22,8 @@ registerPage({
   },
   backLabel: () => "Back to the path",
   clearsSearch: true,   // la recherche a servi à choisir l'arrivée
+  onOpen: cancelPath,   // le chemin attendu est tracé
   render: ({ a, b }) => {
-    cancelPath();
     S.echoAdj ||= echoGraph(S.docs.map(d => d.echoes));
     const path = echoPath(S.echoAdj, a, b);
     S.path = path; S.pathSet = path ? new Set(path) : null;

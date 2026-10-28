@@ -19,6 +19,8 @@
 //   clearsSearch      true : l'ouvrir vide la recherche (le chemin : elle a servi à choisir l'arrivée)
 //   divert(args)      { page, …args } : ouvrir plutôt cette page-là (un texte choisi quand un chemin
 //                     attend son arrivée ouvre le chemin) ; null : rien à détourner
+//   onOpen(args)      ce qu'elle fait en s'ouvrant, hors de la carte et du panneau (annuler un chemin en
+//                     attente) ; pas refait quand on la réaffiche
 //   panel             false : la page « panneau fermé »
 //   render(args)      allume ce qu'il faut sur la carte et rend { html, bind(panel), announce, frame } ;
 //                     frame : les étoiles à cadrer (deps.frame), ou une fonction qui cadre elle-même (le chemin)
@@ -54,15 +56,18 @@ function show(e, { rerender = false, fly = true } = {}) {
   if (!kind) return;
   if (!kind.keepsFocus) deps.resetFocus();
   if (!rerender && kind.clearsSearch) deps.clearSearch?.();
+  if (!rerender) kind.onOpen?.(args);
   const page = kind.render(args) || {};
   panel.hidden = kind.panel === false;
   panel.dataset.page = kind.panel === false ? "" : name;
   if (!rerender) record({ page: name, ...args });
   if (kind.panel !== false) {
+    const scroll = rerender ? panel.scrollTop : 0;    // réaffichée : on reste où on lisait
     panel.innerHTML = deps.top(backLabel()) + page.html;
     deps.bindTop();
     panel.scrollTop = 0;
     page.bind?.(panel);                 // après : bind peut faire défiler jusqu'à un passage
+    if (rerender) panel.scrollTop = scroll;
     if (!rerender) deps.focus(page.announce);
     if (!rerender && fly && page.frame) typeof page.frame === "function" ? page.frame() : deps.frame(page.frame);
   }

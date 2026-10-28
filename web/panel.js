@@ -33,7 +33,7 @@ export function bindPanelTop() {
 }
 
 // Le panneau fermé est une page : fermer est une étape, Retour rouvre ce qu'on vient de fermer.
-registerPage({ name: "none", panel: false, render: () => { cancelPath(); return {}; } });
+registerPage({ name: "none", panel: false, onOpen: cancelPath, render: () => ({}) });
 
 // lien collé dans la barre d'adresse sans recharger la page (replaceState ne déclenche pas l'événement)
 addEventListener("hashchange", () => { if (S.docs.length && !poppedHere()) openFromAddress(location.hash); });
