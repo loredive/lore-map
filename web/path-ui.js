@@ -5,7 +5,8 @@ import { S, esc, docRow, nameOf, textOf } from "./state.js";
 import { fitPoints } from "./render.js";
 import { echoGraph, echoPath } from "./graph.js";
 import { registerPage } from "./pages.js";
-import { select, snippet, cancelPath } from "./panel.js";
+import { select, cancelPath } from "./panel.js";
+import { snippet } from "./links.js";
 import { resetSearch } from "./search-ui.js";
 
 const indexOf = name => S.docs.findIndex(x => x.name === name);

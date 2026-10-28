@@ -6,7 +6,7 @@ import { draw } from "./render.js";
 import { select, snippet, mark } from "./panel.js";
 import { current, goBack } from "./nav.js";
 import { registerPage, openPage } from "./pages.js";
-import { bindEntityButtons } from "./entities-ui.js";
+import { bindEntityButtons } from "./links.js";
 
 const TRANSFORMERS_URL = "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1";   // version exacte : une nouvelle version ne peut pas entrer dans la page à notre insu
 

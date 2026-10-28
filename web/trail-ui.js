@@ -6,7 +6,7 @@ import { draw } from "./render.js";
 import { snippet } from "./panel.js";
 import { onRecord, openEntry } from "./nav.js";
 import { registerPage, openPage, rerenderPage } from "./pages.js";
-import { KIND_LABELS } from "./entities-ui.js";
+import { KIND_LABELS } from "./links.js";
 import { push, previousDoc, docKeys, recentDocs, serialize, parse } from "./trail.js";
 
 const UNDO_MS = 10000;           // « Undo » reste proposé après « Clear »

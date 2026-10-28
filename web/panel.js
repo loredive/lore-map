@@ -1,11 +1,8 @@
 // Le panneau de droite : en-tête commun, liens (#…), et ce que partagent les pages de textes.
 import { S, $, panel, esc, clusterById } from "./state.js";
 import { draw, focusDoc } from "./render.js";
-import { openEntity, showIndex } from "./entities-ui.js";
 import { poppedHere } from "./nav.js";
 import { registerPage, backLabel, goBack, closePage, openFromAddress, openPage } from "./pages.js";
-import { openDialogue } from "./dialogue-ui.js";
-import { showTours, openTour } from "./tours-ui.js";
 
 // Mode lecture : le panneau s'élargit (environ la moitié de l'écran) ; retenu d'une visite à l'autre.
 const READING_KEY = "lore-map:reading";
@@ -34,29 +31,10 @@ export function bindPanelTop() {
   panel.querySelector(".panel-top .close").addEventListener("click", closePage);
 }
 
-export function snippet(text, terms, len = 150) {
-  const flat = text.replace(/\s+/g, " ");
-  const low = flat.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
-  let at = -1;
-  for (const t of terms) { at = low.indexOf(t); if (at >= 0) break; }
-  if (at < 0) return flat.length > len ? flat.slice(0, len) + "…" : flat;
-  const start = Math.max(0, flat.lastIndexOf(" ", Math.max(0, at - 50)));
-  const s = flat.slice(start, start + len).trim();
-  return (start > 0 ? "…" : "") + s + (start + len < flat.length ? "…" : "");
-}
-export function mark(html, terms) {
-  if (!terms.length) return html;
-  const re = new RegExp(`\\b(${terms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})\\w*`, "gi");
-  return html.replace(re, "<mark>$&</mark>");
-}
+export { snippet, mark, dlcBadge } from "./links.js";     // pour search-ui, trail-ui, tip
 
 
 // ------------------------------------------------------------------ textes et groupes
-// « The Old Hunters » à côté de la catégorie d'un texte ajouté par le DLC (game.json : ui.dlc_label)
-export function dlcBadge(d) {
-  return d.dlc ? `<span class="dlc-badge" title="Added with ${esc(S.ui.dlc_label || "the DLC")}">${esc(S.ui.dlc_label || "DLC")}</span>` : "";
-}
-
 // Ouvre la page d'un texte (text-ui.js) ; si un chemin attend son second texte, ouvre plutôt le chemin.
 export function select(i, opts) {
   if (S.pathFrom >= 0 && i !== S.pathFrom) openPage("path", { a: S.pathFrom, b: i });
@@ -71,68 +49,13 @@ registerPage({ name: "none", panel: false, render: () => { cancelPath(); return 
 export const closePanel = closePage;
 
 
-// ------------------------------------------------------------------ pages pas encore enregistrées
-// L'ancien code des pages que pages.js ne connaît pas encore : il s'en sert en dernier recours.
-// Chaque sorte de page qui s'enregistre auprès de pages.js disparaît de ces aiguillages.
-
-// adresse d'une entrée de l'historique ; null : pas d'adresse propre (résultats, index, rien)
-function address(e) {
-  switch (e.view) {
-    case "entity": return "#entity=" + encodeURIComponent(e.name);
-    case "dialogue": return "#dialogue=" + encodeURIComponent(e.speaker);
-    case "tour": return `#tour=${encodeURIComponent(e.id)}/${e.k + 1}`;
-    default: return null;
-  }
-}
-
-function oldBackLabel(e) {
-  switch (e.view) {
-    case "entity": return `Back to “${S.entities.find(x => x.name === e.name)?.label || e.name}”`;
-    case "index": return "Back to characters and places";
-    case "dialogue": return `Back to the dialogue of ${e.speaker}`;
-    case "tours": return "Back to the guided tours";
-    case "tour": return `Back to “${S.tours.find(t => t.id === e.id)?.title || e.id}”, step ${e.k + 1}`;
-    default: return null;                       // avant : le panneau fermé, « Fermer » suffit
-  }
-}
-
-// ouvre la page d'une adresse ; false si aucune ancienne sorte de page ne la reconnaît
-function readAddress(hash) {
-  const name = decodeURIComponent(hash.slice(1));
-  if (!name) return false;
-  // liens anglais (#entity=…) et anciens liens français (#entite=…), toujours reconnus
-  const arg = (...keys) => { const k = keys.find(p => name.startsWith(p + "=")); return k === undefined ? null : name.slice(k.length + 1); };
-  const entity = arg("entity", "entite");
-  if (name.startsWith("tour=")) {                 // #tour=paleblood/3
-    const [id, k] = name.slice(5).split("/");
-    openTour(id, (+k || 1) - 1);
-    return true;
-  }
-  if (name.startsWith("dialogue=")) {
-    openDialogue(name.slice(9));
-    return true;
-  }
-  if (entity !== null) {
-    const e = S.entities.find(x => x.name === entity);
-    if (e) openEntity(e);
-    return true;
-  }
-  return false;
-}
-
+// ------------------------------------------------------------------ adresses
 // lien collé dans la barre d'adresse sans recharger la page (replaceState ne déclenche pas l'événement)
 addEventListener("hashchange", () => { if (S.docs.length && !poppedHere()) openFromAddress(location.hash); });
 
-// Rouvre une entrée de l'historique (bouton Retour, « Retour à … »)
-function reopen(e) {
-  if (e.view === "entity") { const x = S.entities.find(y => y.name === e.name); if (x) openEntity(x); }
-  else if (e.view === "index") showIndex();
-  else if (e.view === "dialogue") openDialogue(e.speaker);
-  else if (e.view === "tours") showTours();
-  else if (e.view === "tour") openTour(e.id, e.k);
-}
-
-export const oldPages = { address, backLabel: oldBackLabel, reopen, readAddress };
+// L'ancien code des pages que pages.js ne connaissait pas encore : toutes les sortes de pages
+// sont désormais enregistrées, il ne reste que ce dernier recours vide (à retirer, ticket 07).
+export const oldPages = { address: () => null, backLabel: () => null, reopen() {}, readAddress: () => false };
 
 
 // ------------------------------------------------------------------ groupe d'un texte

@@ -121,6 +121,7 @@ ADDRESSES = {
         ("path", "#path=Hunter's%20Mark&Bold%20Hunter's%20Mark", "path", "Hunter's Mark → Bold Hunter's Mark"),
         ("dialogue", "#dialogue=Chapel%20Dweller", "dialogue", "Chapel Dweller"),
         ("tour", "#tour=paleblood/3", "tour", "Paleblood and the Moon"),
+        ("old-french-entity", "#entite=Gehrman", "entity", "Gehrman"),
     ],
     "elden-ring": [
         ("text", "#Tarnished's%20Furled%20Finger", "doc", "Tarnished's Furled Finger"),
@@ -131,8 +132,11 @@ ADDRESSES = {
          "Tarnished's Furled Finger → About Cooperative Multiplayer"),
         ("dialogue", "#dialogue=Ranni%20the%20Witch", "dialogue", "Ranni the Witch"),
         ("tour", "#tour=story/3", "tour", "The story of the Lands Between"),
+        ("old-french-entity", "#entite=Marika", "entity", "Marika"),
     ],
 }
+TOURS = {"bloodborne": ("paleblood", "Paleblood and the Moon"), "elden-ring": ("story", "The story of the Lands Between")}
+ENTITIES = {"bloodborne": "Gehrman", "elden-ring": "Marika"}
 FIRST_TEXT = {"bloodborne": "Hunter's Mark", "elden-ring": "Tarnished's Furled Finger"}
 
 
@@ -156,7 +160,7 @@ def wait_shown(page, expected):
 
 
 @pytest.mark.parametrize("game", GAMES)
-@pytest.mark.parametrize("kind", range(7), ids=[a[0] for a in ADDRESSES["bloodborne"]])
+@pytest.mark.parametrize("kind", range(len(ADDRESSES["bloodborne"])), ids=[a[0] for a in ADDRESSES["bloodborne"]])
 def test_address_opens_its_page(browser, site, game, kind):
     _, address, view, title = ADDRESSES[game][kind]
     page, problems = open_page(browser, f"{site}?game={game}{address}", DESKTOP)
@@ -222,6 +226,68 @@ def test_back_after_closing_reopens_the_page(browser, site, game):
     wait_shown(page, None)
     page.go_back()
     wait_shown(page, ("doc", first))
+
+
+@pytest.mark.parametrize("game", GAMES)
+def test_back_from_a_tour_step_names_the_step(browser, site, game):
+    tour, title = TOURS[game]
+    page, problems = open_page(browser, f"{site}?game={game}#tour={tour}/3", DESKTOP)
+    page.click("#panel .tnext")
+    page.wait_for_function("() => document.querySelector('#panel .cat').textContent.includes('step 4 of')")
+    assert page.url.endswith(f"#tour={tour}/4")
+    assert page.text_content("#panel .panel-top .back").strip() == f"Back to “{title}”, step 3"
+    page.go_back()
+    page.wait_for_function("() => document.querySelector('#panel .cat').textContent.includes('step 3 of')")
+    assert problems == []
+
+
+@pytest.mark.parametrize("game", GAMES)
+def test_links_between_characters_index_and_dialogues(browser, site, game):
+    name = ENTITIES[game]
+    page, problems = open_page(browser, f"{site}?game={game}#entity={name}", DESKTOP)
+    page.click("#panel .to-index")
+    wait_shown(page, ("index", "Characters and places"))
+    assert page.text_content("#panel .panel-top .back").strip() == f"Back to “{name}”"
+    speaker = page.get_attribute("#panel button[data-sp]", "data-sp")
+    page.click("#panel button[data-sp]")
+    wait_shown(page, ("dialogue", speaker))
+    assert page.text_content("#panel .panel-top .back").strip() == "Back to characters and places"
+    passage = page.get_attribute("#panel .pnum", "data-i")
+    page.click("#panel .pnum")
+    page.wait_for_function("() => document.querySelector('#panel').dataset.view === 'doc'")
+    assert page.text_content("#panel .panel-top .back").strip() == f"Back to the dialogue of {speaker}"
+    page.click("#panel button.tdial")                  # le dialogue du passage, celui-ci mis en avant
+    wait_shown(page, ("dialogue", speaker))
+    assert page.get_attribute(f"#panel #p{passage}", "class") == "here"
+    page.go_back()
+    page.go_back()
+    wait_shown(page, ("dialogue", speaker))
+    page.go_back()
+    wait_shown(page, ("index", "Characters and places"))
+    page.go_back()
+    wait_shown(page, ("entity", name))
+    assert problems == []
+
+
+@pytest.mark.parametrize("game", GAMES)
+def test_tour_list_and_steps(browser, site, game):
+    tour, title = TOURS[game]
+    page, problems = open_page(browser, f"{site}?game={game}", DESKTOP)
+    page.click("#tours")
+    wait_shown(page, ("tours", "Guided tours"))
+    page.click(f"#panel button[data-t='{tour}']")
+    wait_shown(page, ("tour", title))
+    assert page.url.endswith(f"#tour={tour}/1")
+    assert page.text_content("#panel .panel-top .back").strip() == "Back to the guided tours"
+    text = page.text_content("#panel .tour-text h3").strip()
+    page.click("#panel .topen")
+    wait_shown(page, ("doc", text))
+    assert page.text_content("#panel .panel-top .back").strip() == f"Back to “{title}”, step 1"
+    page.go_back()
+    wait_shown(page, ("tour", title))
+    page.go_back()
+    wait_shown(page, ("tours", "Guided tours"))
+    assert problems == []
 
 
 @pytest.mark.parametrize("game", GAMES)

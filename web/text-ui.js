@@ -5,9 +5,8 @@ import { tokenize } from "./search.js";
 import { S, esc, colorOf, clusterById, portrait, nameOf, textOf, textLang, groupName } from "./state.js";
 import { setHover } from "./render.js";
 import { registerPage, openPage } from "./pages.js";
-import { select, startPath, groupOf, dlcBadge } from "./panel.js";
-import { entityChips, bindEntityButtons, linkText } from "./entities-ui.js";
-import { dialogueButtons, bindDialogueButtons } from "./dialogue-ui.js";
+import { select, startPath, groupOf } from "./panel.js";
+import { entityChips, bindEntityButtons, linkText, dialogueButtons, bindDialogueButtons, dlcBadge } from "./links.js";
 import { tipAtStar } from "./tip.js";
 
 registerPage({

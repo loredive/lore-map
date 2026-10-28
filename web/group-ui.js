@@ -1,7 +1,8 @@
 // La page d'un groupe de textes : son nom, sa description, ses textes (ceux du cœur d'abord).
 import { S, esc, clusterById, docRow, isHidden, nameOf, textOf, groupName, groupDesc } from "./state.js";
 import { registerPage } from "./pages.js";
-import { select, snippet } from "./panel.js";
+import { select } from "./panel.js";
+import { snippet } from "./links.js";
 
 const groupOfArgs = ({ id, label }) => clusterById(id) || S.clusters.find(x => x.label === label);
 

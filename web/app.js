@@ -8,7 +8,7 @@ import { buildIndex, runSearch, renderResults, resetSearch } from "./search-ui.j
 import { select, openCluster, closePanel, cancelPath, panelTop, bindPanelTop, oldPages } from "./panel.js";
 import { record, current, openEntry } from "./nav.js";
 import { showTip } from "./tip.js";
-import { openEntity } from "./entities-ui.js";
+import "./entities-ui.js";
 import { initTrail } from "./trail-ui.js";
 import { loadTours } from "./tours-ui.js";
 import { startPages, openFromAddress, rerenderPage } from "./pages.js";
@@ -19,7 +19,7 @@ import "./path-ui.js";
 
 // ------------------------------------------------------------------ pages du panneau
 // pages.js reçoit ici tout ce qui touche au DOM et à l'état partagé ; les sortes de pages se sont
-// enregistrées en important leur module (help-ui.js, text-ui.js…), les autres passent encore par panel.js.
+// enregistrées en important leur module (help-ui.js, text-ui.js, entities-ui.js…).
 startPages({
   panel,
   browser: {
@@ -404,8 +404,7 @@ function buildLegend() {
 // une catégorie (ou le DLC) masquée ou réaffichée : les listes ouvertes et la carte suivent
 function refreshVisible() {
   if (S.results.length && S.selected < 0) renderResults();
-  else if (S.cluster && S.selected < 0) rerenderPage();
-  else if (S.entity && S.selected < 0) openEntity(S.entity, { fly: false, focus: false });
+  else if ((S.cluster || S.entity) && S.selected < 0) rerenderPage();
   draw();
 }
 

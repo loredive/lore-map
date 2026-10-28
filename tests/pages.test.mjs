@@ -201,6 +201,13 @@ test("page kinds not registered go through the old code", () => {
   assert.deepEqual(reopened, [{ view: "old", n: "3", q: "" }]);
 });
 
+test("opening a page kind not registered yet hands it to the old code", () => {
+  const reopened = [];
+  start({ reopen: e => reopened.push(e) });
+  openPage("old", { n: 4 });
+  assert.deepEqual(reopened, [{ view: "old", n: 4 }]);
+});
+
 test("a History step maps to its page and back", () => {
   start();
   assert.deepEqual(stepOf({ view: "note", id: "a", q: "" }), { kind: "page", key: "a" });
