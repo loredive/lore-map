@@ -1,45 +1,21 @@
-// L'historique de lecture : enregistré par jeu dans le navigateur, montré sur la carte (sky.js :
-// drawTrail, les textes déjà lus) et en entier dans le panneau « History » (bouton de la barre).
-// Chaque fiche ouverte (texte, entité, groupe, dialogue) est un pas ; nav.js nous les signale.
+// L'History : les pages ouvertes, enregistrées par jeu dans le navigateur, montrées sur la carte
+// (sky.js : drawTrail, les textes déjà lus) et en entier dans la page « History » (bouton de la barre).
+// Les sortes de pages déclarent le pas qu'elles ajoutent (texte, entité, groupe, dialogue ; une étape
+// de visite compte comme son texte) et la page que rouvre un pas ; pages.js nous signale chaque pas.
 import { S, $, panel, esc, colorOf, nameOf, textOf, groupName } from "./state.js";
 import { draw } from "./render.js";
-import { snippet } from "./panel.js";
-import { onRecord, openEntry } from "./nav.js";
-import { registerPage, openPage, rerenderPage } from "./pages.js";
-import { KIND_LABELS } from "./links.js";
+import { registerPage, openPage, rerenderPage, onStep, openStep, pageOfStep } from "./pages.js";
+import { KIND_LABELS, snippet } from "./links.js";
 import { push, previousDoc, docKeys, recentDocs, serialize, parse } from "./trail.js";
 
 const UNDO_MS = 10000;           // « Undo » reste proposé après « Clear »
-const storeKey = () => `lore-map:trail:${S.game}`;
+const storeKey = () => `lore-map:trail:${S.game}`;   // clé d'avant le nom History : la garder
 let steps = [], docIndex = new Map();
-let cleared = null, undoTimer = 0;   // parcours effacé, récupérable quelques secondes
+let cleared = null, undoTimer = 0;   // History effacée, récupérable quelques secondes
 
 const entityOf = name => S.entities.find(e => e.name === name);
 const clusterOf = label => S.clusters.find(c => c.label === label);
 
-function exists(s) {
-  return s.kind === "doc" ? docIndex.has(s.key) : s.kind === "entity" ? !!entityOf(s.key)
-    : s.kind === "cluster" ? !!clusterOf(s.key) : S.dialogues.has(s.key);
-}
-
-// entrée de l'historique (nav.js) -> pas du parcours, ou null pour une page qui n'en est pas un
-function stepOf(e) {
-  switch (e.view) {
-    case "doc": case "tour": return { kind: "doc", key: S.docs[e.i].name };   // une étape de visite : un texte lu
-    case "entity": return { kind: "entity", key: e.name };
-    case "cluster": return { kind: "cluster", key: e.label };
-    case "dialogue": return { kind: "dialogue", key: e.speaker };
-    default: return null;
-  }
-}
-function entryOf(s) {
-  switch (s.kind) {
-    case "doc": return { view: "doc", i: docIndex.get(s.key) };
-    case "entity": return { view: "entity", name: s.key };
-    case "cluster": { const c = clusterOf(s.key); return { view: "cluster", id: c.id, label: c.label }; }
-    default: return { view: "dialogue", speaker: s.key };
-  }
-}
 function labelOf(s) {
   return s.kind === "entity" ? entityOf(s.key)?.label || s.key : s.kind === "dialogue" ? `Dialogue: ${s.key}`
     : s.kind === "doc" ? nameOf(S.docs[docIndex.get(s.key)]) : groupName(clusterOf(s.key));
@@ -49,14 +25,13 @@ function kindOf(s) {
     ? KIND_LABELS[entityOf(s.key).kind][0] : s.kind === "cluster" ? "Group of texts" : "Dialogue";
 }
 
-export function initTrail() {
+export function initHistory() {
   docIndex = new Map(S.docs.map(d => [d.name, d.i]));
   let saved = parse(null);
   try { saved = parse(localStorage.getItem(storeKey())); } catch { /* stockage bloqué */ }
-  steps = saved.steps.filter(exists);      // un texte renommé depuis la dernière visite disparaît
+  steps = saved.steps.filter(s => pageOfStep(s));   // un texte renommé depuis la dernière visite disparaît
   S.trailShown = saved.shown;
-  onRecord(e => {
-    const s = stepOf(e);
+  onStep(s => {
     if (s) { steps = push(steps, s); cleared = null; }
     update(!!s);
     // une page qui n'est pas un pas (recherche, aide, panneau fermé) : plus de « d'où l'on vient »
@@ -78,14 +53,14 @@ function update(save = true) {
 }
 
 // Effacer tout de suite, et proposer « Undo » quelques secondes (pas de confirm() du navigateur)
-function clearTrail() {
+function clearHistory() {
   cleared = { steps, at: Date.now() };
   steps = [];
   S.cameFrom = -1;
   clearTimeout(undoTimer);
-  undoTimer = setTimeout(() => { cleared = null; if (panel.dataset.view === "history") rerenderPage(); }, UNDO_MS);
+  undoTimer = setTimeout(() => { cleared = null; if (panel.dataset.page === "history") rerenderPage(); }, UNDO_MS);
   update();
-  if (panel.dataset.view === "history") rerenderPage();
+  if (panel.dataset.page === "history") rerenderPage();
   panel.querySelector(".tundo")?.focus();
   draw();
 }
@@ -95,7 +70,7 @@ function undoClear() {
   cleared = null;
   clearTimeout(undoTimer);
   update();
-  if (panel.dataset.view === "history") rerenderPage();
+  if (panel.dataset.page === "history") rerenderPage();
   draw();
 }
 
@@ -131,15 +106,15 @@ function historyPage() {
 
 function bindHistory(panel, last) {
   panel.querySelectorAll(".trail-list button[data-k]").forEach(b =>
-    b.addEventListener("click", () => openEntry(entryOf(steps[+b.dataset.k]))));
-  panel.querySelector(".tcontinue")?.addEventListener("click", () => openEntry(entryOf(last)));
+    b.addEventListener("click", () => openStep(steps[+b.dataset.k])));
+  panel.querySelector(".tcontinue")?.addEventListener("click", () => openStep(last));
   panel.querySelector(".tshow").addEventListener("click", ev => {
     S.trailShown = !S.trailShown;
     ev.currentTarget.setAttribute("aria-pressed", String(S.trailShown));
     update();
     draw();
   });
-  panel.querySelector(".tclear")?.addEventListener("click", clearTrail);
+  panel.querySelector(".tclear")?.addEventListener("click", clearHistory);
   panel.querySelector(".tundo")?.addEventListener("click", undoClear);
 }
 

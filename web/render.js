@@ -219,7 +219,7 @@ export function render() {
   }
   ctx.globalCompositeOperation = "source-over";
 
-  // 1 bis. parcours de lecture : textes lus, derniers pas, texte d'où l'on vient (trail-ui.js)
+  // 1 bis. parcours de lecture : textes lus, derniers pas, texte d'où l'on vient (history-ui.js)
   // (pas pendant une visite, un chemin ou une recherche : leurs propres tracés suffisent)
   if (!S.morphing && !S.path && !S.hits) drawTrail(toScreen, R);
 

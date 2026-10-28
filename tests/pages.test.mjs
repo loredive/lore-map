@@ -2,8 +2,7 @@
 // factice et un historique de navigateur factice (pas de DOM).
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { record } from "../web/nav.js";
-import { registerPage, startPages, openPage, rerenderPage, closePage, currentPage, backLabel, goBack, openFromAddress, stepOf, pageOfStep } from "../web/pages.js";
+import { registerPage, startPages, openPage, rerenderPage, closePage, currentPage, backLabel, goBack, openFromAddress, stepOf, pageOfStep, openStep, onStep } from "../web/pages.js";
 
 // historique du navigateur : une liste d'adresses, Retour prévient l'écouteur comme popstate
 function fakeBrowser() {
@@ -21,12 +20,13 @@ function fakeBrowser() {
 }
 
 // démarre le module avec des faux, et note ce que chaque appel a fait
-function start(fallback = {}) {
+function start() {
   const log = [];
   const panel = { hidden: true, dataset: {}, innerHTML: "", scrollTop: 0 };
   const browser = fakeBrowser();
   startPages({
-    panel, browser, fallback,
+    panel, browser,
+    clearSearch: () => log.push("clear search"),
     query: () => "",
     resetFocus: () => log.push("reset"),
     top: label => `<top ${label ?? "-"}>`,
@@ -67,12 +67,12 @@ test("opening a page records it once, with its address, and runs the opening seq
   openPage("list");
   assert.deepEqual(log, ["reset", "bindTop", "focus List", "draw"]);
   assert.equal(panel.hidden, false);
-  assert.equal(panel.dataset.view, "list");
+  assert.equal(panel.dataset.page, "list");
   assert.equal(panel.innerHTML, "<top ->" + "<h2>List</h2>");
   assert.equal(panel.bound, true);
   openPage("note", { id: "a" });
   assert.deepEqual(urls(), ["/", "#note=a"]);
-  assert.deepEqual(currentPage(), { view: "note", id: "a", q: "" });
+  assert.deepEqual(currentPage(), { page: "note", id: "a", q: "" });
   assert.equal(panel.innerHTML, "<top Back to the list><h2>a</h2>");
   assert.deepEqual(log.slice(4), ["bindTop", "focus Note a", "frame a", "draw"]);   // garde le focus
 });
@@ -95,7 +95,7 @@ test("a page that replaces the previous one of its kind does so whatever its arg
   openPage("find", { q: "bl" });
   openPage("find", { q: "blo" });
   assert.deepEqual(urls(), ["#note=a", "/"]);
-  assert.deepEqual(currentPage(), { view: "find", q: "blo" });
+  assert.deepEqual(currentPage(), { page: "find", q: "blo" });
   assert.equal(backLabel(), "Back to note a");
 });
 
@@ -110,8 +110,8 @@ test("Back reopens the previous page without recording it, and names it", () => 
   assert.equal(backLabel(), "Back to note a");
   log.length = 0;
   goBack();
-  assert.equal(panel.dataset.view, "note");
-  assert.deepEqual(currentPage(), { view: "note", id: "a", q: "" });
+  assert.equal(panel.dataset.page, "note");
+  assert.deepEqual(currentPage(), { page: "note", id: "a", q: "" });
   assert.deepEqual(urls(), ["#note=a", "/"]);     // rien d'enregistré : l'entrée suivante reste
   assert.equal(backLabel(), null);
   assert.ok(log.includes("frame a"));
@@ -160,20 +160,20 @@ test("closing is an entry that Back undoes", () => {
   openPage("note", { id: "a" });
   closePage();
   assert.equal(panel.hidden, true);
-  assert.equal(panel.dataset.view, "");
-  assert.deepEqual(currentPage(), { view: "none", q: "" });
+  assert.equal(panel.dataset.page, "");
+  assert.deepEqual(currentPage(), { page: "none", q: "" });
   assert.equal(backLabel(), "Back to note a");
   goBack();
   assert.equal(panel.hidden, false);
-  assert.equal(panel.dataset.view, "note");
+  assert.equal(panel.dataset.page, "note");
 });
 
 test("an address is read back to its page, old aliases included", () => {
   start();
   assert.equal(openFromAddress("#note=x%20y"), true);
-  assert.deepEqual(currentPage(), { view: "note", id: "x y", q: "" });
+  assert.deepEqual(currentPage(), { page: "note", id: "x y", q: "" });
   openFromAddress("#notiz=z");
-  assert.deepEqual(currentPage(), { view: "note", id: "z", q: "" });
+  assert.deepEqual(currentPage(), { page: "note", id: "z", q: "" });
 });
 
 test("an unknown address is ignored", () => {
@@ -184,36 +184,53 @@ test("an unknown address is ignored", () => {
   assert.equal(currentPage(), null);
 });
 
-test("page kinds not registered go through the old code", () => {
-  const reopened = [];
-  const { urls } = start({
-    address: e => "#old=" + e.n,
-    backLabel: e => `Back to old ${e.n}`,
-    reopen: e => reopened.push(e),
-    // l'ancien code enregistre lui-même sa page, par la navigation
-    readAddress: hash => hash.startsWith("#old=") && (record({ view: "old", n: hash.slice(5) }), true),
-  });
-  assert.equal(openFromAddress("#old=3"), true);
-  openPage("note", { id: "a" });
-  assert.deepEqual(urls(), ["#old=3", "#note=a"]);
-  assert.equal(backLabel(), "Back to old 3");
-  goBack();
-  assert.deepEqual(reopened, [{ view: "old", n: "3", q: "" }]);
-});
-
-test("opening a page kind not registered yet hands it to the old code", () => {
-  const reopened = [];
-  start({ reopen: e => reopened.push(e) });
-  openPage("old", { n: 4 });
-  assert.deepEqual(reopened, [{ view: "old", n: 4 }]);
-});
-
 test("a History step maps to its page and back", () => {
   start();
-  assert.deepEqual(stepOf({ view: "note", id: "a", q: "" }), { kind: "page", key: "a" });
-  assert.deepEqual(stepOf({ view: "list", q: "" }), { kind: "page", key: "list" });
-  assert.equal(stepOf({ view: "find", q: "x" }), null);
-  assert.deepEqual(pageOfStep({ kind: "page", key: "a" }), { view: "note", id: "a" });
+  assert.deepEqual(stepOf({ page: "note", id: "a", q: "" }), { kind: "page", key: "a" });
+  assert.deepEqual(stepOf({ page: "list", q: "" }), { kind: "page", key: "list" });
+  assert.equal(stepOf({ page: "find", q: "x" }), null);
+  assert.deepEqual(pageOfStep({ kind: "page", key: "a" }), { page: "note", id: "a" });
   assert.equal(pageOfStep({ kind: "page", key: "gone" }), null);
   assert.equal(pageOfStep({ kind: "other", key: "a" }), null);
+});
+
+test("a History step reopens its page as a new entry", () => {
+  const { urls } = start();
+  openPage("list");
+  openStep({ kind: "page", key: "b" });
+  assert.deepEqual(currentPage(), { page: "note", id: "b", q: "" });
+  assert.deepEqual(urls(), ["/", "#note=b"]);
+  assert.equal(backLabel(), "Back to the list");
+  openStep({ kind: "page", key: "gone" });          // un pas dont la page n'existe plus : rien
+  assert.deepEqual(currentPage(), { page: "note", id: "b", q: "" });
+});
+
+test("a page can send the reader to another page instead", () => {
+  start();
+  registerPage({ name: "pick", divert: a => (a.n > 1 ? { page: "note", id: `from ${a.n}` } : null),
+    render: a => ({ html: `<h2>${a.n}</h2>` }) });
+  openPage("pick", { n: 1 });
+  assert.deepEqual(currentPage(), { page: "pick", n: 1, q: "" });
+  openPage("pick", { n: 2 });
+  assert.deepEqual(currentPage(), { page: "note", id: "from 2", q: "" });
+});
+
+test("each page opened, Back included, reports its History step", () => {
+  start();
+  const seen = [];
+  onStep(s => seen.push(s));
+  openPage("note", { id: "a" });
+  openPage("find", { q: "x" });
+  goBack();
+  assert.deepEqual(seen, [{ kind: "page", key: "a" }, null, { kind: "page", key: "a" }]);
+  onStep(() => {});
+});
+
+test("a page can clear the search when opened, but not on re-render", () => {
+  const { log } = start();
+  registerPage({ name: "trace", clearsSearch: true, render: () => ({ html: "<h2>Trace</h2>" }) });
+  openPage("trace");
+  assert.equal(log.filter(x => x === "clear search").length, 1);
+  rerenderPage();
+  assert.equal(log.filter(x => x === "clear search").length, 1);
 });

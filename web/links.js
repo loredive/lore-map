@@ -1,7 +1,7 @@
 // Ce que plusieurs pages du panneau partagent : pastilles et liens vers les personnages et lieux,
-// boutons des dialogues, extraits, surlignage, badge du DLC. Ce n'est pas une page : les modules de
-// pages l'importent sans s'importer entre eux, et ses liens ouvrent les pages par pages.js.
-import { S, panel, esc } from "./state.js";
+// boutons des dialogues, extraits, surlignage, badge du DLC, groupe d'un texte. Ce n'est pas une page :
+// les modules de pages l'importent sans s'importer entre eux, et ses liens ouvrent les pages par pages.js.
+import { S, panel, esc, clusterById } from "./state.js";
 import { openPage } from "./pages.js";
 import { mentionSpans } from "./mentions.js";
 
@@ -69,4 +69,17 @@ export function dialogueButtons(speakers, cls = "tdial") {
 export function bindDialogueButtons(focusOn = -1, root = panel) {
   root.querySelectorAll("button[data-sp]").forEach(b =>
     b.addEventListener("click", () => openPage("dialogue", focusOn >= 0 ? { speaker: b.dataset.sp, focusOn } : { speaker: b.dataset.sp })));
+}
+
+// ------------------------------------------------------------------ groupe d'un texte
+// Le groupe du texte, ou pour un texte hors groupe celui de la plupart de ses échos.
+export function groupOf(d) {
+  if (d.cluster >= 0) return { c: clusterById(d.cluster), near: false };
+  const votes = new Map();
+  for (const e of d.echoes) {
+    const k = S.docs[e].cluster;
+    if (k >= 0) votes.set(k, (votes.get(k) || 0) + 1);
+  }
+  const best = [...votes].sort((a, b) => b[1] - a[1])[0];
+  return best ? { c: clusterById(best[0]), near: true } : null;
 }
