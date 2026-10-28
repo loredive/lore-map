@@ -3,7 +3,7 @@ import { BM25, tokenize, corpusText, lexicalRanking, hybridRanking, semanticScor
          parseQuery, hasConstraints, satisfies } from "./search.js";
 import { S, panel, input, mode, esc, fold, docRow, announce, dataPath, MAX_HITS_ON_MAP, MAX_RESULTS, isHidden, nameOf, textOf } from "./state.js";
 import { draw } from "./render.js";
-import { registerPage, openPage, currentPage, goBack } from "./pages.js";
+import { registerPage, openPage, rerenderPage, currentPage, goBack } from "./pages.js";
 import { bindEntityButtons, snippet, mark } from "./links.js";
 
 const TRANSFORMERS_URL = "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1";   // version exacte : une nouvelle version ne peut pas entrer dans la page à notre insu
@@ -98,8 +98,9 @@ function offerOrApply(hybrid, q) {
     pending = hybrid;
     showRefineOffer();
   } else {
-    applyResults(hybrid, q);
+    showRefined(hybrid, q);
     panel.querySelector(".count")?.insertAdjacentHTML("beforeend", ' <span class="refined">List refined by meaning.</span>');
+    announce("List refined by meaning");
   }
 }
 
@@ -111,7 +112,7 @@ function showRefineOffer() {
   b?.addEventListener("click", () => {
     const ranked = pending;
     pending = null; touched = false;
-    if (ranked) applyResults(ranked, S.query);
+    if (ranked) showRefined(ranked, S.query);
     panel.querySelector(".results button")?.focus();
   });
   announce("Results refined by meaning are ready");
@@ -152,6 +153,12 @@ function keepResults(ranked, q) {
 export function applyResults(ranked, q) {
   keepResults(ranked, q);
   renderResults();
+}
+
+// la liste affinée par le sens remplace celle par mots-clés sur place : même page, même entrée
+function showRefined(ranked, q) {
+  keepResults(ranked, q);
+  rerenderPage();
 }
 
 export async function embedQuery(q) {

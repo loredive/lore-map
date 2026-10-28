@@ -4,7 +4,7 @@ import { buildGrid, buildSprites, computeHulls, resize, draw, toWorld, nearest, 
 import { buildViewSwitch, addShelves } from "./views.js";
 import { prepareSky } from "./sky.js";
 import { buildDialogues } from "./dialogue-ui.js";
-import { buildIndex, runSearch, renderResults, resetSearch } from "./search-ui.js";
+import { buildIndex, runSearch, resetSearch } from "./search-ui.js";
 import { panelTop, bindPanelTop } from "./panel.js";
 import { cancelPath } from "./pathbar.js";
 import { record } from "./nav.js";
@@ -12,7 +12,7 @@ import { showTip } from "./tip.js";
 import "./entities-ui.js";
 import { initHistory } from "./history-ui.js";
 import { loadTours } from "./tours-ui.js";
-import { startPages, openFromAddress, rerenderPage, openPage, closePage, currentPage, reopen } from "./pages.js";
+import { startPages, openFromAddress, rerenderPage, openPage, closePage, currentPage } from "./pages.js";
 import "./help-ui.js";
 import "./text-ui.js";
 import "./group-ui.js";
@@ -350,7 +350,7 @@ function buildLangSwitch() {
     try { localStorage.setItem(langKey(), S.altLang ? "alt" : "main"); } catch { /* idem */ }
     mark();
     tip.hidden = true;
-    if (!panel.hidden && currentPage()) reopen(currentPage());   // la fiche, la liste ou la visite ouverte, dans l'autre langue
+    rerenderPage();                // la page ouverte, sur place, dans l'autre langue
     draw();
     announce(S.altLang ? `Texts in ${label}` : "Texts in English");
   }));
@@ -402,10 +402,9 @@ function buildLegend() {
   }
 }
 
-// une catégorie (ou le DLC) masquée ou réaffichée : les listes ouvertes et la carte suivent
+// une catégorie (ou le DLC) masquée ou réaffichée : la page ouverte (sur place) et la carte suivent
 function refreshVisible() {
-  if (S.results.length && S.selected < 0) renderResults();
-  else if ((S.cluster || S.entity) && S.selected < 0) rerenderPage();
+  rerenderPage();
   draw();
 }
 

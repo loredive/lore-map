@@ -234,3 +234,37 @@ test("a page can clear the search when opened, but not on re-render", () => {
   rerenderPage();
   assert.equal(log.filter(x => x === "clear search").length, 1);
 });
+
+test("what a page does on opening is not done again on re-render", () => {
+  start();
+  const opened = [];
+  registerPage({ name: "walk", onOpen: a => opened.push(a.id), render: a => ({ html: `<h2>${a.id}</h2>` }) });
+  openPage("walk", { id: "a" });
+  rerenderPage();
+  assert.deepEqual(opened, ["a"]);
+  goBack();                                         // pas de page avant : rien
+  openPage("list");
+  goBack();                                         // rouverte par Retour : c'est une ouverture
+  assert.deepEqual(opened, ["a", "a"]);
+});
+
+test("re-render with no page open does nothing", () => {
+  const { log, urls } = start();
+  rerenderPage();
+  assert.deepEqual(log, []);
+  assert.deepEqual(urls(), ["/"]);
+});
+
+test("re-render keeps the panel's scroll position, even when the page scrolls itself on open", () => {
+  const { panel } = start();
+  registerPage({ name: "script", render: () => ({ html: "<h2>Script</h2>", bind: p => { p.scrollTop = 500; } }) });
+  openPage("list");
+  panel.scrollTop = 120;
+  rerenderPage();
+  assert.equal(panel.scrollTop, 120);
+  openPage("script");
+  assert.equal(panel.scrollTop, 500);              // ouverte : elle défile jusqu'à son passage
+  panel.scrollTop = 80;
+  rerenderPage();
+  assert.equal(panel.scrollTop, 80);
+});

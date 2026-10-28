@@ -391,3 +391,99 @@ def test_tracing_a_path_from_a_text(browser, site, game):
     page.go_back()
     wait_shown(page, ("doc", first))
     assert problems == []
+
+
+# ------------------------------------------------------------------ réaffichage sur place
+# Changer de langue ou masquer une catégorie réaffiche la page ouverte telle quelle : ni caméra qui
+# bouge, ni focus clavier déplacé, ni entrée d'historique, ni pas d'History, ni défilement perdu.
+def moved_aside(page):
+    """Laisse finir le vol de l'ouverture, puis décale la caméra : un recadrage se verrait."""
+    page.wait_for_timeout(1200)
+    page.evaluate("async () => { const { S } = await import('./state.js'); S.cam.x += 40; S.cam.y -= 30; }")
+
+
+def still(page):
+    """Ce qu'un réaffichage sur place ne doit pas changer. Le défilement à 10 pixels près : une fois le
+    panneau redessiné, le navigateur ajuste un peu la position pour garder le même passage à l'écran."""
+    return page.evaluate("""async () => { const { S } = await import('./state.js');
+        let steps = null;
+        try { steps = JSON.parse(localStorage.getItem('lore-map:trail:' + S.game)).steps.length; } catch {}
+        return { cam: { ...S.cam }, length: history.length, url: location.href, steps,
+                 scroll: Math.round(document.querySelector('#panel').scrollTop / 10) }; }""")
+
+
+def test_language_switch_redraws_the_text_in_place(browser, site):
+    _, address, _, name = ADDRESSES["bloodborne"][0]
+    page, problems = open_page(browser, f"{site}?game=bloodborne{address}", DESKTOP)
+    french = page.evaluate("async () => (await import('./state.js')).S.docs.find(d => d.name === \"Hunter's Mark\").altName")
+    assert french and french != name
+    moved_aside(page)
+    page.evaluate("() => { document.querySelector('#panel').scrollTop = 60; }")
+    before = still(page)
+    assert before["scroll"] > 0
+    page.click("#lang button[data-alt='1']")
+    wait_shown(page, ("doc", french))
+    assert still(page) == before
+    assert page.evaluate("() => document.activeElement.matches('#lang button[data-alt=\"1\"]')")
+    page.click("#lang button[data-alt='0']")
+    wait_shown(page, ("doc", name))
+    assert still(page) == before
+    assert problems == []
+
+
+@pytest.mark.parametrize("game", GAMES)
+def test_hiding_a_category_updates_the_open_group_in_place(browser, site, game):
+    _, address, _, group = ADDRESSES[game][1]
+    page, problems = open_page(browser, f"{site}?game={game}{address}", DESKTOP)
+    rows = page.locator("#panel .results li").count()
+    cat = page.evaluate("""async () => { const { S } = await import('./state.js');
+        return S.cats[S.docs.find(d => d.cluster === S.cluster.id).cat]; }""")
+    assert "of them shown" not in page.text_content("#panel .count")
+    moved_aside(page)
+    before = still(page)
+    page.click(f"#legend button[title=\"{cat}\"]")
+    page.wait_for_function("() => document.querySelector('#panel .count').textContent.includes('of them shown')")
+    assert shown(page) == ["cluster", group]
+    assert page.locator("#panel .results li").count() < rows
+    assert still(page) == before
+    page.click(f"#legend button[title=\"{cat}\"]")
+    page.wait_for_function("() => !document.querySelector('#panel .count').textContent.includes('of them shown')")
+    assert page.locator("#panel .results li").count() == rows
+    assert still(page) == before
+    assert problems == []
+
+
+def open_by_click(page, site, kind):
+    if kind == "results":
+        # la recherche par le sens téléchargerait un modèle : sans réseau, elle se rabat sur les mots
+        page.route(lambda url: not url.startswith(site), lambda route: route.abort())
+        page.fill("#q", "blood")
+    else:
+        page.click(f"#{kind}")
+    page.wait_for_function("k => document.querySelector('#panel').dataset.page === k", arg=kind)
+
+
+@pytest.mark.parametrize("kind", ["entity", "path", "dialogue", "tour", "results", "history", "help", "tours", "none"])
+def test_both_triggers_redraw_any_page_in_place(browser, site, kind):
+    by_address = {}
+    for _, address, page_kind, _ in ADDRESSES["bloodborne"]:
+        by_address.setdefault(page_kind, address)
+    page, problems = open_page(browser, f"{site}?game=bloodborne{by_address.get(kind, '')}", DESKTOP)
+    if kind not in by_address and kind != "none":
+        open_by_click(page, site, kind)
+    expected = shown(page)
+    moved_aside(page)
+    before = still(page)
+    query = page.input_value("#q")
+    page.click("#lang button[data-alt='1']")
+    page.wait_for_timeout(300)
+    assert (shown(page) or [None])[0] == (expected or [None])[0]
+    page.click("#legend button.dlc")
+    page.wait_for_timeout(300)
+    page.click("#legend button.dlc")
+    page.click("#lang button[data-alt='0']")
+    page.wait_for_timeout(300)
+    assert shown(page) == expected
+    assert still(page) == before
+    assert page.input_value("#q") == query                  # la recherche n'est pas effacée
+    assert problems == []
