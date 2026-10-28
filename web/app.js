@@ -1,16 +1,43 @@
 // Point d'entrée : chargement des données, souris, clavier, légende.
-import { S, $, canvas, panel, tip, status, input, mode, esc, colorOf, announce, dataPath, DEFAULT_GAME, nameOf, groupName } from "./state.js";
-import { buildGrid, buildSprites, computeHulls, resize, draw, toWorld, nearest, flyTo, zoomAt, setHover, starsNear, viewCenter } from "./render.js";
+import { S, $, canvas, panel, tip, status, input, mode, esc, colorOf, announce, dataPath, DEFAULT_GAME, nameOf, groupName, resetContext, focusPanel } from "./state.js";
+import { buildGrid, buildSprites, computeHulls, resize, draw, toWorld, nearest, flyTo, zoomAt, setHover, starsNear, viewCenter, frameFrom } from "./render.js";
 import { buildViewSwitch, addShelves } from "./views.js";
 import { prepareSky } from "./sky.js";
 import { buildDialogues } from "./dialogue-ui.js";
-import { buildIndex, runSearch, renderResults } from "./search-ui.js";
-import { select, openCluster, closePanel, openFromHash, cancelPath } from "./panel.js";
+import { buildIndex, runSearch, renderResults, resetSearch } from "./search-ui.js";
+import { select, openCluster, closePanel, cancelPath, panelTop, bindPanelTop, oldPages } from "./panel.js";
 import { record, current, openEntry } from "./nav.js";
 import { showTip } from "./tip.js";
 import { openEntity } from "./entities-ui.js";
 import { initTrail } from "./trail-ui.js";
 import { loadTours } from "./tours-ui.js";
+import { startPages, openFromAddress } from "./pages.js";
+import "./help-ui.js";
+
+// ------------------------------------------------------------------ pages du panneau
+// pages.js reçoit ici tout ce qui touche au DOM et à l'état partagé ; les sortes de pages se sont
+// enregistrées en important leur module (help-ui.js…), les autres passent encore par panel.js.
+startPages({
+  panel,
+  browser: {
+    push: (state, url) => history.pushState(state, "", url),
+    replace: (state, url) => history.replaceState(state, "", url),
+    back: () => history.back(),
+    href: () => location.href,
+    plain: () => location.pathname + location.search,     // une page sans adresse propre
+    onPop: f => addEventListener("popstate", e => f(e.state)),
+  },
+  query: () => S.query,
+  resetFocus: () => { resetContext(); S.selected = -1; },
+  top: panelTop,
+  bindTop: bindPanelTop,
+  focus: focusPanel,
+  frame: frameFrom,
+  draw,
+  // revenir à une page ouverte avant la recherche efface la recherche
+  onReopen: e => { if (e.view !== "results" && !e.q && S.query) resetSearch(); },
+  fallback: oldPages,
+});
 
 // ------------------------------------------------------------------ jeu
 const optional = (f, empty) => fetch(f).then(r => r.ok ? r.json() : empty).catch(() => empty);
@@ -97,12 +124,12 @@ async function load() {
   legendFade();
   buildViewSwitch();
   buildLangSwitch();
-  initTrail();                                  // avant openFromHash : le lien collé est un premier pas
+  initTrail();                                  // avant openFromAddress : le lien collé est un premier pas
   await loadTours();                            // data/<jeu>/tours.json, s'il y en a
   status.textContent = "";
   mode.textContent = "";                       // la ligne d'état ne parle que quand il y a du nouveau
   resize();
-  openFromHash();
+  openFromAddress(location.hash);
   if (!current()) record({ view: "none" });     // premier état : la carte seule, panneau fermé
 }
 

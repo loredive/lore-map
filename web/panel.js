@@ -5,7 +5,8 @@ import { draw, focusDoc, fitPoints, frameFrom, setHover } from "./render.js";
 import { echoGraph, echoPath } from "./graph.js";
 import { runSearch, resetSearch } from "./search-ui.js";
 import { entityChips, bindEntityButtons, openEntity, showIndex, linkText } from "./entities-ui.js";
-import { record, goBack, backLabel, setOpener, poppedHere } from "./nav.js";
+import { record, poppedHere } from "./nav.js";
+import { backLabel, goBack, closePage, openFromAddress } from "./pages.js";
 import { openDialogue, dialogueButtons, bindDialogueButtons } from "./dialogue-ui.js";
 import { tipAtStar } from "./tip.js";
 import { showTrail } from "./trail-ui.js";
@@ -26,8 +27,7 @@ function toggleReading(btn) {
 }
 
 // En-tête commun du panneau : « Retour à … » (l'entrée précédente de l'historique), « Agrandir » et « Fermer ».
-export function panelTop() {
-  const back = backLabel();
+export function panelTop(back = backLabel()) {
   const on = document.body.classList.contains("reading");
   return `<div class="panel-top">${back ? `<button type="button" class="back">${esc(back)}</button>` : "<span></span>"}
     <span class="actions"><button type="button" class="widen" aria-pressed="${on}" title="Widen the panel for reading">${on ? "Narrow" : "Widen"}</button>
@@ -36,7 +36,7 @@ export function panelTop() {
 export function bindPanelTop() {
   panel.querySelector(".panel-top .back")?.addEventListener("click", goBack);
   panel.querySelector(".panel-top .widen").addEventListener("click", ev => toggleReading(ev.currentTarget));
-  panel.querySelector(".panel-top .close").addEventListener("click", closePanel);
+  panel.querySelector(".panel-top .close").addEventListener("click", closePage);
 }
 
 export function snippet(text, terms, len = 150) {
@@ -181,89 +181,85 @@ export function closePanel() {
 }
 
 
-export function showHelp() {
-  resetContext();
-  S.selected = -1;
-  panel.hidden = false;
-  panel.dataset.view = "help";
-  record({ view: "help" });
-  const ui = S.ui, x = ui.precise || {};     // exemples propres au jeu (game.json)
-  panel.innerHTML = `${panelTop()}<article class="card">
-    <h2>How to read this map</h2>
-    <ul class="help">
-      <li>Each point is a text from the game: an item, a weapon, a piece of armor, a dialogue…</li>
-      <li>Texts close together talk about the same things; distant ones, about other subjects.</li>
-      <li>The names written on the map label groups of neighboring texts.</li>
-      <li>Click a point to read it, or a name to browse its group.</li>
-    </ul>
-    <h3>What you can do</h3>
-    <ul class="help">
-      ${S.tours.length ? "<li><strong>Guided tours</strong>, in the top bar: short walks through the story, step by step. The best place to start.</li>" : ""}
-      <li><strong>Search</strong> by name or by meaning: ${(ui.search_examples || []).map(q => `“${esc(q)}”`).join(", ")}; or precisely: <code>${esc(x.both)}</code>, <code>${esc(x.exclude)}</code>, <code>"${esc(x.phrase)}"</code>, <code>${esc(x.category)}</code>.</li>
-      <li><strong>Characters and places</strong>: every text that mentions ${esc(ui.entity_examples || "")}…, and the names linked to them.</li>
-      <li><strong>Echoes</strong>: under each text, the ones closest to it in meaning.</li>
-      <li><strong>Trace a path</strong> between two texts, from echo to echo, starting from any text.</li>
-      <li><strong>By meaning / by category</strong>, in the top bar: texts placed by what they talk about, or sorted into columns by category.</li>
-      <li><strong>Categories</strong>, in the top bar: click one to hide or show its texts.</li>
-      <li><strong>History</strong>, in the top bar: every page you opened, and how many texts you have read. On the map, a ring marks each text already read, and the text you came from is named.</li>
-      <li><strong>Back</strong> (or the browser's Back button) returns to the previous page; Escape closes.</li>
-      <li>By touch: tapping a crowded spot zooms in, then lists the texts there.</li>
-      <li>By keyboard: Tab to the map, arrow keys to move, + and − to zoom, Enter to open the targeted star.</li>
-    </ul>
-  </article>`;
-  bindPanelTop();
-  panel.scrollTop = 0;
-  focusPanel("Help: how to read this map");
-  draw();
-}
-$("#help").addEventListener("click", showHelp);
+// ------------------------------------------------------------------ pages pas encore enregistrées
+// L'ancien code des pages que pages.js ne connaît pas encore : il s'en sert en dernier recours.
+// Chaque sorte de page qui s'enregistre auprès de pages.js disparaît de ces aiguillages.
 
-export function openFromHash() {
-  const name = decodeURIComponent(location.hash.slice(1));
-  if (!name) return;
+// adresse d'une entrée de l'historique ; null : pas d'adresse propre (résultats, index, rien)
+function address(e) {
+  switch (e.view) {
+    case "doc": return "#" + encodeURIComponent(S.docs[e.i].name);
+    case "cluster": return "#group=" + encodeURIComponent(e.label);
+    case "entity": return "#entity=" + encodeURIComponent(e.name);
+    case "path": return "#path=" + encodeURIComponent(S.docs[e.a].name) + "&" + encodeURIComponent(S.docs[e.b].name);
+    case "dialogue": return "#dialogue=" + encodeURIComponent(e.speaker);
+    case "tour": return `#tour=${encodeURIComponent(e.id)}/${e.k + 1}`;
+    default: return null;
+  }
+}
+
+function oldBackLabel(e) {
+  switch (e.view) {
+    case "doc": return `Back to “${nameOf(S.docs[e.i])}”`;
+    case "cluster": { const c = S.clusters.find(x => x.label === e.label); return `Back to the group “${c ? groupName(c) : e.label}”`; }
+    case "entity": return `Back to “${S.entities.find(x => x.name === e.name)?.label || e.name}”`;
+    case "results": return `Back to the results for “${e.q}”`;
+    case "index": return "Back to characters and places";
+    case "path": return "Back to the path";
+    case "dialogue": return `Back to the dialogue of ${e.speaker}`;
+    case "trail": return "Back to your history";
+    case "tours": return "Back to the guided tours";
+    case "tour": return `Back to “${S.tours.find(t => t.id === e.id)?.title || e.id}”, step ${e.k + 1}`;
+    default: return null;                       // avant : le panneau fermé, « Fermer » suffit
+  }
+}
+
+// ouvre la page d'une adresse ; false si aucune ancienne sorte de page ne la reconnaît
+function readAddress(hash) {
+  const name = decodeURIComponent(hash.slice(1));
+  if (!name) return false;
   // liens anglais (#group=…) et anciens liens français (#groupe=…), toujours reconnus
   const arg = (...keys) => { const k = keys.find(p => name.startsWith(p + "=")); return k === undefined ? null : name.slice(k.length + 1); };
   const group = arg("group", "groupe"), path = arg("path", "chemin"), entity = arg("entity", "entite");
   if (group !== null) {
     const c = S.clusters.find(x => x.label === group);
     if (c) openCluster(c);
-    return;
+    return true;
   }
   if (path !== null) {
-    const [a, b] = location.hash.slice(location.hash.indexOf("=") + 1).split("&").map(decodeURIComponent)
+    const [a, b] = hash.slice(hash.indexOf("=") + 1).split("&").map(decodeURIComponent)
       .map(n => S.docs.findIndex(x => x.name === n));
     if (a >= 0 && b >= 0) showPath(a, b);
-    return;
+    return true;
   }
   if (name.startsWith("tour=")) {                 // #tour=paleblood/3
     const [id, k] = name.slice(5).split("/");
     openTour(id, (+k || 1) - 1);
-    return;
+    return true;
   }
   if (name.startsWith("dialogue=")) {
     openDialogue(name.slice(9));
-    return;
+    return true;
   }
   if (entity !== null) {
     const e = S.entities.find(x => x.name === entity);
     if (e) openEntity(e);
-    return;
+    return true;
   }
   const d = S.docs.find(x => x.name === name);
   if (d) select(d.i);
+  return !!d;
 }
 
 // lien collé dans la barre d'adresse sans recharger la page (replaceState ne déclenche pas l'événement)
-addEventListener("hashchange", () => { if (S.docs.length && !poppedHere()) openFromHash(); });
+addEventListener("hashchange", () => { if (S.docs.length && !poppedHere()) openFromAddress(location.hash); });
 
 // Rouvre une entrée de l'historique (bouton Retour, « Retour à … »)
-setOpener(e => {
-  if (e.view !== "results" && !e.q && S.query) resetSearch();
+function reopen(e) {
   if (e.view === "doc") select(e.i);
   else if (e.view === "cluster") { const c = clusterById(e.id) || S.clusters.find(x => x.label === e.label); if (c) openCluster(c); }
   else if (e.view === "entity") { const x = S.entities.find(y => y.name === e.name); if (x) openEntity(x); }
   else if (e.view === "index") showIndex();
-  else if (e.view === "help") showHelp();
   else if (e.view === "path") showPath(e.a, e.b);
   else if (e.view === "dialogue") openDialogue(e.speaker);
   else if (e.view === "results") { input.value = e.q; runSearch(); }
@@ -271,7 +267,9 @@ setOpener(e => {
   else if (e.view === "tours") showTours();
   else if (e.view === "tour") openTour(e.id, e.k);
   else closePanel();
-});
+}
+
+export const oldPages = { address, backLabel: oldBackLabel, replaces: a => a.view === "results", reopen, readAddress, close: closePanel };
 
 
 // ------------------------------------------------------------------ groupe d'un texte
