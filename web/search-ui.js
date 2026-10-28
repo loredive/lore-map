@@ -1,11 +1,10 @@
 // La recherche dans la page : saisie, chargement du modèle, liste des résultats.
 import { BM25, tokenize, corpusText, lexicalRanking, hybridRanking, semanticScores, rrf, RRF_K, LEXICAL_WEIGHT, POOL,
          parseQuery, hasConstraints, satisfies } from "./search.js";
-import { S, panel, input, mode, esc, fold, resetContext, docRow, announce, dataPath, MAX_HITS_ON_MAP, MAX_RESULTS, isHidden, nameOf, textOf } from "./state.js";
+import { S, panel, input, mode, esc, fold, docRow, announce, dataPath, MAX_HITS_ON_MAP, MAX_RESULTS, isHidden, nameOf, textOf } from "./state.js";
 import { draw } from "./render.js";
-import { select, snippet, mark, panelTop, bindPanelTop } from "./panel.js";
-import { record, current, goBack } from "./nav.js";
-import { bindEntityButtons } from "./entities-ui.js";
+import { registerPage, openPage, rerenderPage, currentPage, goBack } from "./pages.js";
+import { bindEntityButtons, snippet, mark } from "./links.js";
 
 const TRANSFORMERS_URL = "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1";   // version exacte : une nouvelle version ne peut pas entrer dans la page à notre insu
 
@@ -28,7 +27,7 @@ let searchSeq = 0, debounce = 0;
 // la lire (défilement, clic, touche), on ne la remplace pas sous les yeux : on propose de l'afficher.
 let touched = false, pending = null;
 for (const ev of ["wheel", "touchmove", "pointerdown", "keydown"]) {
-  panel.addEventListener(ev, () => { if (panel.dataset.view === "results") touched = true; }, { passive: true });
+  panel.addEventListener(ev, () => { if (panel.dataset.page === "results") touched = true; }, { passive: true });
 }
 input.addEventListener("input", () => { clearTimeout(debounce); debounce = setTimeout(runSearch, 180); });
 // Entrée : la recherche part tout de suite et le focus passe au premier résultat
@@ -40,13 +39,15 @@ input.addEventListener("keydown", e => {
   panel.querySelector(".entity-link, .results button")?.focus();
 });
 
-export async function runSearch() {
+// apply : ce qu'on fait de la première liste (l'afficher ; ou, en rouvrant les résultats, la retenir
+// seulement : la page les affiche elle-même)
+export async function runSearch(apply = applyResults) {
   const q = input.value.trim();
   const seq = ++searchSeq;
   if (q.length < 2) {
     S.hits = null; S.results = [];
     // recherche effacée : on revient à ce qu'il y avait avant elle (une fiche, ou la carte seule)
-    if (current()?.view === "results") goBack();
+    if (currentPage()?.page === "results") goBack();
     mode.textContent = "";
     draw();
     return;
@@ -54,9 +55,9 @@ export async function runSearch() {
   const parsed = parseQuery(q);
   S.parsed = parsed;
   touched = false; pending = null;
-  if (hasConstraints(parsed)) { await constrainedSearch(parsed, q, seq); return; }
+  if (hasConstraints(parsed)) { await constrainedSearch(parsed, q, seq, apply); return; }
   const lexical = lexicalRanking(S.bm25, q);
-  applyResults(lexical, q);                       // réponse immédiate
+  apply(lexical, q);                       // réponse immédiate
   if (!S.meta.semantic) return;
 
   const qv = await embedQuery(q);
@@ -67,19 +68,19 @@ export async function runSearch() {
 
 // Recherche précise : les contraintes filtrent tous les textes ; le texte libre (s'il y en a) classe
 // ceux qui restent, par mots-clés puis par sens ; sinon, ordre de pertinence du premier nom exigé.
-async function constrainedSearch(parsed, q, seq) {
+async function constrainedSearch(parsed, q, seq, apply) {
   const ok = S.docs.map(d => satisfies(d.i, S.folded[d.i], S.catFolded[d.cat], parsed, termDocs));
   const kept = S.docs.filter(d => ok[d.i]).map(d => d.i);
   // sans texte libre : par pertinence pour le premier nom exigé (sinon dans l'ordre des textes)
   const lead = parsed.must.map(entityFor).find(Boolean);
   const byConstraints = [...new Set(lead ? [...lead.docs.filter(i => ok[i]), ...kept] : kept)].map(i => [i, 1]);
-  if (!parsed.text) { applyResults(byConstraints, q); return; }
+  if (!parsed.text) { apply(byConstraints, q); return; }
   // le texte libre garde son rôle habituel : textes qui en ont les mots, puis les meilleurs par le sens
   // (sinon « Godwyn -Ranni » rendrait tous les textes sans Ranni)
   const lexical = S.bm25.search(parsed.text).filter(([i]) => ok[i]).slice(0, POOL);
   // aucun mot-clé trouvé (« lune » n'est pas dans les textes anglais) : en attendant le classement par
   // le sens, montrer les textes qui satisfont les conditions plutôt que « aucun texte »
-  applyResults(lexical.length || !S.meta.semantic ? lexical : byConstraints, q);
+  apply(lexical.length || !S.meta.semantic ? lexical : byConstraints, q);
   if (!S.meta.semantic) return;
   const qv = await embedQuery(parsed.text);
   if (!qv || seq !== searchSeq) return;
@@ -92,12 +93,12 @@ function offerOrApply(hybrid, q) {
   mode.textContent = "Results by keyword and meaning";
   // une fiche, un dialogue ou un chemin ouverts entre-temps restent affichés : « Retour aux résultats »
   // relance la recherche, affinée d'emblée puisque le modèle est chargé
-  if (panel.hidden || panel.dataset.view !== "results") return;
+  if (panel.hidden || panel.dataset.page !== "results") return;
   if (touched) {
     pending = hybrid;
     showRefineOffer();
   } else {
-    applyResults(hybrid, q);
+    showRefined(hybrid, q);
     panel.querySelector(".count")?.insertAdjacentHTML("beforeend", ' <span class="refined">List refined by meaning.</span>');
   }
 }
@@ -110,7 +111,7 @@ function showRefineOffer() {
   b?.addEventListener("click", () => {
     const ranked = pending;
     pending = null; touched = false;
-    if (ranked) applyResults(ranked, S.query);
+    if (ranked) showRefined(ranked, S.query);
     panel.querySelector(".results button")?.focus();
   });
   announce("Results refined by meaning are ready");
@@ -140,15 +141,25 @@ export function resetSearch() {
   S.hits = null; S.results = []; S.query = "";
 }
 
-export function applyResults(ranked, q) {
-  resetContext();   // un chemin en attente garde son départ (S.pathFrom)
+function keepResults(ranked, q) {
   S.results = ranked.map(([i]) => i);
   S.hits = new Map(S.results.slice(0, MAX_HITS_ON_MAP).map((i, r) => [i, r]));
   S.query = q;
-  // une recherche remplace la fiche ouverte, qui reste à un « Retour » (et revient si on efface)
-  S.selected = -1;
+}
+
+// une recherche remplace la fiche ouverte, qui reste à un « Retour » (et revient si on efface) ;
+// un chemin en attente garde son départ (S.pathFrom)
+export function applyResults(ranked, q) {
+  keepResults(ranked, q);
   renderResults();
-  draw();
+}
+
+// la liste affinée par le sens remplace celle par mots-clés sur place : même page, même entrée
+function showRefined(ranked, q) {
+  keepResults(ranked, q);
+  rerenderPage();
+  const found = S.results.filter(i => !isHidden(S.docs[i])).length;
+  if (found) announce(`${found} texts found`);       // comme la première liste
 }
 
 export async function embedQuery(q) {
@@ -181,41 +192,52 @@ function preciseTip() {
     both, <code>${esc(x.exclude)}</code> to exclude, <code>${esc(x.category)}</code> for a category.`;
 }
 
-export function renderResults() {
+export function renderResults() { openPage("results", { q: S.query }); }
+
+// La page des résultats. Une nouvelle liste remplace la précédente dans l'historique : taper une
+// recherche n'y laisse qu'une entrée. Rouverte par Retour après une autre recherche (ou après l'avoir
+// effacée), elle relance la sienne.
+registerPage({
+  name: "results",
+  replacesPrevious: true,
+  backLabel: a => `Back to the results for “${a.q}”`,
+  render: ({ q }) => {
+    if (q !== S.query) { input.value = q; runSearch(keepResults); }
+    return resultsPage();
+  },
+});
+
+function resultsPage() {
   const visible = S.results.filter(i => !isHidden(S.docs[i]));
   const shown = visible.slice(0, MAX_RESULTS);
   const p = S.parsed || { text: S.query || "", must: [], phrases: [] };
   const terms = tokenize([p.text, ...p.must, ...p.phrases].join(" "));
   // la liste est remplacée quand les résultats « par sens » arrivent : garder le focus sur le même texte
   const focused = panel.contains(document.activeElement) ? document.activeElement.dataset.i : undefined;
-  panel.hidden = false;
-  panel.dataset.view = "results";
-  record({ view: "results", q: S.query });
   if (!shown.length) {
-    panel.innerHTML = `${panelTop()}${understood(p)}<p class="count">No text matches. ${hasConstraints(p)
+    return { html: `${understood(p)}<p class="count">No text matches. ${hasConstraints(p)
       ? "No text meets all these conditions together: drop one?"
-      : `Try a proper name (${esc(S.ui.empty_hint || "")}) or a word from the game.`}</p>`;
-    bindPanelTop();
-    return;
+      : `Try a proper name (${esc(S.ui.empty_hint || "")}) or a word from the game.`}</p>` };
   }
   const more = visible.length > shown.length ? `, the first ${shown.length} below` : "";
   // une recherche qui nomme une entité connue mène à sa fiche
   const q = fold(S.query || "");
   const known = S.entities.find(e => [e.name, e.label, ...e.aliases].some(n => fold(n) === q));
-  panel.innerHTML = `${panelTop()}${understood(p)}${known ? `<button type="button" class="entity-link" data-e="${S.entities.indexOf(known)}">
+  return {
+    announce: `${visible.length} texts found`,
+    html: `${understood(p)}${known ? `<button type="button" class="entity-link" data-e="${S.entities.indexOf(known)}">
       All about “${esc(known.label)}”: ${known.docs.length} texts mention it</button>` : ""}
     <p class="count">${visible.length} texts found${more}. The most relevant glow on the map.</p>
     <ol class="results">${shown.map(i => {
       const d = S.docs[i];
       return docRow(d, mark(esc(nameOf(d)), terms), mark(esc(snippet(textOf(d), terms)), terms));
     }).join("")}</ol>
-    <p class="hint search-tip">${preciseTip()}</p>`;
-  panel.querySelectorAll("button[data-i]").forEach(b =>
-    b.addEventListener("click", () => select(+b.dataset.i)));
-  bindPanelTop();
-  bindEntityButtons();
-  panel.scrollTop = 0;
-  if (focused !== undefined) (panel.querySelector(`button[data-i="${focused}"]`) || panel.querySelector(".results button"))?.focus();
-  announce(`${visible.length} texts found`);
+    <p class="hint search-tip">${preciseTip()}</p>`,
+    bind: panel => {
+      panel.querySelectorAll("button[data-i]").forEach(b =>
+        b.addEventListener("click", () => openPage("doc", { i: +b.dataset.i })));
+      bindEntityButtons();
+      if (focused !== undefined) (panel.querySelector(`button[data-i="${focused}"]`) || panel.querySelector(".results button"))?.focus();
+    },
+  };
 }
-

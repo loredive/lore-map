@@ -124,7 +124,7 @@ export function drawThread(toScreen, R) {
   ctx.restore();
 }
 
-// Historique de lecture (trail-ui.js) : un anneau léger autour des textes déjà lus, le texte d'où l'on
+// Historique de lecture (history-ui.js) : un anneau léger autour des textes déjà lus, le texte d'où l'on
 // vient, nommé, et, si le visiteur l'a demandé, les derniers textes reliés en pointillé.
 export function drawTrail(toScreen, R) {
   ctx.save();

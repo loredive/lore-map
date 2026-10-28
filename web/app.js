@@ -1,16 +1,46 @@
 // Point d'entrée : chargement des données, souris, clavier, légende.
-import { S, $, canvas, panel, tip, status, input, mode, esc, colorOf, announce, dataPath, DEFAULT_GAME, nameOf, groupName } from "./state.js";
-import { buildGrid, buildSprites, computeHulls, resize, draw, toWorld, nearest, flyTo, zoomAt, setHover, starsNear, viewCenter } from "./render.js";
+import { S, $, canvas, panel, tip, status, input, mode, esc, colorOf, announce, dataPath, DEFAULT_GAME, nameOf, groupName, resetContext, focusPanel } from "./state.js";
+import { buildGrid, buildSprites, computeHulls, resize, draw, toWorld, nearest, flyTo, zoomAt, setHover, starsNear, viewCenter, frameFrom } from "./render.js";
 import { buildViewSwitch, addShelves } from "./views.js";
 import { prepareSky } from "./sky.js";
 import { buildDialogues } from "./dialogue-ui.js";
-import { buildIndex, runSearch, renderResults } from "./search-ui.js";
-import { select, openCluster, closePanel, openFromHash, cancelPath } from "./panel.js";
-import { record, current, openEntry } from "./nav.js";
+import { buildIndex, runSearch, resetSearch } from "./search-ui.js";
+import { panelTop, bindPanelTop } from "./panel.js";
+import { cancelPath } from "./pathbar.js";
 import { showTip } from "./tip.js";
-import { openEntity } from "./entities-ui.js";
-import { initTrail } from "./trail-ui.js";
+import "./entities-ui.js";
+import { initHistory } from "./history-ui.js";
 import { loadTours } from "./tours-ui.js";
+import { startPages, openFirstPage, rerenderPage, openPage, closePage } from "./pages.js";
+import "./help-ui.js";
+import "./text-ui.js";
+import "./group-ui.js";
+import "./path-ui.js";
+
+// ------------------------------------------------------------------ pages du panneau
+// pages.js reçoit ici tout ce qui touche au DOM et à l'état partagé ; les sortes de pages se sont
+// enregistrées en important leur module (help-ui.js, text-ui.js, entities-ui.js…).
+startPages({
+  panel,
+  browser: {
+    push: (state, url) => history.pushState(state, "", url),
+    replace: (state, url) => history.replaceState(state, "", url),
+    back: () => history.back(),
+    href: () => location.href,
+    plain: () => location.pathname + location.search,     // une page sans adresse propre
+    onPop: f => addEventListener("popstate", e => f(e.state)),
+  },
+  query: () => S.query,
+  clearSearch: resetSearch,
+  resetFocus: () => { resetContext(); S.selected = -1; },
+  top: panelTop,
+  bindTop: bindPanelTop,
+  focus: focusPanel,
+  frame: frameFrom,
+  draw,
+  // revenir à une page ouverte avant la recherche efface la recherche (les résultats portent la leur)
+  onReopen: e => { if (!e.q && S.query) resetSearch(); },
+});
 
 // ------------------------------------------------------------------ jeu
 const optional = (f, empty) => fetch(f).then(r => r.ok ? r.json() : empty).catch(() => empty);
@@ -97,13 +127,12 @@ async function load() {
   legendFade();
   buildViewSwitch();
   buildLangSwitch();
-  initTrail();                                  // avant openFromHash : le lien collé est un premier pas
+  initHistory();                                // avant openFirstPage : le lien collé est un premier pas
   await loadTours();                            // data/<jeu>/tours.json, s'il y en a
   status.textContent = "";
   mode.textContent = "";                       // la ligne d'état ne parle que quand il y a du nouveau
   resize();
-  openFromHash();
-  if (!current()) record({ view: "none" });     // premier état : la carte seule, panneau fermé
+  openFirstPage(location.hash);                 // la page du lien collé, ou la carte seule
 }
 
 
@@ -156,9 +185,9 @@ canvas.addEventListener("pointerup", e => {
     const label = near < 0 ? labelAt(e.clientX, e.clientY) : null;
     if (e.pointerType !== "mouse" && tapZoom(e.clientX, e.clientY, label)) { drag = null; return; }
     const i = near >= 0 ? near : label ? -1 : pick(e.clientX, e.clientY, e.pointerType === "mouse" ? 12 : 22);
-    if (i >= 0) select(i);
-    else if (label) openCluster(label);
-    else if (!panel.hidden && panel.dataset.view !== "results") closePanel();
+    if (i >= 0) openPage("doc", { i });
+    else if (label) openPage("cluster", { id: label.id, label: label.label });
+    else if (!panel.hidden && panel.dataset.page !== "results") closePage();
   }
   drag = null;
 });
@@ -195,8 +224,8 @@ function openChooser(list, sx, sy, group = null) {
   const w = chooser.offsetWidth, h = chooser.offsetHeight;
   chooser.style.left = Math.max(8, Math.min(sx - w / 2, S.W - w - 8)) + "px";
   chooser.style.top = (sy + 24 + h < S.H ? sy + 24 : Math.max(8, sy - h - 24)) + "px";
-  chooser.querySelectorAll("button[data-i]").forEach(b => b.addEventListener("click", () => { closeChooser(); select(+b.dataset.i); }));
-  chooser.querySelector("button[data-c]")?.addEventListener("click", () => { closeChooser(); openCluster(group); });
+  chooser.querySelectorAll("button[data-i]").forEach(b => b.addEventListener("click", () => { closeChooser(); openPage("doc", { i: +b.dataset.i }); }));
+  chooser.querySelector("button[data-c]")?.addEventListener("click", () => { closeChooser(); openPage("cluster", { id: group.id, label: group.label }); });
   chooser.querySelector("button").focus({ preventScroll: true });
 }
 export function closeChooser() { chooser.hidden = true; }
@@ -259,11 +288,11 @@ addEventListener("keydown", e => {
     if (!chooser.hidden) closeChooser();
     else if (S.pathFrom >= 0) { cancelPath(); draw(); }
     else if (input.value) { input.value = ""; runSearch(); }
-    else if (!panel.hidden) closePanel();
+    else if (!panel.hidden) closePage();
     return;
   }
   if (typing || document.activeElement?.closest("#panel")) return;
-  if (e.key === "Enter" && document.activeElement === canvas && S.hover >= 0) { e.preventDefault(); select(S.hover); return; }
+  if (e.key === "Enter" && document.activeElement === canvas && S.hover >= 0) { e.preventDefault(); openPage("doc", { i: S.hover }); return; }
   const step = 80 / (S.cam.s * S.base);
   const keys = {
     "+": () => zoomAt(S.W / 2, S.cy, 1.3), "=": () => zoomAt(S.W / 2, S.cy, 1.3),
@@ -319,7 +348,7 @@ function buildLangSwitch() {
     try { localStorage.setItem(langKey(), S.altLang ? "alt" : "main"); } catch { /* idem */ }
     mark();
     tip.hidden = true;
-    if (!panel.hidden && current()) openEntry(current());   // la fiche, la liste ou la visite ouverte, dans l'autre langue
+    rerenderPage();                // la page ouverte, sur place, dans l'autre langue
     draw();
     announce(S.altLang ? `Texts in ${label}` : "Texts in English");
   }));
@@ -371,11 +400,9 @@ function buildLegend() {
   }
 }
 
-// une catégorie (ou le DLC) masquée ou réaffichée : les listes ouvertes et la carte suivent
+// une catégorie (ou le DLC) masquée ou réaffichée : la page ouverte (sur place) et la carte suivent
 function refreshVisible() {
-  if (S.results.length && S.selected < 0) renderResults();
-  else if (S.cluster && S.selected < 0) openCluster(S.cluster, { fly: false, focus: false });
-  else if (S.entity && S.selected < 0) openEntity(S.entity, { fly: false, focus: false });
+  rerenderPage();
   draw();
 }
 

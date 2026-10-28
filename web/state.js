@@ -39,7 +39,7 @@ export const S = {
   bm25: null, emb: null, extractor: null, semanticState: "off",
   grid: null, sprites: {}, dust: [],
   images: new Map(),     // nom du texte -> icône (ou portrait de l'interlocuteur), data/images.json
-  visited: new Set(), trailDocs: [], cameFrom: -1, trailShown: false,   // parcours de lecture (trail-ui.js)
+  visited: new Set(), trailDocs: [], cameFrom: -1, trailShown: false,   // parcours de lecture (history-ui.js)
   tours: [], tour: null, tourStep: -1,   // visites guidées (tours-ui.js) ; visite ouverte et son étape
   altLang: false,        // textes affichés dans la seconde langue du jeu (Bloodborne : le français officiel)
 };
