@@ -1,7 +1,6 @@
 // La page d'un groupe de textes : son nom, sa description, ses textes (ceux du cœur d'abord).
 import { S, esc, clusterById, docRow, isHidden, nameOf, textOf, groupName, groupDesc } from "./state.js";
-import { registerPage } from "./pages.js";
-import { select } from "./panel.js";
+import { registerPage, openPage } from "./pages.js";
 import { snippet } from "./links.js";
 
 const groupOfArgs = ({ id, label }) => clusterById(id) || S.clusters.find(x => x.label === label);
@@ -37,7 +36,7 @@ registerPage({
     <ol class="results">${visible.map(d => docRow(d, esc(nameOf(d)), esc(snippet(textOf(d), [])))).join("")}</ol>
   </article>`,
       bind: panel => panel.querySelectorAll("button[data-i]").forEach(b =>
-        b.addEventListener("click", () => select(+b.dataset.i))),
+        b.addEventListener("click", () => openPage("doc", { i: +b.dataset.i }))),
       announce: `Group ${groupName(c)}: ${c.n} texts`,
       frame: members,               // les étoiles du groupe à l'écran, avec le texte d'où l'on vient
     };

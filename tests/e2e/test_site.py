@@ -143,7 +143,7 @@ FIRST_TEXT = {"bloodborne": "Hunter's Mark", "elden-ring": "Tarnished's Furled F
 def shown(page):
     """La page du panneau : [sorte de page, titre], ou None quand le panneau est fermé."""
     return page.evaluate("""() => { const p = document.querySelector('#panel');
-        return p.hidden ? null : [p.dataset.view, p.querySelector('h2')?.textContent.trim() ?? null]; }""")
+        return p.hidden ? null : [p.dataset.page, p.querySelector('h2')?.textContent.trim() ?? null]; }""")
 
 
 def wait_shown(page, expected):
@@ -152,7 +152,7 @@ def wait_shown(page, expected):
     try:
         page.wait_for_function("""w => { const p = document.querySelector('#panel');
             return w === null ? p.hidden
-                 : !p.hidden && p.dataset.view === w[0] && p.querySelector('h2')?.textContent.trim() === w[1]; }""",
+                 : !p.hidden && p.dataset.page === w[0] && p.querySelector('h2')?.textContent.trim() === w[1]; }""",
                                arg=want, timeout=5000)
     except sync_api.TimeoutError:
         pass
@@ -254,7 +254,7 @@ def test_links_between_characters_index_and_dialogues(browser, site, game):
     assert page.text_content("#panel .panel-top .back").strip() == "Back to characters and places"
     passage = page.get_attribute("#panel .pnum", "data-i")
     page.click("#panel .pnum")
-    page.wait_for_function("() => document.querySelector('#panel').dataset.view === 'doc'")
+    page.wait_for_function("() => document.querySelector('#panel').dataset.page === 'doc'")
     assert page.text_content("#panel .panel-top .back").strip() == f"Back to the dialogue of {speaker}"
     page.click("#panel button.tdial")                  # le dialogue du passage, celui-ci mis en avant
     wait_shown(page, ("dialogue", speaker))
@@ -298,7 +298,7 @@ def test_typing_a_search_is_one_step(browser, site, game):
     page.route(lambda url: not url.startswith(site), lambda route: route.abort())
     page.click("#q")
     page.keyboard.type("blood", delay=300)          # plus lent que l'attente de la recherche : un rendu par lettre
-    page.wait_for_function("() => document.querySelector('#panel').dataset.view === 'results'")
+    page.wait_for_function("() => document.querySelector('#panel').dataset.page === 'results'")
     page.wait_for_timeout(500)
     page.go_back()
     wait_shown(page, ("doc", first))
@@ -343,12 +343,12 @@ def test_a_text_keeps_the_focus_and_a_group_starts_fresh(browser, site, game):
     assert page.text_content("#panel .panel-top .back").strip() == f"Back to the group “{group}”"
     entity = ENTITY[game]
     page.goto(f"{site}?game={game}#entity={entity}")
-    page.wait_for_function("() => document.querySelector('#panel').dataset.view === 'entity'")
+    page.wait_for_function("() => document.querySelector('#panel').dataset.page === 'entity'")
     page.click("#panel .results button")
-    page.wait_for_function("() => document.querySelector('#panel').dataset.view === 'doc'")
+    page.wait_for_function("() => document.querySelector('#panel').dataset.page === 'doc'")
     assert focus(page)["entity"] == entity                  # l'entité aussi
     page.click("#panel .glink")
-    page.wait_for_function("() => document.querySelector('#panel').dataset.view === 'cluster'")
+    page.wait_for_function("() => document.querySelector('#panel').dataset.page === 'cluster'")
     f = focus(page)
     assert f["entity"] is None and f["selected"] == -1 and f["group"] is not None
     assert problems == []
@@ -359,13 +359,13 @@ def test_back_to_the_results(browser, site, game):
     page, _ = open_page(browser, f"{site}?game={game}", DESKTOP)
     page.route(lambda url: not url.startswith(site), lambda route: route.abort())
     page.fill("#q", "blood")
-    page.wait_for_function("() => document.querySelector('#panel').dataset.view === 'results'")
+    page.wait_for_function("() => document.querySelector('#panel').dataset.page === 'results'")
     name = page.text_content("#panel .results button .name").strip()
     page.click("#panel .results button")
     wait_shown(page, ("doc", name))
     assert page.text_content("#panel .panel-top .back").strip() == "Back to the results for “blood”"
     page.click("#panel .panel-top .back")
-    page.wait_for_function("() => document.querySelector('#panel').dataset.view === 'results'")
+    page.wait_for_function("() => document.querySelector('#panel').dataset.page === 'results'")
     assert page.input_value("#q") == "blood"
 
 

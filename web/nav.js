@@ -1,17 +1,17 @@
-// Historique de navigation du panneau : chaque page ouverte (texte, groupe, entité, index, aide,
-// chemin, résultats) est une entrée de l'historique du navigateur. « Retour » dans le panneau et le
-// bouton Retour du navigateur font la même chose ; revenir au premier état referme le panneau
-// au lieu de quitter la page.
-// Ce module ne touche ni au DOM ni à l'état partagé : l'historique du navigateur et ce qu'il faut
-// savoir des pages (adresse, règle de remplacement, page à rouvrir) lui sont donnés par pages.js.
+// L'historique du navigateur, et rien d'autre : chaque page ouverte est une entrée. « Retour » dans
+// le panneau et le bouton Retour du navigateur font la même chose ; revenir au premier état referme
+// le panneau au lieu de quitter la page.
+// Ce module ne touche ni au DOM ni à l'état partagé, et ne sait rien des sortes de pages : l'historique
+// du navigateur et ce qu'il faut savoir d'une entrée (adresse, règle de remplacement, comment la
+// rouvrir) lui sont donnés par pages.js.
 
-const stack = [];        // entrées {view, …} de cette visite, dans l'ordre de l'historique
+const stack = [];        // entrées {page, …} de cette visite, dans l'ordre de l'historique
 let pos = -1;
 let restoring = false;   // pendant qu'on rejoue une entrée : ne rien enregistrer
 let popped = null;       // adresse rétablie par popstate (le hashchange qui suit n'est pas un lien collé)
 let browser = null;      // l'historique du navigateur : push, replace, back, href, plain, onPop
 let pages = null;        // addressOf(e), replaces(a, b), query(), reopen(e) : fournis par pages.js
-let watcher = null;      // prévenu de chaque entrée ouverte (le parcours de lecture, trail-ui.js)
+let watcher = null;      // prévenu de chaque entrée ouverte (pages.js, pour l'History)
 
 export function startNav(b, p) {
   browser = b;
@@ -24,8 +24,6 @@ export function startNav(b, p) {
 }
 
 export function onRecord(f) { watcher = f; }
-// rouvre une entrée comme un nouveau pas (le parcours sous la recherche), pas comme un Retour
-export function openEntry(e) { pages.reopen(e); }
 
 export function record(entry) {
   if (restoring) return;
@@ -60,17 +58,13 @@ export function poppedHere() {
   return hit;
 }
 
-// rejoue une entrée sans rien enregistrer (Retour, ou une page réaffichée par l'ancien code)
-export function replay(e, open) {
-  restoring = true;
-  try { open(e); } finally { restoring = false; }
-}
-
+// Retour : rouvre l'entrée sans rien enregistrer
 function restore(state) {
   const k = state?.k;
   if (k === undefined || !stack[k]) return;    // entrée d'une visite précédente : hashchange s'en charge
   popped = browser.href();
   pos = k;
   watcher?.(stack[k]);           // revenir à une page, c'est aussi la relire (avant : la caméra en dépend)
-  replay(stack[k], pages.reopen);
+  restoring = true;
+  try { pages.reopen(stack[k]); } finally { restoring = false; }
 }

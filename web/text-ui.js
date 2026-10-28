@@ -5,8 +5,8 @@ import { tokenize } from "./search.js";
 import { S, esc, colorOf, clusterById, portrait, nameOf, textOf, textLang, groupName } from "./state.js";
 import { setHover } from "./render.js";
 import { registerPage, openPage } from "./pages.js";
-import { select, startPath, groupOf } from "./panel.js";
-import { entityChips, bindEntityButtons, linkText, dialogueButtons, bindDialogueButtons, dlcBadge } from "./links.js";
+import { startPath } from "./pathbar.js";
+import { entityChips, bindEntityButtons, linkText, dialogueButtons, bindDialogueButtons, dlcBadge, groupOf } from "./links.js";
 import { tipAtStar } from "./tip.js";
 
 registerPage({
@@ -19,6 +19,8 @@ registerPage({
   step: ({ i }) => ({ kind: "doc", key: S.docs[i].name }),
   fromStep: { kind: "doc", page: key => { const d = S.docs.find(x => x.name === key); return d ? { i: d.i } : null; } },
   keepsFocus: true,
+  // un chemin attend son second texte (pathbar.js) : choisir un texte ouvre plutôt le chemin
+  divert: ({ i }) => (S.pathFrom >= 0 && i !== S.pathFrom ? { page: "path", a: S.pathFrom, b: i } : null),
   render: ({ i }) => {
     S.selected = i;
     const d = S.docs[i];
@@ -84,7 +86,7 @@ function bind(panel, d) {
     navigator.clipboard?.writeText(location.href).then(() => { ev.target.textContent = "Link copied"; });
   });
   panel.querySelectorAll(".echoes button").forEach(b => {
-    b.addEventListener("click", () => { setHover(-1); select(+b.dataset.i); });   // la liste est remplacée : pas de pointerleave
+    b.addEventListener("click", () => { setHover(-1); openPage("doc", { i: +b.dataset.i }); });   // la liste est remplacée : pas de pointerleave
     // survol ou focus d'un écho : son étoile s'allume sur la carte, avec sa bulle
     // (souris et clavier seulement : au doigt, le toucher ouvre directement la fiche)
     const on = () => { setHover(+b.dataset.i); tipAtStar(+b.dataset.i); }, off = () => setHover(-1);

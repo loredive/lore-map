@@ -3,7 +3,7 @@
 // et le survol de la liste des échos dans le panneau.
 import { S, tip, esc, portrait, nameOf, textOf, groupName } from "./state.js";
 import { toScreen } from "./render.js";
-import { groupOf, snippet, dlcBadge } from "./panel.js";
+import { groupOf, snippet, dlcBadge } from "./links.js";
 
 const TIP_SNIPPET = 180;    // caractères du texte montrés dans la bulle
 const TIP_WIDTH = 360;      // px, largeur maximale de la bulle

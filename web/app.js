@@ -5,13 +5,14 @@ import { buildViewSwitch, addShelves } from "./views.js";
 import { prepareSky } from "./sky.js";
 import { buildDialogues } from "./dialogue-ui.js";
 import { buildIndex, runSearch, renderResults, resetSearch } from "./search-ui.js";
-import { select, openCluster, closePanel, cancelPath, panelTop, bindPanelTop, oldPages } from "./panel.js";
-import { record, current, openEntry } from "./nav.js";
+import { panelTop, bindPanelTop } from "./panel.js";
+import { cancelPath } from "./pathbar.js";
+import { record } from "./nav.js";
 import { showTip } from "./tip.js";
 import "./entities-ui.js";
-import { initTrail } from "./trail-ui.js";
+import { initHistory } from "./history-ui.js";
 import { loadTours } from "./tours-ui.js";
-import { startPages, openFromAddress, rerenderPage } from "./pages.js";
+import { startPages, openFromAddress, rerenderPage, openPage, closePage, currentPage, reopen } from "./pages.js";
 import "./help-ui.js";
 import "./text-ui.js";
 import "./group-ui.js";
@@ -31,15 +32,15 @@ startPages({
     onPop: f => addEventListener("popstate", e => f(e.state)),
   },
   query: () => S.query,
+  clearSearch: resetSearch,
   resetFocus: () => { resetContext(); S.selected = -1; },
   top: panelTop,
   bindTop: bindPanelTop,
   focus: focusPanel,
   frame: frameFrom,
   draw,
-  // revenir à une page ouverte avant la recherche efface la recherche
-  onReopen: e => { if (e.view !== "results" && !e.q && S.query) resetSearch(); },
-  fallback: oldPages,
+  // revenir à une page ouverte avant la recherche efface la recherche (les résultats portent la leur)
+  onReopen: e => { if (!e.q && S.query) resetSearch(); },
 });
 
 // ------------------------------------------------------------------ jeu
@@ -127,13 +128,13 @@ async function load() {
   legendFade();
   buildViewSwitch();
   buildLangSwitch();
-  initTrail();                                  // avant openFromAddress : le lien collé est un premier pas
+  initHistory();                                // avant openFromAddress : le lien collé est un premier pas
   await loadTours();                            // data/<jeu>/tours.json, s'il y en a
   status.textContent = "";
   mode.textContent = "";                       // la ligne d'état ne parle que quand il y a du nouveau
   resize();
   openFromAddress(location.hash);
-  if (!current()) record({ view: "none" });     // premier état : la carte seule, panneau fermé
+  if (!currentPage()) record({ page: "none" });   // premier état : la carte seule, panneau fermé
 }
 
 
@@ -186,9 +187,9 @@ canvas.addEventListener("pointerup", e => {
     const label = near < 0 ? labelAt(e.clientX, e.clientY) : null;
     if (e.pointerType !== "mouse" && tapZoom(e.clientX, e.clientY, label)) { drag = null; return; }
     const i = near >= 0 ? near : label ? -1 : pick(e.clientX, e.clientY, e.pointerType === "mouse" ? 12 : 22);
-    if (i >= 0) select(i);
-    else if (label) openCluster(label);
-    else if (!panel.hidden && panel.dataset.view !== "results") closePanel();
+    if (i >= 0) openPage("doc", { i });
+    else if (label) openPage("cluster", { id: label.id, label: label.label });
+    else if (!panel.hidden && panel.dataset.page !== "results") closePage();
   }
   drag = null;
 });
@@ -225,8 +226,8 @@ function openChooser(list, sx, sy, group = null) {
   const w = chooser.offsetWidth, h = chooser.offsetHeight;
   chooser.style.left = Math.max(8, Math.min(sx - w / 2, S.W - w - 8)) + "px";
   chooser.style.top = (sy + 24 + h < S.H ? sy + 24 : Math.max(8, sy - h - 24)) + "px";
-  chooser.querySelectorAll("button[data-i]").forEach(b => b.addEventListener("click", () => { closeChooser(); select(+b.dataset.i); }));
-  chooser.querySelector("button[data-c]")?.addEventListener("click", () => { closeChooser(); openCluster(group); });
+  chooser.querySelectorAll("button[data-i]").forEach(b => b.addEventListener("click", () => { closeChooser(); openPage("doc", { i: +b.dataset.i }); }));
+  chooser.querySelector("button[data-c]")?.addEventListener("click", () => { closeChooser(); openPage("cluster", { id: group.id, label: group.label }); });
   chooser.querySelector("button").focus({ preventScroll: true });
 }
 export function closeChooser() { chooser.hidden = true; }
@@ -289,11 +290,11 @@ addEventListener("keydown", e => {
     if (!chooser.hidden) closeChooser();
     else if (S.pathFrom >= 0) { cancelPath(); draw(); }
     else if (input.value) { input.value = ""; runSearch(); }
-    else if (!panel.hidden) closePanel();
+    else if (!panel.hidden) closePage();
     return;
   }
   if (typing || document.activeElement?.closest("#panel")) return;
-  if (e.key === "Enter" && document.activeElement === canvas && S.hover >= 0) { e.preventDefault(); select(S.hover); return; }
+  if (e.key === "Enter" && document.activeElement === canvas && S.hover >= 0) { e.preventDefault(); openPage("doc", { i: S.hover }); return; }
   const step = 80 / (S.cam.s * S.base);
   const keys = {
     "+": () => zoomAt(S.W / 2, S.cy, 1.3), "=": () => zoomAt(S.W / 2, S.cy, 1.3),
@@ -349,7 +350,7 @@ function buildLangSwitch() {
     try { localStorage.setItem(langKey(), S.altLang ? "alt" : "main"); } catch { /* idem */ }
     mark();
     tip.hidden = true;
-    if (!panel.hidden && current()) openEntry(current());   // la fiche, la liste ou la visite ouverte, dans l'autre langue
+    if (!panel.hidden && currentPage()) reopen(currentPage());   // la fiche, la liste ou la visite ouverte, dans l'autre langue
     draw();
     announce(S.altLang ? `Texts in ${label}` : "Texts in English");
   }));

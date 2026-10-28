@@ -3,10 +3,8 @@ import { BM25, tokenize, corpusText, lexicalRanking, hybridRanking, semanticScor
          parseQuery, hasConstraints, satisfies } from "./search.js";
 import { S, panel, input, mode, esc, fold, docRow, announce, dataPath, MAX_HITS_ON_MAP, MAX_RESULTS, isHidden, nameOf, textOf } from "./state.js";
 import { draw } from "./render.js";
-import { select, snippet, mark } from "./panel.js";
-import { current, goBack } from "./nav.js";
-import { registerPage, openPage } from "./pages.js";
-import { bindEntityButtons } from "./links.js";
+import { registerPage, openPage, currentPage, goBack } from "./pages.js";
+import { bindEntityButtons, snippet, mark } from "./links.js";
 
 const TRANSFORMERS_URL = "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1";   // version exacte : une nouvelle version ne peut pas entrer dans la page à notre insu
 
@@ -29,7 +27,7 @@ let searchSeq = 0, debounce = 0;
 // la lire (défilement, clic, touche), on ne la remplace pas sous les yeux : on propose de l'afficher.
 let touched = false, pending = null;
 for (const ev of ["wheel", "touchmove", "pointerdown", "keydown"]) {
-  panel.addEventListener(ev, () => { if (panel.dataset.view === "results") touched = true; }, { passive: true });
+  panel.addEventListener(ev, () => { if (panel.dataset.page === "results") touched = true; }, { passive: true });
 }
 input.addEventListener("input", () => { clearTimeout(debounce); debounce = setTimeout(runSearch, 180); });
 // Entrée : la recherche part tout de suite et le focus passe au premier résultat
@@ -49,7 +47,7 @@ export async function runSearch(apply = applyResults) {
   if (q.length < 2) {
     S.hits = null; S.results = [];
     // recherche effacée : on revient à ce qu'il y avait avant elle (une fiche, ou la carte seule)
-    if (current()?.view === "results") goBack();
+    if (currentPage()?.page === "results") goBack();
     mode.textContent = "";
     draw();
     return;
@@ -95,7 +93,7 @@ function offerOrApply(hybrid, q) {
   mode.textContent = "Results by keyword and meaning";
   // une fiche, un dialogue ou un chemin ouverts entre-temps restent affichés : « Retour aux résultats »
   // relance la recherche, affinée d'emblée puisque le modèle est chargé
-  if (panel.hidden || panel.dataset.view !== "results") return;
+  if (panel.hidden || panel.dataset.page !== "results") return;
   if (touched) {
     pending = hybrid;
     showRefineOffer();
@@ -229,7 +227,7 @@ function resultsPage() {
     <p class="hint search-tip">${preciseTip()}</p>`,
     bind: panel => {
       panel.querySelectorAll("button[data-i]").forEach(b =>
-        b.addEventListener("click", () => select(+b.dataset.i)));
+        b.addEventListener("click", () => openPage("doc", { i: +b.dataset.i })));
       bindEntityButtons();
       if (focused !== undefined) (panel.querySelector(`button[data-i="${focused}"]`) || panel.querySelector(".results button"))?.focus();
     },

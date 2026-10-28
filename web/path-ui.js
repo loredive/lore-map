@@ -1,13 +1,12 @@
 // La page d'un chemin d'échos : d'un texte à un autre en sautant d'écho en écho, comment le sens
-// glisse d'un sujet à l'autre. On le commence depuis un texte (panel.js : startPath), et choisir le
-// second texte ouvre cette page.
+// glisse d'un sujet à l'autre. On le commence depuis un texte (pathbar.js : startPath), et choisir le
+// second texte ouvre cette page (le détour déclaré par la page d'un texte, text-ui.js).
 import { S, esc, docRow, nameOf, textOf } from "./state.js";
 import { fitPoints } from "./render.js";
 import { echoGraph, echoPath } from "./graph.js";
-import { registerPage } from "./pages.js";
-import { select, cancelPath } from "./panel.js";
+import { registerPage, openPage } from "./pages.js";
+import { cancelPath } from "./pathbar.js";
 import { snippet } from "./links.js";
-import { resetSearch } from "./search-ui.js";
 
 const indexOf = name => S.docs.findIndex(x => x.name === name);
 
@@ -22,9 +21,9 @@ registerPage({
     },
   },
   backLabel: () => "Back to the path",
+  clearsSearch: true,   // la recherche a servi à choisir l'arrivée
   render: ({ a, b }) => {
     cancelPath();
-    resetSearch();      // la recherche a servi à choisir l'arrivée
     S.echoAdj ||= echoGraph(S.docs.map(d => d.echoes));
     const path = echoPath(S.echoAdj, a, b);
     S.path = path; S.pathSet = path ? new Set(path) : null;
@@ -47,7 +46,7 @@ registerPage({
       return docRow(d, esc(nameOf(d)), esc(snippet(textOf(d), [])), `<span class="step">${k + 1}</span>`);
     }).join("")}</ol>
   </article>`,
-      bind: panel => panel.querySelectorAll("button[data-i]").forEach(b => b.addEventListener("click", () => select(+b.dataset.i))),
+      bind: panel => panel.querySelectorAll("button[data-i]").forEach(b => b.addEventListener("click", () => openPage("doc", { i: +b.dataset.i }))),
       announce: `Path of ${hops} ${hops > 1 ? "echoes" : "echo"}`,
       frame: () => fitPoints(path.map(i => S.docs[i]), 0),     // tout le chemin, au plus près
     };

@@ -61,7 +61,7 @@ registerPage({
     const t = tourById(id);
     // la page d'avant (pas encore remplacée) était-elle déjà cette visite ?
     const was = currentPage();
-    const fresh = !(was && was.view === "tour" && was.id === id);
+    const fresh = !(was && was.page === "tour" && was.id === id);
     S.tour = t; S.tourStep = k;
     S.path = t.steps.map(s => s.i); S.pathSet = new Set(S.path);
     const step = t.steps[k], d = S.docs[step.i];

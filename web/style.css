@@ -406,7 +406,7 @@ body.sky-d[data-game="bloodborne"]::after {
 .legend button.dlc .dlc-badge { margin: 0 .45rem 0 0; font-size: .62rem; }
 .legend button.dlc[aria-pressed="false"] .dlc-badge { opacity: .35; }
 
-/* historique de lecture (trail-ui.js) */
+/* History (history-ui.js) */
 .trail-list .kind { color: var(--faint); font-size: .78rem; font-style: italic; margin-right: .45rem; }
 .card .tools .danger { color: #e3a3a3; text-decoration-color: rgba(227, 163, 163, .5); }
 
