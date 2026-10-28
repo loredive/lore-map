@@ -18,6 +18,12 @@ jobs:
       # the tests don't need the embedding model, only these
       - run: uv run --no-project --with pytest --with numpy --with scikit-learn --with pillow pytest
       - run: node --test tests/*.test.mjs
+      - run: uvx ruff@0.17.3 check .
+      # the page in a real browser (tests/e2e), so a broken page is never deployed
+      - name: Page in a browser
+        run: |
+          uv run --no-project --with playwright==1.64.0 playwright install --with-deps chromium
+          uv run --no-project --with pytest --with playwright==1.64.0 pytest tests/e2e
 
   deploy:
     needs: test

@@ -98,6 +98,9 @@ function clouds(k) {
   return cache.get(k);
 }
 
+// nombre de nuages prêts pour la vue affichée (le test de la page vérifie qu'ils ne manquent pas)
+export const cloudCount = () => (cache.get(S.view) || []).length;
+
 // à l'écran : le groupe ouvert ou survolé s'allume, les autres s'effacent quand un groupe est ouvert
 export function drawClouds(toScreen, minCohesion) {
   ctx.save();
