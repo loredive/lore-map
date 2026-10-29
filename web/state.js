@@ -58,6 +58,10 @@ export const textLang = d => (S.altLang && d.alt ? S.ui.alt_lang : "en");
 export const groupName = c => (S.altLang && c.altLabel) || c.label;
 export const groupDesc = c => (S.altLang && c.altDescription) || c.description;
 
+// Les étoiles à cadrer, plus le texte d'où l'on vient (S.cameFrom) s'il y en a un : la caméra ne lit
+// pas l'historique, c'est l'appelant de frameFrom qui le lui ajoute, pour qu'il reste à l'écran.
+export const withCameFrom = points => (S.cameFrom >= 0 ? [...points, S.docs[S.cameFrom]] : points);
+
 // Icône d'un texte, ou portrait du PNJ pour un passage de dialogue ; "" sans image.
 // Décorative (alt vide) : le nom est toujours écrit à côté.
 export function portrait(d, cls, size) {

@@ -1,5 +1,6 @@
 import { S, $, esc, MORPH_MS, reducedMotion } from "./state.js";
-import { buildGrid, draw, render, setHover, focusDoc, fitPoints } from "./render.js";
+import { buildGrid, draw, render, setHover } from "./render.js";
+import { focusDoc, fitPoints } from "./camera.js";
 import { shelves, SHELVES } from "./shelves.js";
 
 // ------------------------------------------------------------------ vues (projections)
@@ -45,7 +46,7 @@ export function setView(k) {
   };
   // à l'arrivée, ce qui est ouvert revient au centre (sinon le texte choisi peut sortir de l'écran)
   const recenter = () => {
-    if (S.selected >= 0) focusDoc(S.docs[S.selected], S.cam.s);
+    if (S.selected >= 0) focusDoc(S.docs[S.selected]);
     else if (S.path) fitPoints(S.path.map(i => S.docs[i]), 0);
     else if (S.cluster) fitPoints(S.docs.filter(d => d.cluster === S.cluster.id));
     else if (S.entity) fitPoints(S.entity.docs.map(i => S.docs[i]));
