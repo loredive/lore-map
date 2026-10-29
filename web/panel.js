@@ -1,6 +1,7 @@
 // Le panneau de droite : en-tête commun, panneau fermé, liens collés dans la barre d'adresse.
 import { S, panel, esc } from "./state.js";
-import { draw, focusDoc } from "./render.js";
+import { draw } from "./render.js";
+import { focusDoc } from "./camera.js";
 import { poppedHere } from "./nav.js";
 import { registerPage, backLabel, goBack, closePage, openFromAddress } from "./pages.js";
 import { cancelPath } from "./pathbar.js";
@@ -15,7 +16,7 @@ function toggleReading(btn) {
   btn.setAttribute("aria-pressed", String(on));
   btn.textContent = on ? "Narrow" : "Widen";
   // la carte visible a changé de largeur : y recentrer le texte ouvert
-  if (S.selected >= 0) focusDoc(S.docs[S.selected], S.cam.s);
+  if (S.selected >= 0) focusDoc(S.docs[S.selected]);
   else draw();
 }
 

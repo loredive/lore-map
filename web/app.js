@@ -1,7 +1,7 @@
 // Point d'entrée : chargement des données, souris, clavier, légende.
-import { S, $, canvas, panel, tip, status, input, mode, esc, colorOf, announce, dataPath, DEFAULT_GAME, nameOf, groupName, resetContext, focusPanel } from "./state.js";
-import { buildGrid, buildSprites, computeHulls, resize, draw, nearest, setHover, starsNear, frameFrom } from "./render.js";
-import { camera, toWorld, panBy, zoomAt, canZoom, flyTo, viewCenter } from "./camera.js";
+import { S, $, canvas, panel, tip, status, input, mode, esc, colorOf, announce, dataPath, DEFAULT_GAME, nameOf, groupName, resetContext, focusPanel, withCameFrom } from "./state.js";
+import { buildGrid, buildSprites, computeHulls, resize, draw, nearest, setHover, starsNear } from "./render.js";
+import { camera, toWorld, panBy, zoomAt, canZoom, flyTo, viewCenter, frameFrom } from "./camera.js";
 import { buildViewSwitch, addShelves } from "./views.js";
 import { prepareSky } from "./sky.js";
 import { buildDialogues } from "./dialogue-ui.js";
@@ -37,7 +37,7 @@ startPages({
   top: panelTop,
   bindTop: bindPanelTop,
   focus: focusPanel,
-  frame: frameFrom,
+  frame: stars => frameFrom(withCameFrom(stars)),   // avec le texte d'où l'on vient
   draw,
   // revenir à une page ouverte avant la recherche efface la recherche (les résultats portent la leur)
   onReopen: e => { if (!e.q && S.query) resetSearch(); },

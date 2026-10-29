@@ -2,7 +2,7 @@
 // glisse d'un sujet à l'autre. On le commence depuis un texte (pathbar.js : startPath), et choisir le
 // second texte ouvre cette page (le détour déclaré par la page d'un texte, text-ui.js).
 import { S, esc, docRow, nameOf, textOf } from "./state.js";
-import { fitPoints } from "./render.js";
+import { fitPoints } from "./camera.js";
 import { echoGraph, echoPath } from "./graph.js";
 import { registerPage, openPage } from "./pages.js";
 import { cancelPath } from "./pathbar.js";
