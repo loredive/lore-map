@@ -81,9 +81,6 @@ function cloud(c, k, members) {
 // les images sont refaites quand on masque une catégorie (ses étoiles quittent le nuage)
 let cache = new Map(), cacheKey = "";
 function clouds(k) {
-  // la carte peut se dessiner avant l'arrivée des données (la barre du haut change de taille au
-  // chargement) : ne rien mettre en cache tant qu'il n'y a pas de groupes, sinon la liste vide resterait
-  if (!S.clusters.length) return [];
   const key = [...S.hidden].sort().join(",") + (S.hideDlc ? "|dlc" : "");
   if (key !== cacheKey) { cache = new Map(); cacheKey = key; }
   if (!cache.has(k)) {

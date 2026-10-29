@@ -12,6 +12,7 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+from urllib.parse import quote
 
 import pytest
 
@@ -91,6 +92,46 @@ def test_clouds_survive_slow_data(browser, site, game):
 
 
 @pytest.mark.parametrize("game", GAMES)
+@pytest.mark.parametrize("device", [DESKTOP, PHONE], ids=["desktop", "phone"])
+def test_pressing_things_while_the_data_loads(browser, site, game, device):
+    """lore.json retenu pendant qu'on agit sur la page : redimensionner, des touches, un clic sur la
+    carte, une autre adresse puis Retour, le menu sur téléphone. Une fois les données là : aucune erreur,
+    les nuages sont dessinés, la page du lien collé s'ouvre, et les commandes répondent."""
+    lore = json.loads((WEB / "data" / game / "lore.json").read_text(encoding="utf-8"))
+    first, second = (c["label"] for c in sorted(lore["clusters"], key=lambda c: -c["n"])[:2])
+    context = browser.new_context(**device)
+    page = context.new_page()
+    problems = []
+    page.on("pageerror", lambda e: problems.append(f"page error: {e}"))
+    held = []
+    page.route("**/lore.json", lambda route: held.append(route))   # retenu jusqu'à ce qu'on le laisse passer
+    page.goto(f"{site}?game={game}#group={quote(first, safe="")}")
+    page.wait_for_function("() => document.querySelector('#status').textContent !== ''")
+    while not held:
+        page.wait_for_timeout(20)
+    # pendant le chargement : seuls le menu et les liens des jeux répondent
+    assert page.evaluate("() => document.querySelector('.seek').inert && document.querySelector('.drawer .links').inert")
+    if device is PHONE:
+        page.click(".menu-btn")
+        assert page.evaluate("() => document.querySelector('.topbar').classList.contains('open')")
+        page.click(".menu-btn")
+    page.set_viewport_size({"width": device["viewport"]["width"] - 40, "height": device["viewport"]["height"] - 30})
+    for key in ["ArrowLeft", "+", "/", "Escape"]:
+        page.keyboard.press(key)
+    page.mouse.click(100, 400)
+    page.evaluate(f"() => {{ location.hash = {json.dumps('#group=' + quote(second, safe=""))}; }}")
+    page.evaluate("() => history.back()")
+    page.wait_for_function(f"() => location.hash === {json.dumps('#group=' + quote(first, safe=""))}")
+    held[0].continue_()
+    page.wait_for_function("() => document.querySelector('#status').textContent === ''", timeout=20000)
+    wait_shown(page, ["cluster", first])
+    assert problems == []
+    assert page.evaluate("async () => (await import('./nebula.js')).cloudCount()") > 0
+    assert page.evaluate("() => !document.querySelector('.seek').inert && !document.querySelector('#q').disabled")
+    context.close()
+
+
+@pytest.mark.parametrize("game", GAMES)
 def test_broken_data_names_the_missing_field(browser, site, game):
     """Un lore.json sans le champ obligatoire « xy » : la ligne d'état le nomme, et la page ne plante pas."""
     lore = json.loads((WEB / "data" / game / "lore.json").read_text(encoding="utf-8"))
@@ -108,6 +149,11 @@ def test_broken_data_names_the_missing_field(browser, site, game):
     message = page.locator("#status").text_content()
     assert 'missing required field "xy"' in message and "prepare.py" in message
     assert problems == []
+    # sans données, l'interface reste inerte, mais on peut encore changer de jeu
+    assert page.evaluate("() => document.querySelector('.seek').inert")
+    page.set_viewport_size(PHONE["viewport"])
+    page.click(".menu-btn")
+    assert page.evaluate("() => document.querySelector('.topbar').classList.contains('open')")
     context.close()
 
 

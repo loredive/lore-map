@@ -36,5 +36,8 @@ export function bindPanelTop() {
 // Le panneau fermé est une page : fermer est une étape, Retour rouvre ce qu'on vient de fermer.
 registerPage({ name: "none", panel: false, onOpen: cancelPath, render: () => ({}) });
 
-// lien collé dans la barre d'adresse sans recharger la page (replaceState ne déclenche pas l'événement)
-addEventListener("hashchange", () => { if (S.docs.length && !poppedHere()) openFromAddress(location.hash); });
+// lien collé dans la barre d'adresse sans recharger la page (replaceState ne déclenche pas l'événement) ;
+// posé par app.js une fois les données là
+export function watchAddress() {
+  addEventListener("hashchange", () => { if (!poppedHere()) openFromAddress(location.hash); });
+}
