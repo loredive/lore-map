@@ -819,3 +819,46 @@ def test_back_to_a_visible_text_keeps_the_camera(browser, site, game, device):
     wait_shown(page, ("doc", first))
     assert camera(page) == {k: v for k, v in before.items() if k != "screen"}
     assert problems == []
+
+
+# ------------------------------------------------------------------ ouverture dans le brouillard
+def intro_active(page):
+    return page.evaluate("async () => (await import('./render.js')).introActive()")
+
+
+@pytest.mark.parametrize("game", GAMES)
+def test_intro_plays_on_a_plain_load(browser, site, game):
+    page, problems = open_page(browser, f"{site}?game={game}", DESKTOP)
+    assert intro_active(page)                          # open_page attend 500 ms, l'ouverture en dure 7000
+    page.mouse.click(100, 400)
+    assert not intro_active(page)
+    assert problems == []
+
+
+@pytest.mark.parametrize("game", GAMES)
+def test_link_to_a_page_skips_the_intro(browser, site, game):
+    groups = [a for a in ADDRESSES[game] if a[0] == "group"]
+    page, problems = open_page(browser, f"{site}?game={game}{groups[0][1]}", DESKTOP)
+    assert shown(page) == ["cluster", groups[0][3]]
+    assert not intro_active(page)
+    entity = next(a for a in ADDRESSES[game] if a[0] == "entity")
+    paste_address(page, entity[1])
+    wait_shown(page, (entity[2], entity[3]))
+    assert not intro_active(page)
+    assert problems == []
+
+
+@pytest.mark.parametrize("game", GAMES)
+def test_click_during_intro_opens_the_star(browser, site, game):
+    first = FIRST_TEXT[game]
+    page, problems = open_page(browser, f"{site}?game={game}", DESKTOP)
+    i = doc_index(page, first)
+    c = camera(page)
+    x, y = page.evaluate("async i => { const d = (await import('./state.js')).S.docs[i]; return [d.x, d.y]; }", i)
+    move_camera(page, x - c["x"], y - c["y"], 8)        # de près : l'étoile seule sous le pointeur
+    assert intro_active(page)
+    sx, sy = camera(page, [i])["screen"][0]
+    page.mouse.click(sx, sy)
+    wait_shown(page, ("doc", first))
+    assert not intro_active(page)
+    assert problems == []

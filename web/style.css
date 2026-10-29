@@ -379,6 +379,11 @@ ol.script .text { margin: 0; white-space: pre-line; line-height: 1.6; }
   * { transition: none !important; }
 }
 
+/* ouverture sans brouillard (moins d'animations demandé) : la carte apparaît en fondu court ; une
+   animation et non une transition, que la règle ci-dessus couperait */
+#sky.fade-in { animation: sky-fade-in 400ms ease-out; }
+@keyframes sky-fade-in { from { opacity: 0; } }
+
 /* ---------- personnages et lieux ---------- */
 .chips { display: flex; flex-wrap: wrap; gap: .35rem .4rem; margin: .4rem 0 .2rem; }
 .chip {
@@ -427,9 +432,10 @@ body.sky-d::before {
     var(--atmo, none);
 }
 body.sky-d[data-game="elden-ring"] {
+  --fog: #8a8678;
   --atmo: radial-gradient(ellipse 38% 55% at 50% 108%, rgba(240, 210, 140, .16), rgba(240, 210, 140, .05) 55%, transparent 75%);
 }
-body.sky-d[data-game="bloodborne"] { background: #06070d; }
+body.sky-d[data-game="bloodborne"] { background: #06070d; --fog: #6c6f80; }
 /* sous les étoiles (z-index -1 : au-dessus du fond de la page, sous la carte) ; la ville reste en bas,
    la lune à droite, même quand l'écran rogne l'image */
 body.sky-d[data-game="bloodborne"]::after {
