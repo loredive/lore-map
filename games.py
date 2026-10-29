@@ -10,6 +10,8 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
+from lore_format import read_lore
+
 ROOT = Path(__file__).parent
 GAMES = ROOT / "games"
 WEB = ROOT / "web"
@@ -95,8 +97,8 @@ def publish_tours(game: Game) -> None:
         dst.unlink(missing_ok=True)
         return
     tours = json.loads(src.read_text(encoding="utf-8"))
-    lore = json.loads((game.data_dir / "lore.json").read_text(encoding="utf-8"))
-    names = {r[lore["fields"].index("name")] for r in lore["docs"]}
+    lore = read_lore(game.data_dir / "lore.json")
+    names = {d["name"] for d in lore["docs"]}
     missing = [(t["id"], s["text"]) for t in tours for s in t["steps"] if s["text"] not in names]
     if missing:
         raise SystemExit(f"tours.json : étapes sans texte sur la carte : {missing}")
