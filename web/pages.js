@@ -23,9 +23,10 @@
 //   onOpen(args)      ce qu'elle fait en s'ouvrant, hors de la carte et du panneau (annuler un chemin en
 //                     attente) ; pas refait quand on la réaffiche
 //   panel             false : la page « panneau fermé »
-//   render(args, { from })  allume ce qu'il faut sur la carte et rend { html, bind(panel), announce, frame } ;
+//   render(args, { from })  allume ce qu'il faut sur la carte et rend { html, bind(panel), announce, frame, side } ;
 //                     frame : les étoiles à cadrer (deps.frame), ou une fonction qui cadre elle-même (le chemin) ;
-//                     from : l'entrée d'où l'on vient (la page quittée, Retour compris), ou null
+//                     side : { html, bind(column) }, la colonne à gauche du panneau (la liste d'où vient un
+//                     texte), cachée sans elle ; from : l'entrée d'où l'on vient (la page quittée, Retour compris), ou null
 import { startNav, record, current, previous, goBack as navBack, onRecord } from "./nav.js";
 
 const kinds = new Map();
@@ -33,7 +34,7 @@ let deps = null;
 
 export function registerPage(kind) { kinds.set(kind.name, kind); }
 
-// deps : panel, browser (adaptateur de l'historique du navigateur), query() (la recherche en cours),
+// deps : panel, side (la colonne à gauche du panneau, facultative), browser (adaptateur de l'historique du navigateur), query() (la recherche en cours),
 // clearSearch(), resetFocus(), top(backLabel) -> HTML de l'en-tête, bindTop(), focus(message),
 // frame(stars), draw(), onReopen(entry) (avant de rouvrir une entrée).
 export function startPages(d) {
@@ -54,8 +55,9 @@ function replaces(a, b) {
 // La séquence d'ouverture, écrite une seule fois. e : une entrée {page, …args} ; from : l'entrée quittée.
 function show(e, { rerender = false, fly = true, from = current() } = {}) {
   const name = e.page, args = argsOf(e);
-  const kind = kinds.get(name), { panel } = deps;
+  const kind = kinds.get(name), { panel, side } = deps;
   if (!kind) return;
+  const inSide = side?.contains(side.ownerDocument.activeElement);    // un texte choisi dans la colonne
   if (!kind.keepsFocus) deps.resetFocus();
   if (!rerender && kind.clearsSearch) deps.clearSearch?.();
   if (!rerender) kind.onOpen?.(args);
@@ -63,6 +65,7 @@ function show(e, { rerender = false, fly = true, from = current() } = {}) {
   panel.hidden = kind.panel === false;
   panel.dataset.page = kind.panel === false ? "" : name;
   if (!rerender) record({ page: name, ...args });
+  if (side) showSide(side, kind.panel !== false && page.side);    // avant le cadrage : elle cache une part de la carte
   if (kind.panel !== false) {
     const scroll = rerender ? panel.scrollTop : 0;    // réaffichée : on reste où on lisait
     panel.innerHTML = deps.top(backLabel()) + page.html;
@@ -71,9 +74,20 @@ function show(e, { rerender = false, fly = true, from = current() } = {}) {
     page.bind?.(panel);                 // après : bind peut faire défiler jusqu'à un passage
     if (rerender) panel.scrollTop = scroll;
     if (!rerender) deps.focus(page.announce);
+    if (inSide) side.querySelector("[aria-current]")?.focus({ preventScroll: true });   // on continue d'y choisir
     if (!rerender && fly && page.frame) typeof page.frame === "function" ? page.frame() : deps.frame(page.frame);
   }
   deps.draw();
+}
+
+// La colonne garde son défilement d'un texte à l'autre (et le focus quand on y a choisi le texte, plus haut).
+function showSide(side, content) {
+  const was = side.hidden ? 0 : side.scrollTop;
+  side.hidden = !content;
+  if (!content) { side.innerHTML = ""; return; }
+  side.innerHTML = content.html;
+  side.scrollTop = was;
+  content.bind?.(side);
 }
 
 // Ouvre une page : openPage("help"), openPage("cluster", { id, label }, { fly: false }).
@@ -101,10 +115,9 @@ export function reopen(e, from = current()) {
 export function currentPage() { return current(); }
 export function goBack() { navBack(); }
 
-export function backLabel() {
-  const e = previous();
-  return (e && kinds.get(e.page)?.backLabel?.(argsOf(e))) ?? null;
-}
+export function backLabel() { return labelOf(previous()); }
+// « Back to … » pour une entrée quelconque (la page d'une liste, dans la colonne)
+export function labelOf(e) { return (e && kinds.get(e.page)?.backLabel?.(argsOf(e))) ?? null; }
 
 // Ouvre la page d'une adresse (#group=…, un nom de texte…) ; false si elle n'en désigne aucune.
 export function openFromAddress(hash) {
@@ -144,6 +157,11 @@ export function pageOfStep(s) {
 export function describeStep(s) {
   const from = kindOfStep(s)?.fromStep;
   return from ? { label: from.label(s.key), kind: from.kindLabel(s.key) } : null;
+}
+// Le nom et la sorte d'une entrée, comme pour son pas d'History ; null pour une page sans pas (les résultats)
+export function describeEntry(e) {
+  const s = stepOf(e);
+  return s ? describeStep(s) : null;
 }
 // Prévient f du pas d'History de chaque page ouverte, Retour compris (null : une page qui n'en ajoute pas).
 export function onStep(f) { onRecord(e => f(stepOf(e))); }

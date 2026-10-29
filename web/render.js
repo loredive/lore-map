@@ -1,5 +1,5 @@
 // Rendu du ciel sur le canvas : grille de sélection, étoiles, noms des groupes, caméra.
-import { S, $, canvas, ctx, panel, tip, GRACE, MIN_COHESION, reducedMotion, isPhone, colorOf, isHidden, membersIn } from "./state.js";
+import { S, $, canvas, ctx, panel, listColumn, tip, GRACE, MIN_COHESION, reducedMotion, isPhone, colorOf, isHidden, membersIn } from "./state.js";
 import { startCamera, setViewport, camera, toScreen, toWorld, viewCenter } from "./camera.js";
 import { STYLE, starWeight, drawNebulae, drawConstellations, drawThread, drawTrail, drawEntity, labelStyle, muteColor } from "./sky.js";
 import { drawClouds } from "./nebula.js";
@@ -418,13 +418,14 @@ export function setHover(i) {
   draw();
 }
 
-// Partie visible de la carte : sous la barre du haut, à gauche du panneau ouvert (grand écran) ou
-// au-dessus de lui (téléphone, où il monte du bas)
+// Partie visible de la carte : sous la barre du haut, à gauche du panneau ouvert et de la liste à côté
+// (grand écran) ou au-dessus de lui (téléphone, où il monte du bas)
 function visibleArea() {
   const phone = isPhone(), open = !panel.hidden, { width, height, top } = camera();
+  const col = listColumn.hidden ? null : listColumn.getBoundingClientRect();   // sans largeur : cachée par style.css
   return {
     top,
-    right: open && !phone ? panel.getBoundingClientRect().left : width,
+    right: open && !phone ? Math.min(panel.getBoundingClientRect().left, col?.width ? col.left : width) : width,
     bottom: open && phone ? panel.getBoundingClientRect().top : height,
   };
 }

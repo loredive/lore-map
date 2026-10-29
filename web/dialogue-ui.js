@@ -2,8 +2,8 @@
 // (ceux de Ranni dans plusieurs groupes) ; ici on les relit dans l'ordre, et la carte trace le fil
 // qui les relie.
 import { S, esc, portrait, textOf, textLang } from "./state.js";
-import { registerPage, openPage } from "./pages.js";
-import { linkText, bindEntityButtons } from "./links.js";
+import { registerPage } from "./pages.js";
+import { linkText, bindEntityButtons, openInList } from "./links.js";
 
 // speaker et part d'un passage viennent de son nom (lore.js)
 export function buildDialogues() {
@@ -53,7 +53,7 @@ registerPage({
     }).join("")}</ol>
   </article>`,
       bind: p => {
-        p.querySelectorAll(".pnum").forEach(b => b.addEventListener("click", () => openPage("doc", { i: +b.dataset.i })));
+        p.querySelectorAll(".pnum").forEach(b => b.addEventListener("click", () => openInList(+b.dataset.i, list)));
         bindEntityButtons(p);
         if (focusOn >= 0) p.querySelector(`#p${focusOn}`)?.scrollIntoView({ block: "center" });
       },

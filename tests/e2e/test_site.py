@@ -448,6 +448,7 @@ def test_saved_history_reopens_its_steps(browser, site, game):
 
 # ------------------------------------------------------------------ focus de la carte, chemin d'échos
 ENTITY = {"bloodborne": "Gehrman", "elden-ring": "Marika"}
+DIALOGUE = {"bloodborne": "Alfred, Hunter of Vilebloods", "elden-ring": "Ranni the Witch"}
 
 
 def focus(page):
@@ -475,6 +476,76 @@ def test_a_text_keeps_the_focus_and_a_group_starts_fresh(browser, site, game):
     page.wait_for_function("() => document.querySelector('#panel').dataset.page === 'cluster'")
     f = focus(page)
     assert f["entity"] is None and f["selected"] == -1 and f["group"] is not None
+    assert problems == []
+
+
+def column(page):
+    """La colonne à côté du panneau : visible ou non, son nombre de textes et le texte marqué."""
+    return page.evaluate("""() => { const c = document.querySelector('#list-column');
+        return { shown: c.getBoundingClientRect().width > 0, n: c.querySelectorAll('li').length,
+                 current: c.querySelector('[aria-current] .name')?.textContent.trim() ?? null }; }""")
+
+
+@pytest.mark.parametrize("game", GAMES)
+def test_a_text_opened_from_a_list_keeps_the_list_beside_it(browser, site, game):
+    _, address, _, group = ADDRESSES[game][1]
+    page, problems = open_page(browser, f"{site}?game={game}{address}", DESKTOP)
+    n = page.locator("#panel .results li").count()
+    first = page.text_content("#panel .results button .name").strip()
+    page.click("#panel .results button")
+    wait_shown(page, ("doc", first))
+    assert column(page) == {"shown": True, "n": n, "current": first}
+    assert page.text_content("#panel .pager .at").strip() == f"1 of {n}"
+    # un autre texte de la colonne : le panneau change, la colonne reste, et son étoile n'est pas dessous
+    third = page.locator("#list-column li button").nth(2)
+    name = third.locator(".name").text_content().strip()
+    third.click()
+    wait_shown(page, ("doc", name))
+    assert column(page) == {"shown": True, "n": n, "current": name}
+    assert page.evaluate("() => document.activeElement.closest('#list-column') !== null")   # on continue d'y choisir
+    i = page.evaluate("async () => (await import('./state.js')).S.selected")
+    left = page.evaluate("() => document.querySelector('#panel').getBoundingClientRect().left")
+    assert camera(page, [i])["screen"][0][0] < left
+    # la liste reste à droite, le texte s'ouvre à sa gauche
+    assert page.evaluate("""() => document.querySelector('#panel').getBoundingClientRect().right
+        <= document.querySelector('#list-column').getBoundingClientRect().left + 1""")
+    assert page.is_hidden("#panel .pager")               # la liste est là : pas de « suivant »
+    page.locator("#list-column li button").nth(3).click()
+    wait_shown(page, ("doc", page.locator("#list-column li button").nth(3).locator(".name").text_content().strip()))
+    page.go_back()
+    wait_shown(page, ("doc", name))
+    assert column(page)["current"] == name               # Retour : la liste revient avec lui
+    # suivre un écho garde la liste
+    echo = page.text_content("#panel .echoes button .name").strip()
+    page.click("#panel .echoes button")
+    wait_shown(page, ("doc", echo))
+    assert column(page)["n"] == n
+    # × ferme la colonne, Retour la rouvre ; son lien ramène au groupe, sans colonne
+    page.click("#list-column .list-close")
+    page.wait_for_function("() => document.querySelector('#list-column').hidden")
+    assert shown(page) == ["doc", echo]
+    page.go_back()
+    page.wait_for_function("() => !document.querySelector('#list-column').hidden")
+    assert page.text_content("#list-column .list-back").strip() == group
+    page.click("#list-column .list-back")
+    wait_shown(page, ("cluster", group))
+    assert column(page)["shown"] is False
+    assert problems == []
+
+
+@pytest.mark.parametrize("game", GAMES)
+def test_on_a_phone_a_list_is_walked_with_previous_and_next(browser, site, game):
+    page, problems = open_page(browser, f"{site}?game={game}#dialogue={quote(DIALOGUE[game])}", PHONE)
+    first, second = page.evaluate("""async () => { const { S } = await import('./state.js');
+        const l = S.dialogues.get(%s); return [S.docs[l[0]].name, S.docs[l[1]].name]; }""" % json.dumps(DIALOGUE[game]))
+    page.click("#panel .pnum")
+    wait_shown(page, ("doc", first))
+    assert column(page)["shown"] is False                 # pas la place : la fiche a son « suivant »
+    assert page.query_selector("#panel .pager button.prev") is None      # le premier passage : pas de « précédent »
+    page.click("#panel .pager .next")
+    wait_shown(page, ("doc", second))
+    page.click("#panel .pager .prev")
+    wait_shown(page, ("doc", first))
     assert problems == []
 
 

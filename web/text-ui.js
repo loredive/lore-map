@@ -1,12 +1,15 @@
 // La page d'un texte : catégorie, nom, texte (et ses autres langues), mentions, échos.
 // C'est la seule page qui garde le focus de la carte : un texte ouvert depuis un groupe, une
 // entité ou une visite laisse ce groupe, cette entité ou cette visite allumés.
+// Ouvert depuis une liste (list : { from, items }, voir openInList), il la garde à côté : la liste reste
+// à droite, telle qu'on la lisait, et le texte s'ouvre à sa gauche (grand écran) ; sinon « précédent ·
+// 3 sur 28 · suivant » en tête de la fiche.
 import { tokenize } from "./search.js";
-import { S, esc, colorOf, clusterById, portrait, nameOf, textOf, textLang, groupName } from "./state.js";
+import { S, esc, colorOf, isHidden, docRow, clusterById, portrait, nameOf, textOf, textLang, groupName } from "./state.js";
 import { setHover } from "./render.js";
-import { registerPage, openPage } from "./pages.js";
+import { registerPage, openPage, describeEntry, reopen } from "./pages.js";
 import { startPath } from "./pathbar.js";
-import { entityChips, bindEntityButtons, linkText, dialogueButtons, bindDialogueButtons, dlcBadge, groupOf } from "./links.js";
+import { entityChips, bindEntityButtons, linkText, dialogueButtons, bindDialogueButtons, dlcBadge, groupOf, snippet, mark } from "./links.js";
 import { tipAtStar } from "./tip.js";
 
 const docNamed = name => S.docs.find(x => x.name === name);
@@ -26,12 +29,65 @@ registerPage({
   keepsFocus: true,
   // un chemin attend son second texte (pathbar.js) : choisir un texte ouvre plutôt le chemin
   divert: ({ i }) => (S.pathFrom >= 0 && i !== S.pathFrom ? { page: "path", a: S.pathFrom, b: i } : null),
-  render: ({ i }) => {
+  render: ({ i, list }) => {
     S.selected = i;
     const d = S.docs[i];
-    return { html: card(d), bind: panel => bind(panel, d), announce: `Text: ${nameOf(d)}`, frame: [d] };   // sans zoomer : le texte, et celui d'où l'on vient
+    const items = list && list.items.filter(j => !isHidden(S.docs[j]));
+    return {
+      html: (items ? pager(i, items) : "") + card(d),
+      bind: panel => bind(panel, d, list),
+      side: items && { html: column(i, items, list), bind: col => bindColumn(col, list) },
+      announce: `Text: ${nameOf(d)}`,
+      frame: [d],          // sans zoomer : le texte, et celui d'où l'on vient
+    };
   },
 });
+
+// « ‹ Previous · 3 of 28 · Next › » : la liste sans la colonne (téléphone, écran moyen) ; rien pour un
+// texte hors de la liste (un écho suivi depuis elle)
+function pager(i, items) {
+  const at = items.indexOf(i);
+  if (at < 0) return "";
+  const step = (j, cls, label) => (j === undefined ? `<span class="${cls}"></span>`
+    : `<button type="button" class="${cls}" data-i="${j}" title="${esc(nameOf(S.docs[j]))}">${label}</button>`);
+  return `<nav class="pager" aria-label="This list">${step(items[at - 1], "prev", "‹ Previous")}
+    <span class="at">${at + 1} of ${items.length}</span>${step(items[at + 1], "next", "Next ›")}</nav>`;
+}
+
+// la colonne : la liste telle qu'on la lisait (nom et extrait de chaque texte), le texte ouvert marqué ;
+// son titre rouvre la page de la liste
+function column(i, items, list) {
+  const { from } = list, terms = from.page === "results" ? tokenize(from.q) : [];
+  const what = describeEntry(from) || { kind: "Search results", label: `“${from.q}”` };
+  return `<div class="list-top"><div class="cat">${esc(what.kind)}</div>
+    <button type="button" class="list-close" aria-label="Close this list">×</button></div>
+    <h2><button type="button" class="list-back" title="Open the whole page">${esc(what.label)}</button></h2>
+    <p class="count">${items.length} texts</p>
+    <ol class="results">${items.map(j => {
+      const x = S.docs[j], row = docRow(x, mark(esc(nameOf(x)), terms), mark(esc(snippet(textOf(x), terms)), terms));
+      return j === i ? row.replace("<button ", '<button aria-current="true" ') : row;
+    }).join("")}</ol>`;
+}
+
+function bindColumn(col, list) {
+  col.querySelector(".list-back").addEventListener("click", () => reopen(list.from));
+  // fermer la liste : le même texte, seul (Retour la rouvre)
+  col.querySelector(".list-close").addEventListener("click", () => openPage("doc", { i: S.selected }, { fly: false }));
+  col.querySelectorAll("button[data-i]").forEach(b => {
+    b.addEventListener("click", () => { setHover(-1); openPage("doc", { i: +b.dataset.i, list }); });
+    lightOnHover(b);
+  });
+  col.querySelector("[aria-current]")?.scrollIntoView({ block: "nearest" });
+}
+
+// survol ou focus d'un texte d'une liste : son étoile s'allume sur la carte, avec sa bulle
+// (souris et clavier seulement : au doigt, le toucher ouvre directement la fiche)
+function lightOnHover(b) {
+  const on = () => { setHover(+b.dataset.i); tipAtStar(+b.dataset.i); }, off = () => setHover(-1);
+  b.addEventListener("pointerenter", e => { if (e.pointerType === "mouse") on(); });
+  b.addEventListener("focus", () => { if (b.matches(":focus-visible")) on(); });
+  b.addEventListener("pointerleave", off); b.addEventListener("blur", off);
+}
 
 // l'autre langue du texte (le français si l'anglais est affiché, et inversement), sous le bouton « Show the … text »
 function other(d) {
@@ -74,7 +130,9 @@ function card(d) {
   </article>`;
 }
 
-function bind(panel, d) {
+function bind(panel, d, list) {
+  panel.querySelectorAll(".pager button").forEach(b =>
+    b.addEventListener("click", () => openPage("doc", { i: +b.dataset.i, list })));
   panel.querySelector(".tjp")?.addEventListener("click", ev => {
     const jp = panel.querySelector(".jp"), open = jp.hidden;
     jp.hidden = !open;
@@ -90,14 +148,10 @@ function bind(panel, d) {
   panel.querySelector(".tlink").addEventListener("click", ev => {
     navigator.clipboard?.writeText(location.href).then(() => { ev.target.textContent = "Link copied"; });
   });
+  // suivre un écho garde la liste à côté
   panel.querySelectorAll(".echoes button").forEach(b => {
-    b.addEventListener("click", () => { setHover(-1); openPage("doc", { i: +b.dataset.i }); });   // la liste est remplacée : pas de pointerleave
-    // survol ou focus d'un écho : son étoile s'allume sur la carte, avec sa bulle
-    // (souris et clavier seulement : au doigt, le toucher ouvre directement la fiche)
-    const on = () => { setHover(+b.dataset.i); tipAtStar(+b.dataset.i); }, off = () => setHover(-1);
-    b.addEventListener("pointerenter", e => { if (e.pointerType === "mouse") on(); });
-    b.addEventListener("focus", () => { if (b.matches(":focus-visible")) on(); });
-    b.addEventListener("pointerleave", off); b.addEventListener("blur", off);
+    b.addEventListener("click", () => { setHover(-1); openPage("doc", { i: +b.dataset.i, list }); });   // la liste est remplacée : pas de pointerleave
+    lightOnHover(b);
   });
   panel.querySelector(".tpath").addEventListener("click", () => startPath(d.i));
   bindDialogueButtons(d.i);

@@ -2,7 +2,7 @@
 // boutons des dialogues, extraits, surlignage, badge du DLC, groupe d'un texte. Ce n'est pas une page :
 // les modules de pages l'importent sans s'importer entre eux, et ses liens ouvrent les pages par pages.js.
 import { S, panel, esc, clusterById } from "./state.js";
-import { openPage } from "./pages.js";
+import { openPage, currentPage } from "./pages.js";
 import { mentionSpans } from "./mentions.js";
 
 export const KIND_LABELS = { personnage: ["Character", "Characters"], lieu: ["Place", "Places"],
@@ -23,6 +23,12 @@ export function mark(html, terms) {
   if (!terms.length) return html;
   const re = new RegExp(`\\b(${terms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})\\w*`, "gi");
   return html.replace(re, "<mark>$&</mark>");
+}
+
+// Ouvre un texte choisi dans une liste (groupe, résultats, entité, dialogue) : la page du texte garde
+// la liste à côté (sa colonne), avec la page d'où elle vient pour y revenir.
+export function openInList(i, items) {
+  openPage("doc", { i, list: { from: currentPage(), items } });
 }
 
 // « The Old Hunters » à côté de la catégorie d'un texte ajouté par le DLC (game.json : ui.dlc_label)

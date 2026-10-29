@@ -1,5 +1,5 @@
 // Point d'entrée : chargement des données, souris, clavier, légende.
-import { S, $, canvas, panel, tip, status, input, mode, esc, colorOf, announce, dataPath, DEFAULT_GAME, nameOf, groupName, resetContext, focusPanel, withCameFrom } from "./state.js";
+import { S, $, canvas, panel, listColumn, tip, status, input, mode, esc, colorOf, announce, dataPath, DEFAULT_GAME, nameOf, groupName, resetContext, focusPanel, withCameFrom } from "./state.js";
 import { buildGrid, buildSprites, computeHulls, resize, draw, nearest, setHover, starsNear } from "./render.js";
 import { camera, toWorld, panBy, zoomAt, canZoom, flyTo, viewCenter, frameFrom } from "./camera.js";
 import { buildViewSwitch } from "./views.js";
@@ -40,7 +40,7 @@ function wire() {
 // pages.js reçoit ici tout ce qui touche au DOM et à l'état partagé ; les sortes de pages se sont
 // enregistrées en important leur module (help-ui.js, text-ui.js, entities-ui.js…).
 const startPanel = () => startPages({
-  panel,
+  panel, side: listColumn,
   browser: {
     push: (state, url) => history.pushState(state, "", url),
     replace: (state, url) => history.replaceState(state, "", url),
@@ -302,7 +302,7 @@ on(window, "keydown", e => {
     else if (!panel.hidden) closePage();
     return;
   }
-  if (typing || document.activeElement?.closest("#panel")) return;
+  if (typing || document.activeElement?.closest("#panel, #list-column")) return;
   if (e.key === "Enter" && document.activeElement === canvas && S.hover >= 0) { e.preventDefault(); openPage("doc", { i: S.hover }); return; }
   const { width, cy } = camera(), step = 80;   // px
   const keys = {
