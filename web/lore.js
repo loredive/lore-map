@@ -8,14 +8,22 @@ import { shelves, SHELVES } from "./shelves.js";
 const REQUIRED = ["fields", "views", "categories", "clusters", "docs"];
 const FIELDS = ["name", "cat", "text", "jp", "jpName", "xy", "cluster", "echoes"];
 
+// un passage de dialogue se nomme « <interlocuteur> — passage <n> »
+const PASSAGE = /^(.*) — passage (\d+)$/;
+
 const missing = name => new Error(`lore.json: missing required field "${name}"`);
 
 // Renvoie { categories, views, clusters, docs, entities, docEntities, shelves } :
 // docs : { i, name, cat, text, jp, jpName, alt, altName, dlc, views: [[x, y]] par vue, x, y, cluster, echoes,
-//          echoedBy } ; clusters (les plus gros d'abord) : ceux du fichier, x / y de la première vue ;
+//          echoedBy, speaker, part (un passage de dialogue : son interlocuteur et son numéro, sinon null) } ; clusters (les plus gros d'abord) : ceux du fichier, x / y de la première vue ;
 // entities (les plus citées d'abord) ; docEntities : les entités de chaque texte ;
 // la vue « rayons » (SHELVES) ajoutée en dernier à views et aux views de chaque texte et groupe,
 // shelves : { k (son indice), columns, cell }. Un champ obligatoire absent : une Error qui le nomme.
+const passage = name => {
+  const m = PASSAGE.exec(name);
+  return m ? { speaker: m[1], part: +m[2] } : { speaker: null, part: null };
+};
+
 export function decodeLore(json) {
   for (const k of REQUIRED) if (json?.[k] === undefined) throw missing(k);
   const F = Object.fromEntries(json.fields.map((f, i) => [f, i]));
@@ -30,7 +38,8 @@ export function decodeLore(json) {
     return { i, name: r[F.name], cat: r[F.cat], text: r[F.text], jp: r[F.jp], jpName: r[F.jpName],
              alt: F.alt !== undefined ? r[F.alt] : "", altName: F.altName !== undefined ? r[F.altName] : "",
              dlc: F.dlc !== undefined && !!r[F.dlc],
-             views, x: views[0][0], y: views[0][1], cluster: r[F.cluster], echoes: r[F.echoes], echoedBy: 0 };
+             views, x: views[0][0], y: views[0][1], cluster: r[F.cluster], echoes: r[F.echoes], echoedBy: 0,
+             ...passage(r[F.name]) };
   });
   // combien d'autres textes comptent chacun parmi leurs échos (le poids d'une étoile, sky.js)
   for (const d of docs) for (const e of d.echoes) docs[e].echoedBy++;

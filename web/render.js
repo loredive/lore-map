@@ -1,7 +1,7 @@
 // Rendu du ciel sur le canvas : grille de sélection, étoiles, noms des groupes, caméra.
 import { S, $, canvas, ctx, panel, tip, GRACE, MIN_COHESION, reducedMotion, isPhone, colorOf, isHidden, membersIn } from "./state.js";
 import { startCamera, setViewport, camera, toScreen, toWorld, viewCenter } from "./camera.js";
-import { STYLE, drawNebulae, drawConstellations, drawThread, drawTrail, drawEntity, labelStyle, muteColor } from "./sky.js";
+import { STYLE, starWeight, drawNebulae, drawConstellations, drawThread, drawTrail, drawEntity, labelStyle, muteColor } from "./sky.js";
 import { drawClouds } from "./nebula.js";
 
 // Grille spatiale pour retrouver vite l'étoile sous le curseur
@@ -205,7 +205,7 @@ export function render() {
     if (sx < -pad || sy < -pad || sx > W + pad || sy > H + pad) continue;
     const dim = (S.path && !S.pathSet.has(d.i)) || (S.hits && !S.hits.has(d.i)) || (sel && d.i !== sel.i && !echoSet.has(d.i)) ||
       (!sel && S.cluster && d.cluster !== S.cluster.id) || (!sel && S.lit && !S.lit.has(d.i));
-    const rr = (STYLE.sizes ? R * d.w : R) * (STYLE.glow ? 0.6 + 0.4 * density : 1);   // « carrefours » du sens plus gros
+    const rr = (STYLE.sizes ? R * starWeight(d.i) : R) * (STYLE.glow ? 0.6 + 0.4 * density : 1);   // « carrefours » du sens plus gros
     ctx.globalAlpha = dim ? off : on;
     ctx.drawImage(sprites[d.cat], sx - rr, sy - rr, 2 * rr, 2 * rr);
   }
