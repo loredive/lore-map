@@ -1,8 +1,8 @@
 // Bulle d'une étoile : nom, catégorie et groupe, début du texte ; si une fiche est ouverte et que
 // l'étoile est l'un de ses échos, son rang. Partagée par le survol de la carte, la visée au clavier
 // et le survol de la liste des échos dans le panneau.
-import { S, tip, esc, portrait, nameOf, textOf, groupName } from "./state.js";
-import { toScreen } from "./render.js";
+import { S, tip, esc, portrait, nameOf, textOf, groupName, isPhone } from "./state.js";
+import { camera, toScreen } from "./camera.js";
 import { groupOf, snippet, dlcBadge } from "./links.js";
 
 const TIP_SNIPPET = 180;    // caractères du texte montrés dans la bulle
@@ -30,18 +30,18 @@ export function showTip(i, sx, sy, { hint = "", dx = 16, dy = 14 } = {}) {
   tip.hidden = false;
   const tw = tip.offsetWidth, th = tip.offsetHeight;
   tip.style.left = Math.max(8, sx + dx + tw <= right ? sx + dx : sx - dx - tw) + "px";
-  tip.style.top = Math.max(8, sy + dy + th <= S.H - 8 ? sy + dy : sy - dy - th) + "px";
+  tip.style.top = Math.max(8, sy + dy + th <= camera().height - 8 ? sy + dy : sy - dy - th) + "px";
 }
 
 function panelLeft() {
   const p = document.getElementById("panel");
-  return p.hidden || innerWidth <= 760 ? S.W : p.getBoundingClientRect().left;
+  return p.hidden || isPhone() ? camera().width : p.getBoundingClientRect().left;
 }
 
 // survol d'un écho dans le panneau : l'étoile s'allume et la bulle s'affiche à côté d'elle,
 // si elle est visible à gauche du panneau
 export function tipAtStar(i) {
   const [sx, sy] = toScreen(S.docs[i].x, S.docs[i].y);
-  if (sx < 0 || sy < 0 || sx > panelLeft() || sy > S.H) { tip.hidden = true; return; }
+  if (sx < 0 || sy < 0 || sx > panelLeft() || sy > camera().height) { tip.hidden = true; return; }
   showTip(i, sx, sy);
 }
