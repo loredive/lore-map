@@ -260,8 +260,8 @@ def camera(page, stars=()):
     { x, y, s, k, width, height, cy, top }, k = s * base (pixels par unité du monde). Avec `stars`
     (des indices de textes), aussi `screen` : la position à l'écran de chacune, par toScreen."""
     return page.evaluate("""async stars => {
-        const { S } = await import('./state.js'), { toScreen } = await import('./render.js');
-        const at = () => [S.cam.x, S.cam.y, S.cam.s];
+        const { S } = await import('./state.js'), { camera, toScreen } = await import('./camera.js');
+        const at = () => { const { x, y, s } = camera(); return [x, y, s]; };
         let last = at(), calm = 0;
         for (const t0 = performance.now(); calm < 10 && performance.now() - t0 < 10000;) {
             await new Promise(r => requestAnimationFrame(r));
@@ -269,16 +269,18 @@ def camera(page, stars=()):
             calm = now.every((v, i) => v === last[i]) ? calm + 1 : 0;
             last = now;
         }
-        const c = { x: S.cam.x, y: S.cam.y, s: S.cam.s, k: S.cam.s * S.base,
-                    width: S.W, height: S.H, cy: S.cy, top: S.top };
+        const { x, y, s, k, width, height, cy, top } = camera(), c = { x, y, s, k, width, height, cy, top };
         if (stars.length) c.screen = stars.map(i => toScreen(S.docs[i].x, S.docs[i].y));
         return c; }""", list(stars))
 
 
 def move_camera(page, dx=0.0, dy=0.0, zoom=1.0):
-    """Déplace la caméra sans vol, en unités du monde : x += dx, y += dy, s *= zoom."""
-    page.evaluate("""async ([dx, dy, zoom]) => { const { S } = await import('./state.js');
-        S.cam.x += dx; S.cam.y += dy; S.cam.s *= zoom; }""", [dx, dy, zoom])
+    """Déplace la caméra sans vol (flyTo en 0 ms saute), en unités du monde : x += dx, y += dy,
+    s *= zoom. Rend la main une fois la carte redessinée."""
+    page.evaluate("""async ([dx, dy, zoom]) => { const { camera, flyTo } = await import('./camera.js');
+        const { x, y, s } = camera();
+        flyTo(x + dx, y + dy, s * zoom, 0);
+        await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))); }""", [dx, dy, zoom])
 
 
 @pytest.mark.parametrize("game", GAMES)
@@ -622,6 +624,25 @@ def test_arrow_keys_pan_by_a_fixed_number_of_pixels(browser, site, game, device)
         page.keyboard.press(key)
         (x1, y1), = camera(page, [0])["screen"]
         assert [x1 - x0, y1 - y0] == pytest.approx(list(shift), abs=1e-6), key
+    assert problems == []
+
+
+@pytest.mark.parametrize("game", GAMES)
+@DEVICES
+def test_the_map_focused_from_the_keyboard_aims_and_pans(browser, site, game, device):
+    page, problems = open_page(browser, f"{site}?game={game}", device)
+    page.evaluate("() => document.activeElement?.blur()")
+    for _ in range(40):                                 # Tab jusqu'à la carte : le focus est « visible »
+        page.keyboard.press("Tab")
+        if page.evaluate("() => document.activeElement?.id === 'sky'"):
+            break
+    assert page.evaluate("async () => (await import('./state.js')).S.kbd")
+    page.wait_for_function("() => /^(Aiming at: |No star at the center)/.test(document.querySelector('#announce').textContent)")
+    (x0, y0), = camera(page, [0])["screen"]
+    page.keyboard.press("ArrowLeft")
+    (x1, y1), = camera(page, [0])["screen"]
+    assert [x1 - x0, y1 - y0] == pytest.approx([80, 0], abs=1e-6)
+    page.evaluate("() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))")   # le viseur redessiné
     assert problems == []
 
 
