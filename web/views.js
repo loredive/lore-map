@@ -1,19 +1,12 @@
 import { S, $, esc, MORPH_MS, reducedMotion } from "./state.js";
 import { buildGrid, draw, render, setHover } from "./render.js";
 import { focusDoc, fitPoints } from "./camera.js";
-import { shelves, SHELVES } from "./shelves.js";
+import { SHELVES } from "./shelves.js";
 
 // ------------------------------------------------------------------ vues (projections)
 // Les mêmes textes et les mêmes groupes, aplatis autrement : passer d'une vue à l'autre
 // fait glisser les étoiles, ce qui montre que seules les proximités ont un sens.
-// la vue rayons (shelves.js) se calcule ici, à partir des catégories et des groupes
-export function addShelves() {
-  const L = shelves(S.docs, S.cats.length);
-  S.views = [...S.views, SHELVES];
-  S.docs.forEach((d, i) => d.views.push(L.pos[i]));
-  for (const c of S.clusters) c.views.push(L.clusters.get(c.id));
-  S.shelves = { k: S.views.length - 1, columns: L.columns, cell: L.cell };
-}
+// la vue rayons (shelves.js) est construite au chargement, avec les autres (lore.js)
 
 export function buildViewSwitch() {
   const box = $("#views");

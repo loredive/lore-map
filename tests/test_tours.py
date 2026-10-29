@@ -3,6 +3,7 @@ import json
 import pytest
 
 import games
+from lore_format import write_lore
 
 
 def make_game(tmp_path, monkeypatch, steps):
@@ -11,8 +12,10 @@ def make_game(tmp_path, monkeypatch, steps):
     monkeypatch.setattr(games, "WEB", tmp_path / "web")
     (tmp_path / "games" / "g").mkdir(parents=True)
     (tmp_path / "web" / "data" / "g").mkdir(parents=True)
-    lore = {"fields": ["name", "cat"], "docs": [["Saw Cleaver", 0], ["Blood Vial", 0]]}
-    (tmp_path / "web" / "data" / "g" / "lore.json").write_text(json.dumps(lore))
+    docs = [{"name": n, "cat": 0, "text": "", "jp": "", "jpName": "", "xy": [0.0, 0.0], "cluster": -1, "echoes": []}
+            for n in ("Saw Cleaver", "Blood Vial")]
+    write_lore(tmp_path / "web" / "data" / "g" / "lore.json", views=["t-SNE"], categories=["Weapons"], clusters=[],
+               entities=[], docs=docs)
     tours = [{"id": "t", "title": "T", "intro": "", "steps": [{"text": s, "note": ""} for s in steps]}]
     (tmp_path / "games" / "g" / "tours.json").write_text(json.dumps(tours))
     return games.Game(id="g", title="G", categories={}, dialog_label="", junk=(), extra_stop=(), speaker_names={},

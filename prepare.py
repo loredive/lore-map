@@ -28,6 +28,7 @@ import layouts
 from entities import KINDS, candidate_names, load_entities, rank_mentions, related_entities
 from games import DEFAULT, list_games, load_game, publish
 from labels import load_titles, match_titles, save_titles
+from lore_format import write_lore
 
 MODEL_NAME = "intfloat/multilingual-e5-small"      # mêmes poids que Xenova/multilingual-e5-small (navigateur)
 BROWSER_MODEL = "Xenova/multilingual-e5-small"
@@ -291,20 +292,15 @@ def resolve_entities(docs, labels, titles, names, path, out):
 # ---------------------------------------------------------------- export
 def export(docs, emb, views, labels, names, titles, entities, nbrs, embedder, out):
     """views : [(nom, xy)] ; la première est la carte principale, sur laquelle les groupes
-    ont été calculés, les suivantes lui sont alignées."""
+    ont été calculés, les suivantes lui sont alignées. lore.json s'écrit par lore_format."""
     out.mkdir(parents=True, exist_ok=True)
     cats = sorted({d["cat"] for d in docs})
     coords = np.hstack([xy for _, xy in views]).astype(float).round(4)   # float64 : pas de 0.11249999…
-    rows = [[d["name"], cats.index(d["cat"]), d["text"], d["jp"], d["jp_name"],
-             coords[i].tolist(), int(labels[i]), nbrs[i].tolist()] for i, d in enumerate(docs)]
-    has_alt = any("alt" in d for d in docs)        # seconde langue (game.json : alt_lang)
-    if has_alt:
-        for row, d in zip(rows, docs):
-            row += [d.get("alt", ""), d.get("alt_name", "")]
-    has_dlc = any(d.get("dlc") for d in docs)      # textes ajoutés par un DLC (Bloodborne : extract.py --base)
-    if has_dlc:
-        for row, d in zip(rows, docs):
-            row.append(int(d.get("dlc", False)))
+    rows = [{"name": d["name"], "cat": cats.index(d["cat"]), "text": d["text"], "jp": d["jp"], "jpName": d["jp_name"],
+             "xy": coords[i].tolist(), "cluster": int(labels[i]), "echoes": nbrs[i].tolist(),
+             # seconde langue (game.json : alt_lang) ; textes ajoutés par un DLC (Bloodborne : extract.py --base)
+             **({"alt": d["alt"], "altName": d.get("alt_name", "")} if "alt" in d else {}),
+             "dlc": bool(d.get("dlc", False))} for i, d in enumerate(docs)]
     cohesions = [layouts.cohesion(xy, labels) for _, xy in views]
     clusters = []
     for c, keywords in names.items():
@@ -313,18 +309,13 @@ def export(docs, emb, views, labels, names, titles, entities, nbrs, embedder, ou
         # position du nom et cohésion du groupe dans chaque vue
         at = [{"x": round(float(np.median(xy[m, 0])), 4), "y": round(float(np.median(xy[m, 1])), 4),
                "cohesion": round(coh[int(c)], 3)} for (_, xy), coh in zip(views, cohesions)]
+        # titre et description dans la seconde langue du jeu (labels.json : alt_title, alt_description)
         clusters.append({"id": int(c), "label": t.get("title") or keywords,
                          "description": t.get("description", ""), "keywords": keywords,
-                         "n": int(m.sum()), "views": at})
-        # titre et description dans la seconde langue du jeu (labels.json : alt_title, alt_description)
-        if t.get("alt_title"):
-            clusters[-1].update(altLabel=t["alt_title"], altDescription=t.get("alt_description", ""))
-    fields = (["name", "cat", "text", "jp", "jpName", "xy", "cluster", "echoes"] + (["alt", "altName"] if has_alt else [])
-              + (["dlc"] if has_dlc else []))
-    with open(out / "lore.json", "w", encoding="utf-8") as f:
-        json.dump({"fields": fields, "views": [n for n, _ in views], "categories": cats,
-                   "clusters": clusters, "entities": entities, "docs": rows},
-                  f, ensure_ascii=False, separators=(",", ":"))
+                         "n": int(m.sum()), "views": at,
+                         "altLabel": t.get("alt_title", ""), "altDescription": t.get("alt_description", "")})
+    write_lore(out / "lore.json", views=[n for n, _ in views], categories=cats, clusters=clusters,
+               entities=entities, docs=rows)
 
     semantic = embedder == "e5"
     meta = {"n": len(docs), "dim": int(emb.shape[1]), "semantic": semantic,

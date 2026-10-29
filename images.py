@@ -23,6 +23,7 @@ from pathlib import Path
 from PIL import Image
 
 from games import DEFAULT, list_games, load_game
+from lore_format import read_lore
 
 ROOT = Path(__file__).parent
 CACHE = ROOT / ".cache" / "fanapi"
@@ -123,14 +124,14 @@ def main():
         raise SystemExit(f"pas de source d'images pour {game.title} : la page s'affiche sans")
     DATA, IMG = game.data_dir, game.img_dir
 
-    lore = json.loads((DATA / "lore.json").read_text(encoding="utf-8"))
+    lore = read_lore(DATA / "lore.json")
     cats = lore["categories"]
     items, npcs = api_index(ITEM_ENDPOINTS, args.refresh), api_index([NPC_ENDPOINT], args.refresh)
     IMG.mkdir(parents=True, exist_ok=True)
 
     mapping, total, found, failed = {}, Counter(), Counter(), []
     for doc in lore["docs"]:
-        name, cat = doc[0], cats[doc[1]]
+        name, cat = doc["name"], cats[doc["cat"]]
         total[cat] += 1
         key = match(name, cat, items, npcs)
         if not key:
