@@ -158,6 +158,11 @@ export function describeStep(s) {
   const from = kindOfStep(s)?.fromStep;
   return from ? { label: from.label(s.key), kind: from.kindLabel(s.key) } : null;
 }
+// Le nom et la sorte d'une entrée, comme pour son pas d'History ; null pour une page sans pas (les résultats)
+export function describeEntry(e) {
+  const s = stepOf(e);
+  return s ? describeStep(s) : null;
+}
 // Prévient f du pas d'History de chaque page ouverte, Retour compris (null : une page qui n'en ajoute pas).
 export function onStep(f) { onRecord(e => f(stepOf(e))); }
 // Rouvre la page d'un pas d'History (« Continue where you left off ») ; rien si elle n'existe plus.

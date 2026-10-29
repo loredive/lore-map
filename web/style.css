@@ -138,46 +138,42 @@ body {
 .pager .next { text-align: right; }
 .pager button:hover, .pager button:focus-visible { color: var(--parch); }
 
-/* la colonne : la liste d'où vient le texte ouvert, à gauche du panneau. Seulement quand la carte garde
-   de la place (un peu plus en mode lecture) ; sinon la fiche a son « précédent · suivant » */
+/* la liste d'où vient le texte ouvert : elle reste à droite, telle qu'on la lisait, et le panneau du texte
+   s'ouvre à sa gauche. Seulement quand la carte garde de la place (un peu plus en mode lecture) ; sinon la
+   fiche a son « précédent · suivant » */
 .list-column {
-  position: fixed; z-index: 3; top: var(--bar-h, 100px); bottom: 0; right: var(--panel-w); width: var(--list-w);
-  display: none; padding: 20px 10px 32px 22px; overflow-y: auto;
-  background: linear-gradient(90deg, rgba(18, 24, 41, 0) 0%, rgba(18, 24, 41, .94) 14%, rgba(16, 21, 37, .97) 100%);
-  border-right: 1px solid rgba(51, 64, 95, .6);
+  position: fixed; z-index: 3; top: var(--bar-h, 100px); bottom: 0; right: 0; width: var(--list-w);
+  display: none; padding: 20px 22px 32px; overflow-y: auto;
+  background: rgba(16, 21, 37, .97); border-left: 1px solid rgba(51, 64, 95, .6);
   scrollbar-width: thin; scrollbar-color: var(--rim) transparent;
 }
-.list-column .list-top { display: flex; justify-content: space-between; align-items: flex-start; gap: .4rem; margin: 0 0 .5rem -.4rem; }
+.list-column .list-top { display: flex; justify-content: space-between; align-items: center; gap: .4rem; }
+.list-column .cat { color: var(--faint); font-size: .88rem; }
 .list-column .list-close {
   flex: none; min-width: 28px; min-height: 28px; border: 0; border-radius: 4px; background: none;
   color: var(--faint); font: 1.2rem/1 var(--body); cursor: pointer;
 }
 .list-column .list-close:hover, .list-column .list-close:focus-visible { color: var(--parch); }
+.list-column h2 { margin: .2rem 0 .6rem; }
 .list-column .list-back {
-  display: block; margin: 0; padding: .3rem .4rem; min-height: 28px; border: 0; border-radius: 4px;
-  background: none; color: var(--faint); font: .88rem/1.3 var(--body); text-align: left; cursor: pointer;
+  padding: 0; border: 0; background: none; text-align: left; cursor: pointer;
+  font: 600 1.6rem/1.1 var(--display); color: var(--grace);
 }
-.list-column .list-back:hover, .list-column .list-back:focus-visible { color: var(--parch); }
-.list-column .count { margin: 0 0 .4rem; }
-.list-column ol { list-style: none; margin: 0; padding: 0; }
-.list-column li button {
-  display: flex; align-items: baseline; gap: .45rem; width: 100%; padding: .3rem .4rem; border: 0; border-radius: 4px;
-  background: none; color: var(--parch); font: 500 .98rem/1.25 var(--display); text-align: left; cursor: pointer;
-}
-.list-column li button .dot { width: 6px; height: 6px; transform: translateY(-1px); }
-.list-column li button:hover, .list-column li button:focus-visible { background: rgba(217, 196, 142, .07); }
-.list-column li button[aria-current] { background: rgba(217, 196, 142, .12); color: var(--grace); font-weight: 600; }
+.list-column .list-back:hover, .list-column .list-back:focus-visible { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+.list-column .results button[aria-current] { background: rgba(217, 196, 142, .12); }
+.list-column .results button[aria-current] .name { color: var(--grace); }
 @media (min-width: 1100px) {
-  :root { --list-w: 250px; }
+  :root { --list-w: clamp(320px, 26vw, 460px); }
   body:not(.reading) .list-column:not([hidden]) { display: block; }
   body:not(.reading):has(#list-column:not([hidden])) .under-bar { right: calc(var(--panel-w) + var(--list-w)); }
-  /* collé à la colonne : le panneau n'a plus à s'effacer vers la carte */
-  body:not(.reading):has(#list-column:not([hidden])) #panel { background: rgba(16, 21, 37, .97); }
+  body:not(.reading):has(#list-column:not([hidden])) #panel { right: var(--list-w); }
+  body:not(.reading):has(#list-column:not([hidden])) .pager { display: none; }   /* la liste est là */
 }
 @media (min-width: 1500px) {
   body.reading .list-column:not([hidden]) { display: block; }
   body.reading:has(#list-column:not([hidden])) .under-bar { right: calc(var(--panel-w) + var(--list-w)); }
-  body.reading:has(#list-column:not([hidden])) #panel { background: rgba(16, 21, 37, .97); }
+  body.reading:has(#list-column:not([hidden])) #panel { right: var(--list-w); }
+  body.reading:has(#list-column:not([hidden])) .pager { display: none; }
 }
 
 .count { margin: 0 0 .6rem; color: var(--faint); font-size: .85rem; }

@@ -483,7 +483,7 @@ def column(page):
     """La colonne à côté du panneau : visible ou non, son nombre de textes et le texte marqué."""
     return page.evaluate("""() => { const c = document.querySelector('#list-column');
         return { shown: c.getBoundingClientRect().width > 0, n: c.querySelectorAll('li').length,
-                 current: c.querySelector('[aria-current]')?.textContent.trim() ?? null }; }""")
+                 current: c.querySelector('[aria-current] .name')?.textContent.trim() ?? null }; }""")
 
 
 @pytest.mark.parametrize("game", GAMES)
@@ -498,21 +498,23 @@ def test_a_text_opened_from_a_list_keeps_the_list_beside_it(browser, site, game)
     assert page.text_content("#panel .pager .at").strip() == f"1 of {n}"
     # un autre texte de la colonne : le panneau change, la colonne reste, et son étoile n'est pas dessous
     third = page.locator("#list-column li button").nth(2)
-    name = third.text_content().strip()
+    name = third.locator(".name").text_content().strip()
     third.click()
     wait_shown(page, ("doc", name))
     assert column(page) == {"shown": True, "n": n, "current": name}
     assert page.evaluate("() => document.activeElement.closest('#list-column') !== null")   # on continue d'y choisir
     i = page.evaluate("async () => (await import('./state.js')).S.selected")
-    left = page.evaluate("() => document.querySelector('#list-column').getBoundingClientRect().left")
+    left = page.evaluate("() => document.querySelector('#panel').getBoundingClientRect().left")
     assert camera(page, [i])["screen"][0][0] < left
-    # « Next › » dans la fiche : le texte suivant de la liste
-    page.click("#panel .pager .next")
-    nxt = page.locator("#list-column li button").nth(3).text_content().strip()
-    wait_shown(page, ("doc", nxt))
+    # la liste reste à droite, le texte s'ouvre à sa gauche
+    assert page.evaluate("""() => document.querySelector('#panel').getBoundingClientRect().right
+        <= document.querySelector('#list-column').getBoundingClientRect().left + 1""")
+    assert page.is_hidden("#panel .pager")               # la liste est là : pas de « suivant »
+    page.locator("#list-column li button").nth(3).click()
+    wait_shown(page, ("doc", page.locator("#list-column li button").nth(3).locator(".name").text_content().strip()))
     page.go_back()
     wait_shown(page, ("doc", name))
-    assert column(page)["current"] == name               # Retour : la colonne revient avec lui
+    assert column(page)["current"] == name               # Retour : la liste revient avec lui
     # suivre un écho garde la liste
     echo = page.text_content("#panel .echoes button .name").strip()
     page.click("#panel .echoes button")
@@ -524,7 +526,7 @@ def test_a_text_opened_from_a_list_keeps_the_list_beside_it(browser, site, game)
     assert shown(page) == ["doc", echo]
     page.go_back()
     page.wait_for_function("() => !document.querySelector('#list-column').hidden")
-    assert page.text_content("#list-column .list-back").strip() == f"Back to the group “{group}”"
+    assert page.text_content("#list-column .list-back").strip() == group
     page.click("#list-column .list-back")
     wait_shown(page, ("cluster", group))
     assert column(page)["shown"] is False

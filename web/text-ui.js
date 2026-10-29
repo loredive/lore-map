@@ -1,14 +1,15 @@
 // La page d'un texte : catégorie, nom, texte (et ses autres langues), mentions, échos.
 // C'est la seule page qui garde le focus de la carte : un texte ouvert depuis un groupe, une
 // entité ou une visite laisse ce groupe, cette entité ou cette visite allumés.
-// Ouvert depuis une liste (list : { from, items }, voir openInList), il la garde à côté : une colonne à
-// gauche du panneau (grand écran), et « précédent · 3 sur 28 · suivant » en tête de la fiche.
+// Ouvert depuis une liste (list : { from, items }, voir openInList), il la garde à côté : la liste reste
+// à droite, telle qu'on la lisait, et le texte s'ouvre à sa gauche (grand écran) ; sinon « précédent ·
+// 3 sur 28 · suivant » en tête de la fiche.
 import { tokenize } from "./search.js";
-import { S, listColumn, esc, colorOf, isHidden, clusterById, portrait, nameOf, textOf, textLang, groupName } from "./state.js";
+import { S, esc, colorOf, isHidden, docRow, clusterById, portrait, nameOf, textOf, textLang, groupName } from "./state.js";
 import { setHover } from "./render.js";
-import { registerPage, openPage, labelOf, reopen } from "./pages.js";
+import { registerPage, openPage, describeEntry, reopen } from "./pages.js";
 import { startPath } from "./pathbar.js";
-import { entityChips, bindEntityButtons, linkText, dialogueButtons, bindDialogueButtons, dlcBadge, groupOf } from "./links.js";
+import { entityChips, bindEntityButtons, linkText, dialogueButtons, bindDialogueButtons, dlcBadge, groupOf, snippet, mark } from "./links.js";
 import { tipAtStar } from "./tip.js";
 
 const docNamed = name => S.docs.find(x => x.name === name);
@@ -53,20 +54,23 @@ function pager(i, items) {
     <span class="at">${at + 1} of ${items.length}</span>${step(items[at + 1], "next", "Next ›")}</nav>`;
 }
 
-// la colonne : d'où vient la liste (pour y revenir), puis les noms des textes, le texte ouvert marqué
+// la colonne : la liste telle qu'on la lisait (nom et extrait de chaque texte), le texte ouvert marqué ;
+// son titre rouvre la page de la liste
 function column(i, items, list) {
-  const back = labelOf(list.from);
-  return `<div class="list-top">${back ? `<button type="button" class="list-back">${esc(back)}</button>` : "<span></span>"}
+  const { from } = list, terms = from.page === "results" ? tokenize(from.q) : [];
+  const what = describeEntry(from) || { kind: "Search results", label: `“${from.q}”` };
+  return `<div class="list-top"><div class="cat">${esc(what.kind)}</div>
     <button type="button" class="list-close" aria-label="Close this list">×</button></div>
+    <h2><button type="button" class="list-back" title="Open the whole page">${esc(what.label)}</button></h2>
     <p class="count">${items.length} texts</p>
-    <ol>${items.map(j => {
-      const x = S.docs[j];
-      return `<li><button type="button" data-i="${j}"${j === i ? ' aria-current="true"' : ""}><span class="dot" style="--c:${colorOf(x.cat)}"></span><span class="name">${esc(nameOf(x))}</span></button></li>`;
+    <ol class="results">${items.map(j => {
+      const x = S.docs[j], row = docRow(x, mark(esc(nameOf(x)), terms), mark(esc(snippet(textOf(x), terms)), terms));
+      return j === i ? row.replace("<button ", '<button aria-current="true" ') : row;
     }).join("")}</ol>`;
 }
 
 function bindColumn(col, list) {
-  col.querySelector(".list-back")?.addEventListener("click", () => reopen(list.from));
+  col.querySelector(".list-back").addEventListener("click", () => reopen(list.from));
   // fermer la liste : le même texte, seul (Retour la rouvre)
   col.querySelector(".list-close").addEventListener("click", () => openPage("doc", { i: S.selected }, { fly: false }));
   col.querySelectorAll("button[data-i]").forEach(b => {

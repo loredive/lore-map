@@ -418,14 +418,14 @@ export function setHover(i) {
   draw();
 }
 
-// Partie visible de la carte : sous la barre du haut, à gauche du panneau ouvert et de sa colonne
+// Partie visible de la carte : sous la barre du haut, à gauche du panneau ouvert et de la liste à côté
 // (grand écran) ou au-dessus de lui (téléphone, où il monte du bas)
 function visibleArea() {
   const phone = isPhone(), open = !panel.hidden, { width, height, top } = camera();
   const col = listColumn.hidden ? null : listColumn.getBoundingClientRect();   // sans largeur : cachée par style.css
   return {
     top,
-    right: open && !phone ? (col?.width ? col.left : panel.getBoundingClientRect().left) : width,
+    right: open && !phone ? Math.min(panel.getBoundingClientRect().left, col?.width ? col.left : width) : width,
     bottom: open && phone ? panel.getBoundingClientRect().top : height,
   };
 }
