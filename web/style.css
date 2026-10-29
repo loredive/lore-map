@@ -84,12 +84,13 @@ body {
 }
 
 /* catégories : des pastilles qui servent aussi de légende des couleurs */
-/* une seule ligne : si les catégories débordent, elles défilent de côté (le bord s'estompe pour le dire) */
+/* une seule ligne : si les catégories débordent, elles défilent de côté (le bord s'estompe pour le dire) ;
+   une fine barre de défilement reste visible, sans quoi une souris sans molette latérale n'atteint pas les autres */
 .legend {
-  display: flex; gap: .3rem; min-width: 0; overflow-x: auto; scrollbar-width: none; margin-right: auto;
+  display: flex; gap: .3rem; min-width: 0; overflow-x: auto; margin-right: auto;
+  scrollbar-width: thin; scrollbar-color: var(--rim-strong) transparent; padding-bottom: 2px;
 }
 .legend.scrolls:not(.at-end) { mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); }
-.legend::-webkit-scrollbar { display: none; }
 .legend button { flex: none; }
 .legend button {
   display: flex; align-items: center; gap: .45rem; padding: .2rem .7rem; min-height: 30px;
