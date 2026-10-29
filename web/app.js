@@ -2,6 +2,7 @@
 import { S, $, canvas, panel, listColumn, tip, status, input, mode, esc, colorOf, announce, dataPath, DEFAULT_GAME, nameOf, groupName, resetContext, focusPanel, reducedMotion } from "./state.js";
 import { buildGrid, buildSprites, computeHulls, resize, draw, nearest, setHover, starsNear, startIntro, skipIntro } from "./render.js";
 import { introMode } from "./intro.js";
+import { startMusic } from "./music.js";
 import { camera, toWorld, panBy, zoomAt, canZoom, flyTo, viewCenter, frameFrom } from "./camera.js";
 import { buildViewSwitch } from "./views.js";
 import { decodeLore } from "./lore.js";
@@ -422,6 +423,7 @@ function refreshVisible() {
 
 if (await load()) {
   wire();
+  startMusic(await optional(dataPath("music.json"), null));   // sans fichier : pas de musique ni de bouton
   resize();
   const opened = openFirstPage(location.hash);   // la page du lien collé, ou la carte seule
   // brouillard sur la carte seule ; un simple fondu si le système demande moins d'animations
