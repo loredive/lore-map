@@ -1,0 +1,70 @@
+{
+ "default": "eerie",
+ "tracks": {
+  "eerie": {
+   "file": "eerie",
+   "title": "Dark Place (loop)",
+   "author": "SkyleTheFrench",
+   "source": "https://opengameart.org/content/dark-place-loop",
+   "license": "CC0"
+  },
+  "chant": {
+   "file": "chant",
+   "title": "Evil temple ambiance loop",
+   "author": "Brandon Morris",
+   "source": "https://opengameart.org/content/evil-temple-ambiance-loop",
+   "license": "CC0"
+  },
+  "melancholy": {
+   "file": "melancholy",
+   "title": "vampires piano",
+   "author": "TAD",
+   "source": "https://opengameart.org/content/vampires-piano",
+   "license": "CC0"
+  },
+  "dread": {
+   "file": "dread",
+   "title": "Dark Shrine Loop",
+   "author": "qubodup, after yd's “Shrine”",
+   "source": "https://opengameart.org/content/dark-shrine-loop",
+   "license": "CC0"
+  },
+  "cosmic": {
+   "file": "cosmic",
+   "title": "Background space track",
+   "author": "yd",
+   "source": "https://opengameart.org/node/10814",
+   "license": "CC0"
+  }
+ },
+ "groups": {
+  "Valtr and the League": "dread",
+  "Guardians of the Forbidden Woods": "dread",
+  "Blood gems": "eerie",
+  "Caryll Runes": "cosmic",
+  "Healing blood and remedies": "chant",
+  "Cainhurst and the Vilebloods": "melancholy",
+  "Coldblood and Blood Echoes": "cosmic",
+  "Patches": "eerie",
+  "Bells and resonance": "chant",
+  "Chalices and labyrinths": "dread",
+  "Chalice ritual materials": "dread",
+  "Chants and prayers": "chant",
+  "Blood ministration and Paleblood": "chant",
+  "Fire and light": "eerie",
+  "Iosefka's clinic": "eerie",
+  "Arianna": "melancholy",
+  "Yahar'gul and the School of Mensis": "cosmic",
+  "Messenger accessories": "melancholy",
+  "Adella, Alfred and the Church": "chant",
+  "Research Hall patients": "cosmic",
+  "Hunter attire": "eerie",
+  "Trick weapons and hunter badges": "eerie",
+  "The Narrow-Minded Man": "eerie",
+  "Yharnamites": "eerie",
+  "Willem, Laurence and Byrgenwerth": "cosmic",
+  "The Hunter's Nightmare": "dread",
+  "The Doll and Gehrman": "melancholy",
+  "The Chapel Dweller": "melancholy"
+ }
+}
