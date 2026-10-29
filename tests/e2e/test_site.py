@@ -252,22 +252,47 @@ def test_back_from_a_tour_step_names_the_step(browser, site, game):
     assert problems == []
 
 
-def camera(page):
-    return page.evaluate("async () => { const { S } = await import('./state.js'); return { ...S.cam }; }")
+# ------------------------------------------------------------------ caméra
+# Les deux seuls endroits du fichier qui lisent ou écrivent la caméra : quand elle change de module,
+# on ne repointe qu'eux.
+def camera(page, stars=()):
+    """La caméra une fois immobile (le vol en cours fini : dix images de suite sans bouger), en nombres :
+    { x, y, s, k, width, height, cy, top }, k = s * base (pixels par unité du monde). Avec `stars`
+    (des indices de textes), aussi `screen` : la position à l'écran de chacune, par toScreen."""
+    return page.evaluate("""async stars => {
+        const { S } = await import('./state.js'), { camera, toScreen } = await import('./camera.js');
+        const at = () => { const { x, y, s } = camera(); return [x, y, s]; };
+        let last = at(), calm = 0;
+        for (const t0 = performance.now(); calm < 10 && performance.now() - t0 < 10000;) {
+            await new Promise(r => requestAnimationFrame(r));
+            const now = at();
+            calm = now.every((v, i) => v === last[i]) ? calm + 1 : 0;
+            last = now;
+        }
+        const { x, y, s, k, width, height, cy, top } = camera(), c = { x, y, s, k, width, height, cy, top };
+        if (stars.length) c.screen = stars.map(i => toScreen(S.docs[i].x, S.docs[i].y));
+        return c; }""", list(stars))
+
+
+def move_camera(page, dx=0.0, dy=0.0, zoom=1.0):
+    """Déplace la caméra sans vol (flyTo en 0 ms saute), en unités du monde : x += dx, y += dy,
+    s *= zoom. Rend la main une fois la carte redessinée."""
+    page.evaluate("""async ([dx, dy, zoom]) => { const { camera, flyTo } = await import('./camera.js');
+        const { x, y, s } = camera();
+        flyTo(x + dx, y + dy, s * zoom, 0);
+        await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))); }""", [dx, dy, zoom])
 
 
 @pytest.mark.parametrize("game", GAMES)
 def test_back_to_a_tour_from_another_page_shows_the_whole_tour(browser, site, game):
     tour, title = TOURS[game]
     page, problems = open_page(browser, f"{site}?game={game}#tour={tour}/3", DESKTOP)
-    page.wait_for_timeout(1200)                     # le vol d'ouverture : toute la visite à l'écran
-    whole = camera(page)
+    whole = camera(page)                            # après le vol d'ouverture : toute la visite à l'écran
     page.click("#help")
     wait_shown(page, ("help", "How to read this map"))
-    page.evaluate("async () => { const { S } = await import('./state.js'); S.cam.x += 3; S.cam.y -= 2; S.cam.s *= 6; }")
+    move_camera(page, 3, -2, 6)
     page.go_back()
     wait_shown(page, ("tour", title))
-    page.wait_for_timeout(1200)
     back = camera(page)
     assert back == pytest.approx(whole, rel=1e-3, abs=1e-3)
     assert problems == []
@@ -430,18 +455,19 @@ def test_tracing_a_path_from_a_text(browser, site, game):
 # bouge, ni focus clavier déplacé, ni entrée d'historique, ni pas d'History, ni défilement perdu.
 def moved_aside(page):
     """Laisse finir le vol de l'ouverture, puis décale la caméra : un recadrage se verrait."""
-    page.wait_for_timeout(1200)
-    page.evaluate("async () => { const { S } = await import('./state.js'); S.cam.x += 40; S.cam.y -= 30; }")
+    camera(page)
+    move_camera(page, 40, -30)
 
 
 def still(page):
     """Ce qu'un réaffichage sur place ne doit pas changer. Le défilement à 10 pixels près : une fois le
     panneau redessiné, le navigateur ajuste un peu la position pour garder le même passage à l'écran."""
-    return page.evaluate("""async () => { const { S } = await import('./state.js');
+    rest = page.evaluate("""async () => { const { S } = await import('./state.js');
         let steps = null;
         try { steps = JSON.parse(localStorage.getItem('lore-map:trail:' + S.game)).steps.length; } catch {}
-        return { cam: { ...S.cam }, length: history.length, url: location.href, steps,
+        return { length: history.length, url: location.href, steps,
                  scroll: Math.round(document.querySelector('#panel').scrollTop / 10) }; }""")
+    return {"cam": camera(page), **rest}
 
 
 def test_language_switch_redraws_the_text_in_place(browser, site):
@@ -518,4 +544,163 @@ def test_both_triggers_redraw_any_page_in_place(browser, site, kind):
     assert shown(page) == expected
     assert still(page) == before
     assert page.input_value("#q") == query                  # la recherche n'est pas effacée
+    assert problems == []
+
+
+# ------------------------------------------------------------------ cadrage et commandes de la caméra
+# Ce que fait la caméra aujourd'hui, sur grand écran et sur téléphone : le filet de sécurité avant de
+# la déplacer dans son propre module. Les valeurs attendues sont calculées dans la page (toScreen, le
+# bord du panneau), pas recopiées.
+DEVICES = pytest.mark.parametrize("device", [DESKTOP, PHONE], ids=["desktop", "phone"])
+GROUPS = {"bloodborne": "Valtr and the League", "elden-ring": "Bell Bearings of the departed"}
+
+
+def visible_area(page):
+    """La partie visible de la carte, mesurée dans la page : sous la barre du haut, à gauche du panneau
+    ouvert (grand écran) ou au-dessus de lui (téléphone) ; avec son centre."""
+    return page.evaluate("""() => {
+        const p = document.querySelector('#panel'), r = p.getBoundingClientRect(), open = !p.hidden;
+        const phone = matchMedia('(max-width: 760px)').matches;
+        const a = { top: document.querySelector('.topbar').getBoundingClientRect().bottom,
+                    right: open && !phone ? r.left : innerWidth, bottom: open && phone ? r.top : innerHeight };
+        return { ...a, center: [a.right / 2, (a.top + a.bottom) / 2] }; }""")
+
+
+def inside(point, area):
+    x, y = point
+    return 0 <= x <= area["right"] and area["top"] <= y <= area["bottom"]
+
+
+def doc_index(page, name):
+    return page.evaluate("async n => (await import('./state.js')).S.docs.findIndex(d => d.name === n)", name)
+
+
+def paste_address(page, address):
+    """Un lien collé dans la barre d'adresse, la page déjà ouverte."""
+    page.evaluate("a => { location.hash = a; }", address)
+
+
+@pytest.mark.parametrize("game", GAMES)
+@DEVICES
+def test_opening_a_text_centres_its_star(browser, site, game, device):
+    first = FIRST_TEXT[game]
+    page, problems = open_page(browser, f"{site}?game={game}", device)
+    i = doc_index(page, first)
+    camera(page)
+    move_camera(page, 3, -2, 6)                         # loin du texte : il faut voler jusqu'à lui
+    assert not inside(camera(page, [i])["screen"][0], visible_area(page))
+    paste_address(page, ADDRESSES[game][0][1])
+    wait_shown(page, ("doc", first))
+    star = camera(page, [i])["screen"][0]
+    assert star == pytest.approx(visible_area(page)["center"], abs=2)
+    assert problems == []
+
+
+@pytest.mark.parametrize("game", GAMES)
+@DEVICES
+def test_plus_and_minus_keep_the_centre_fixed(browser, site, game, device):
+    page, problems = open_page(browser, f"{site}?game={game}", device)
+    page.evaluate("() => document.activeElement?.blur()")
+    stars = list(range(0, 400, 40))
+    cx, cy = visible_area(page)["center"]               # panneau fermé : tout l'écran sous la barre
+    for key, factor in [("+", 1.3), ("-", 1 / 1.3)]:
+        before = camera(page, stars)
+        page.keyboard.press(key)
+        after = camera(page, stars)
+        assert after["s"] == pytest.approx(before["s"] * factor)
+        for (x0, y0), (x1, y1) in zip(before["screen"], after["screen"]):
+            assert [x1 - cx, y1 - cy] == pytest.approx([(x0 - cx) * factor, (y0 - cy) * factor], abs=1e-6)
+    assert problems == []
+
+
+@pytest.mark.parametrize("game", GAMES)
+@DEVICES
+def test_arrow_keys_pan_by_a_fixed_number_of_pixels(browser, site, game, device):
+    page, problems = open_page(browser, f"{site}?game={game}", device)
+    page.evaluate("() => document.activeElement?.blur()")
+    move_camera(page, zoom=2)                           # le pas ne dépend pas du zoom
+    for key, shift in [("ArrowLeft", (80, 0)), ("ArrowRight", (-80, 0)), ("ArrowUp", (0, 80)), ("ArrowDown", (0, -80))]:
+        (x0, y0), = camera(page, [0])["screen"]
+        page.keyboard.press(key)
+        (x1, y1), = camera(page, [0])["screen"]
+        assert [x1 - x0, y1 - y0] == pytest.approx(list(shift), abs=1e-6), key
+    assert problems == []
+
+
+@pytest.mark.parametrize("game", GAMES)
+@DEVICES
+def test_the_map_focused_from_the_keyboard_aims_and_pans(browser, site, game, device):
+    page, problems = open_page(browser, f"{site}?game={game}", device)
+    page.evaluate("() => document.activeElement?.blur()")
+    for _ in range(40):                                 # Tab jusqu'à la carte : le focus est « visible »
+        page.keyboard.press("Tab")
+        if page.evaluate("() => document.activeElement?.id === 'sky'"):
+            break
+    assert page.evaluate("async () => (await import('./state.js')).S.kbd")
+    page.wait_for_function("() => /^(Aiming at: |No star at the center)/.test(document.querySelector('#announce').textContent)")
+    (x0, y0), = camera(page, [0])["screen"]
+    page.keyboard.press("ArrowLeft")
+    (x1, y1), = camera(page, [0])["screen"]
+    assert [x1 - x0, y1 - y0] == pytest.approx([80, 0], abs=1e-6)
+    page.evaluate("() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))")   # le viseur redessiné
+    assert problems == []
+
+
+def group_stars(page, trim):
+    """Les étoiles du groupe ouvert entre les quantiles trim et 1 - trim, comme les garde fitPoints, puis
+    les quatre qui font les bords de cette boîte : [gauche, droite, bas, haut] (en indices de textes)."""
+    return page.evaluate("""async trim => { const { S } = await import('./state.js');
+        const ds = S.docs.map((d, i) => ({ x: d.x, y: d.y, i })).filter(d => S.docs[d.i].cluster === S.cluster.id);
+        const q = (key, t) => [...ds].sort((a, b) => a[key] - b[key])[Math.min(ds.length - 1, Math.floor((ds.length - 1) * t))];
+        const [x0, x1, y0, y1] = [q('x', trim), q('x', 1 - trim), q('y', trim), q('y', 1 - trim)];
+        const kept = ds.filter(d => d.x >= x0.x && d.x <= x1.x && d.y >= y0.y && d.y <= y1.y).map(d => d.i);
+        return [...kept, x0.i, x1.i, y0.i, y1.i]; }""", trim)
+
+
+@pytest.mark.parametrize("game", GAMES)
+@DEVICES
+def test_opening_a_group_puts_its_stars_on_screen(browser, site, game, device):
+    group = GROUPS[game]
+    page, problems = open_page(browser, f"{site}?game={game}", device)
+    camera(page)
+    move_camera(page, -3, 2, 6)
+    paste_address(page, f"#group={group}")
+    wait_shown(page, ("cluster", group))
+    area = visible_area(page)
+
+    def check(stars):
+        """Toutes à l'écran, et le milieu de leur boîte au centre de la partie visible."""
+        c = camera(page, stars)
+        assert [p for p in c["screen"] if not inside(p, area)] == []
+        (left, _), (right, _), (_, low), (_, high) = c["screen"][-4:]
+        assert [(left + right) / 2, (low + high) / 2] == pytest.approx(area["center"], abs=2)
+        return c
+
+    assert check(group_stars(page, 0))["s"] <= 6        # à l'ouverture : toutes ses étoiles, sans zoomer
+    # changer de carte recadre le groupe ouvert, entre les quantiles 0,1 et 0,9
+    if device is PHONE:
+        page.click(".menu-btn")                         # les cartes sont dans le menu
+    page.click("#views button[data-v='1']")
+    page.evaluate("""async () => { const { S } = await import('./state.js');      // la transition finie
+        while (S.morphing) await new Promise(r => requestAnimationFrame(r)); }""")
+    check(group_stars(page, 0.1))
+    assert problems == []
+
+
+@pytest.mark.parametrize("game", GAMES)
+@DEVICES
+def test_back_to_a_visible_text_keeps_the_camera(browser, site, game, device):
+    first = FIRST_TEXT[game]
+    page, problems = open_page(browser, f"{site}?game={game}{ADDRESSES[game][0][1]}", device)
+    echo = page.text_content("#panel .echoes button .name").strip()
+    page.click("#panel .echoes button")
+    wait_shown(page, ("doc", echo))
+    camera(page)
+    move_camera(page, 0.04, -0.03)                      # un peu : les deux textes restent visibles
+    before = camera(page, [doc_index(page, first), doc_index(page, echo)])
+    area = visible_area(page)
+    assert all(inside(p, area) for p in before["screen"])
+    page.go_back()
+    wait_shown(page, ("doc", first))
+    assert camera(page) == {k: v for k, v in before.items() if k != "screen"}
     assert problems == []

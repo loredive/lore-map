@@ -1,6 +1,7 @@
 // Point d'entrée : chargement des données, souris, clavier, légende.
-import { S, $, canvas, panel, tip, status, input, mode, esc, colorOf, announce, dataPath, DEFAULT_GAME, nameOf, groupName, resetContext, focusPanel } from "./state.js";
-import { buildGrid, buildSprites, computeHulls, resize, draw, toWorld, nearest, flyTo, zoomAt, setHover, starsNear, viewCenter, frameFrom } from "./render.js";
+import { S, $, canvas, panel, tip, status, input, mode, esc, colorOf, announce, dataPath, DEFAULT_GAME, nameOf, groupName, resetContext, focusPanel, withCameFrom } from "./state.js";
+import { buildGrid, buildSprites, computeHulls, resize, draw, nearest, setHover, starsNear } from "./render.js";
+import { camera, toWorld, panBy, zoomAt, canZoom, flyTo, viewCenter, frameFrom } from "./camera.js";
 import { buildViewSwitch, addShelves } from "./views.js";
 import { prepareSky } from "./sky.js";
 import { buildDialogues } from "./dialogue-ui.js";
@@ -36,7 +37,7 @@ startPages({
   top: panelTop,
   bindTop: bindPanelTop,
   focus: focusPanel,
-  frame: frameFrom,
+  frame: stars => frameFrom(withCameFrom(stars)),   // avec le texte d'où l'on vient
   draw,
   // revenir à une page ouverte avant la recherche efface la recherche (les résultats portent la leur)
   onReopen: e => { if (!e.q && S.query) resetSearch(); },
@@ -165,11 +166,9 @@ canvas.addEventListener("pointermove", e => {
     drag.moved += Math.abs(dx) + Math.abs(dy);
     if (drag.moved > 3) {
       canvas.classList.add("dragging");
-      S.cam.x -= dx / (S.cam.s * S.base);
-      S.cam.y += dy / (S.cam.s * S.base);
+      panBy(dx, dy);
       drag.x = e.clientX; drag.y = e.clientY;
       setHover(-1);
-      draw();
       return;
     }
   }
@@ -195,7 +194,7 @@ canvas.addEventListener("pointerup", e => {
 // qu'ouvrir l'une d'elles au hasard, on zoome s'il y en a beaucoup, et sinon on propose leurs noms.
 // Mesuré avec une erreur de doigt de 6 px : l'étoile la plus proche n'était la bonne que 2 fois sur 20.
 // Un nom de groupe sous le doigt, avec peu d'étoiles, devient le premier choix de la liste.
-const TAP_PX = 22, MAX_ZOOM = 80, CHOICES = 6, TAP_ZOOM = 4;   // ×4 : moins de touches qu'à ×2,5 (mesuré)
+const TAP_PX = 22, CHOICES = 6, TAP_ZOOM = 4;   // ×4 : moins de touches qu'à ×2,5 (mesuré)
 const chooser = $("#chooser");
 function tapZoom(sx, sy, label) {
   closeChooser();
@@ -206,9 +205,9 @@ function tapZoom(sx, sy, label) {
     return true;
   }
   if (c.length <= 1) return false;                   // une seule étoile sous le doigt : elle s'ouvre
-  if (c.length > CHOICES && S.cam.s * TAP_ZOOM <= MAX_ZOOM) {
+  if (c.length > CHOICES && canZoom(TAP_ZOOM)) {
     const [wx, wy] = toWorld(sx, sy);
-    flyTo(wx, wy, S.cam.s * TAP_ZOOM, 450);
+    flyTo(wx, wy, camera().s * TAP_ZOOM, 450);
     return true;
   }
   openChooser(c.slice(0, CHOICES).map(([i]) => i), sx, sy);
@@ -221,9 +220,9 @@ function openChooser(list, sx, sy, group = null) {
     return `<li><button type="button" data-i="${i}"><span class="dot" style="--c:${colorOf(d.cat)}"></span>${esc(nameOf(d))}</button></li>`;
   }).join("")}</ul>`;
   chooser.hidden = false;
-  const w = chooser.offsetWidth, h = chooser.offsetHeight;
-  chooser.style.left = Math.max(8, Math.min(sx - w / 2, S.W - w - 8)) + "px";
-  chooser.style.top = (sy + 24 + h < S.H ? sy + 24 : Math.max(8, sy - h - 24)) + "px";
+  const w = chooser.offsetWidth, h = chooser.offsetHeight, { width, height } = camera();
+  chooser.style.left = Math.max(8, Math.min(sx - w / 2, width - w - 8)) + "px";
+  chooser.style.top = (sy + 24 + h < height ? sy + 24 : Math.max(8, sy - h - 24)) + "px";
   chooser.querySelectorAll("button[data-i]").forEach(b => b.addEventListener("click", () => { closeChooser(); openPage("doc", { i: +b.dataset.i }); }));
   chooser.querySelector("button[data-c]")?.addEventListener("click", () => { closeChooser(); openPage("cluster", { id: group.id, label: group.label }); });
   chooser.querySelector("button").focus({ preventScroll: true });
@@ -293,12 +292,12 @@ addEventListener("keydown", e => {
   }
   if (typing || document.activeElement?.closest("#panel")) return;
   if (e.key === "Enter" && document.activeElement === canvas && S.hover >= 0) { e.preventDefault(); openPage("doc", { i: S.hover }); return; }
-  const step = 80 / (S.cam.s * S.base);
+  const { width, cy } = camera(), step = 80;   // px
   const keys = {
-    "+": () => zoomAt(S.W / 2, S.cy, 1.3), "=": () => zoomAt(S.W / 2, S.cy, 1.3),
-    "-": () => zoomAt(S.W / 2, S.cy, 1 / 1.3),
-    ArrowLeft: () => { S.cam.x -= step; draw(); }, ArrowRight: () => { S.cam.x += step; draw(); },
-    ArrowUp: () => { S.cam.y += step; draw(); }, ArrowDown: () => { S.cam.y -= step; draw(); },
+    "+": () => zoomAt(width / 2, cy, 1.3), "=": () => zoomAt(width / 2, cy, 1.3),
+    "-": () => zoomAt(width / 2, cy, 1 / 1.3),
+    ArrowLeft: () => panBy(step, 0), ArrowRight: () => panBy(-step, 0),
+    ArrowUp: () => panBy(0, step), ArrowDown: () => panBy(0, -step),
     "0": () => flyTo(0, 0, 1),
   };
   if (keys[e.key]) {
@@ -310,7 +309,7 @@ addEventListener("keydown", e => {
 
 function pick(sx, sy, px) {
   const [wx, wy] = toWorld(sx, sy);
-  return nearest(wx, wy, px / (S.cam.s * S.base));
+  return nearest(wx, wy, px / camera().k);
 }
 function labelAt(sx, sy) {
   const b = S.labelBoxes.find(([x0, y0, x1, y1]) => sx >= x0 && sx <= x1 && sy >= y0 && sy <= y1);

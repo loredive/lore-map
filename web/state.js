@@ -10,6 +10,14 @@ export const MAX_RESULTS = 40;
 export const MIN_COHESION = 0.6;   // en dessous, un groupe est trop éparpillé dans cette vue pour y porter un nom
 export const MORPH_MS = 1100;
 export const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+// Le seuil du téléphone, écrit une fois en JS : le panneau monte du bas et prend toute la largeur.
+// Les règles de style.css doivent suivre : les trois @media (max-width: 760px) (mise en page du
+// téléphone, portraits, fond de Bloodborne) et les quatre @media (min-width: 761px ...) (écran moyen,
+// .under-bar, panneau de tablette, mode lecture). Une requête média ne peut pas lire une variable,
+// d'où ces nombres recopiés. @container (min-width: 760px) mesure le panneau, pas la fenêtre : il
+// n'a pas à suivre.
+const phoneQuery = matchMedia("(max-width: 760px)");
+export const isPhone = () => phoneQuery.matches;
 
 export const $ = s => document.querySelector(s);
 export const canvas = $("#sky"), ctx = canvas.getContext("2d");
@@ -18,8 +26,7 @@ export const panel = $("#panel"), tip = $("#tip"), status = $("#status"), input 
 export const S = {
   game: DEFAULT_GAME, games: [], colors: {}, ui: {},   // jeu affiché, jeux disponibles, game.json
   docs: [], cats: [], clusters: [], meta: null,
-  cam: { x: 0, y: 0, s: 1 },
-  W: 0, H: 0, dpr: 1, base: 1,
+  dpr: 1,
   hover: -1, selected: -1,
   kbd: false,            // la carte a le focus clavier : viseur au centre
   views: [], view: 0, morphing: false,   // projections disponibles, vue affichée, transition en cours
@@ -52,6 +59,10 @@ export const textLang = d => (S.altLang && d.alt ? S.ui.alt_lang : "en");
 // de même pour un groupe : son titre et sa description ; le titre anglais (c.label) reste l'identifiant
 export const groupName = c => (S.altLang && c.altLabel) || c.label;
 export const groupDesc = c => (S.altLang && c.altDescription) || c.description;
+
+// Les étoiles à cadrer, plus le texte d'où l'on vient (S.cameFrom) s'il y en a un : la caméra ne lit
+// pas l'historique, c'est l'appelant de frameFrom qui le lui ajoute, pour qu'il reste à l'écran.
+export const withCameFrom = points => (S.cameFrom >= 0 ? [...points, S.docs[S.cameFrom]] : points);
 
 // Icône d'un texte, ou portrait du PNJ pour un passage de dialogue ; "" sans image.
 // Décorative (alt vide) : le nom est toujours écrit à côté.

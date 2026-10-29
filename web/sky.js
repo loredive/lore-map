@@ -70,15 +70,16 @@ export function muteColor(hex, t = 0.55) {
 }
 
 // ------------------------------------------------------------------ dessin
-export function drawNebulae(toScreen) {
+// cam (dans chaque fonction qui la prend) : la copie de la caméra prise pour l'image par render.js ;
+// toScreen : monde -> écran. Ce module ne lit pas la caméra lui-même.
+export function drawNebulae({ k, width: W, height: H }, toScreen) {
   ctx.save();
   ctx.globalCompositeOperation = "lighter";
-  const k = S.cam.s * S.base;
   for (const c of S.clusters) {
     if (c.views[S.view].cohesion < 0.6) continue;
     const [sx, sy] = toScreen(c.x, c.y);
     const r = Math.max(30, c.radius[S.view] * k * 1.6);
-    if (sx < -r || sy < -r || sx > S.W + r || sy > S.H + r) continue;
+    if (sx < -r || sy < -r || sx > W + r || sy > H + r) continue;
     const g = ctx.createRadialGradient(sx, sy, 0, sx, sy, r);
     const on = S.cluster === c;
     g.addColorStop(0, c.tint + (on ? "2e" : "16"));
@@ -89,12 +90,12 @@ export function drawNebulae(toScreen) {
   ctx.restore();
 }
 
-export function drawConstellations(toScreen, sel) {
+export function drawConstellations({ s, width: W, height: H }, toScreen, sel) {
   ctx.save();
   ctx.strokeStyle = "#a7b6d6";
   ctx.lineWidth = 0.7;
   // plus visibles en zoomant ; avec les nuages (style d), seulement pour le groupe survolé ou ouvert
-  const base = STYLE.clouds ? 0 : Math.min(0.32, 0.1 + 0.03 * S.cam.s);
+  const base = STYLE.clouds ? 0 : Math.min(0.32, 0.1 + 0.03 * s);
   for (const c of S.clusters) {
     const on = S.cluster === c || S.hoverLabel === c;
     if ((S.cluster || sel || S.lit || S.hits || S.path) && !on) continue;   // un mode actif : seul le groupe concerné
@@ -105,7 +106,7 @@ export function drawConstellations(toScreen, sel) {
       const da = S.docs[a], db = S.docs[b];
       if (isHidden(da) || isHidden(db)) continue;
       const [x0, y0] = toScreen(da.x, da.y), [x1, y1] = toScreen(db.x, db.y);
-      if ((x0 < 0 && x1 < 0) || (y0 < 0 && y1 < 0) || (x0 > S.W && x1 > S.W) || (y0 > S.H && y1 > S.H)) continue;
+      if ((x0 < 0 && x1 < 0) || (y0 < 0 && y1 < 0) || (x0 > W && x1 > W) || (y0 > H && y1 > H)) continue;
       ctx.moveTo(x0, y0); ctx.lineTo(x1, y1);
     }
     ctx.stroke();
@@ -126,7 +127,7 @@ export function drawThread(toScreen, R) {
 
 // Historique de lecture (history-ui.js) : un anneau léger autour des textes déjà lus, le texte d'où l'on
 // vient, nommé, et, si le visiteur l'a demandé, les derniers textes reliés en pointillé.
-export function drawTrail(toScreen, R) {
+export function drawTrail({ width: W, height: H }, toScreen, R) {
   ctx.save();
   ctx.strokeStyle = "#f0dc9f"; ctx.lineWidth = 1.5;
   ctx.globalAlpha = 0.55;
@@ -134,7 +135,7 @@ export function drawTrail(toScreen, R) {
     const d = S.docs[i];
     if (isHidden(d)) continue;
     const [x, y] = toScreen(d.x, d.y);
-    if (x < -R || y < -R || x > S.W + R || y > S.H + R) continue;
+    if (x < -R || y < -R || x > W + R || y > H + R) continue;
     ctx.beginPath(); ctx.arc(x, y, R * 0.9 + 3, 0, Math.PI * 2); ctx.stroke();
   }
   const pts = S.trailShown ? S.trailDocs.map(i => toScreen(S.docs[i].x, S.docs[i].y)) : [];
