@@ -1,9 +1,9 @@
 // Rendu du ciel sur le canvas : grille de sélection, étoiles, noms des groupes, caméra.
 import { S, $, canvas, ctx, panel, listColumn, tip, GRACE, MIN_COHESION, reducedMotion, isPhone, colorOf, isHidden, membersIn } from "./state.js";
 import { startCamera, setViewport, camera, toScreen, toWorld, viewCenter } from "./camera.js";
-import { STYLE, starWeight, drawNebulae, drawConstellations, drawThread, drawTrail, drawEntity, labelStyle, muteColor } from "./sky.js";
+import { STYLE, starWeight, drawNebulae, drawConstellations, drawThread, drawEntity, labelStyle, muteColor } from "./sky.js";
 import { drawClouds } from "./nebula.js";
-import { isQuiet, dimmer, showsHulls, showsHistory, showsGroupNames } from "./focus.js";
+import { isQuiet, dimmer, showsHulls, showsGroupNames } from "./focus.js";
 
 // Grille spatiale pour retrouver vite l'étoile sous le curseur
 const CELL = 0.02;
@@ -208,10 +208,6 @@ export function render() {
     ctx.drawImage(sprites[d.cat], sx - rr, sy - rr, 2 * rr, 2 * rr);
   }
   ctx.globalCompositeOperation = "source-over";
-
-  // 1 bis. parcours de lecture : textes lus, derniers pas, texte d'où l'on vient (history-ui.js)
-  // (pas pendant une visite, un chemin ou une recherche : leurs propres tracés suffisent)
-  if (!S.morphing && showsHistory(S)) drawTrail(cam, toScreen, R);
 
   // 2. résultats de recherche : étoiles dorées, plus vives pour les premiers rangs
   if (S.hits && !sel) {

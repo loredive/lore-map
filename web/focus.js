@@ -25,10 +25,9 @@ export function dimmer(s) {
     (!sel && s.cluster && d.cluster !== s.cluster.id) || (!sel && s.lit && !s.lit.has(d.i));
 }
 
-// Les contours des groupes et l'History sur la carte : pas pendant une recherche ni le long d'un chemin
-// ou d'une visite (leurs propres tracés suffisent)
+// Les contours des groupes : pas pendant une recherche ni le long d'un chemin ou d'une visite (leurs
+// propres tracés suffisent)
 export const showsHulls = s => !s.hits && !s.path;
-export const showsHistory = s => !s.hits && !s.path;
 
 // Les noms des groupes : seulement sans rien d'ouvert qui écrive les siens (une entité écrit son nom)
 export const showsGroupNames = s => !s.hits && !selectedDoc(s) && !s.path && !s.entity;

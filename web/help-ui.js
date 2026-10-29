@@ -26,7 +26,6 @@ registerPage({
       <li><strong>Trace a path</strong> between two texts, from echo to echo, starting from any text.</li>
       <li><strong>By meaning / by category</strong>, in the top bar: texts placed by what they talk about, or sorted into columns by category.</li>
       <li><strong>Categories</strong>, in the top bar: click one to hide or show its texts.</li>
-      <li><strong>History</strong>, in the top bar: every page you opened, and how many texts you have read. On the map, a ring marks each text already read, and the text you came from is named.</li>
       <li><strong>Back</strong> (or the browser's Back button) returns to the previous page; Escape closes.</li>
       <li>By touch: tapping a crowded spot zooms in, then lists the texts there.</li>
       <li>By keyboard: Tab to the map, arrow keys to move, + and − to zoom, Enter to open the targeted star.</li>

@@ -46,7 +46,6 @@ export const S = {
   bm25: null, emb: null, extractor: null, semanticState: "off",
   grid: null, sprites: {}, dust: [],
   images: new Map(),     // nom du texte -> icône (ou portrait de l'interlocuteur), data/images.json
-  visited: new Set(), trailDocs: [], cameFrom: -1, trailShown: false,   // parcours de lecture (history-ui.js)
   tours: [], tour: null, tourStep: -1,   // visites guidées (tours-ui.js) ; visite ouverte et son étape
   altLang: false,        // textes affichés dans la seconde langue du jeu (Bloodborne : le français officiel)
 };
@@ -59,10 +58,6 @@ export const textLang = d => (S.altLang && d.alt ? S.ui.alt_lang : "en");
 // de même pour un groupe : son titre et sa description ; le titre anglais (c.label) reste l'identifiant
 export const groupName = c => (S.altLang && c.altLabel) || c.label;
 export const groupDesc = c => (S.altLang && c.altDescription) || c.description;
-
-// Les étoiles à cadrer, plus le texte d'où l'on vient (S.cameFrom) s'il y en a un : la caméra ne lit
-// pas l'historique, c'est l'appelant de frameFrom qui le lui ajoute, pour qu'il reste à l'écran.
-export const withCameFrom = points => (S.cameFrom >= 0 ? [...points, S.docs[S.cameFrom]] : points);
 
 // Icône d'un texte, ou portrait du PNJ pour un passage de dialogue ; "" sans image.
 // Décorative (alt vide) : le nom est toujours écrit à côté.
