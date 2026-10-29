@@ -7,7 +7,7 @@ import { decodeLore } from "./lore.js";
 import { prepareSky } from "./sky.js";
 import { buildDialogues } from "./dialogue-ui.js";
 import { buildIndex, runSearch, resetSearch } from "./search-ui.js";
-import { panelTop, bindPanelTop } from "./panel.js";
+import { panelTop, bindPanelTop, watchAddress } from "./panel.js";
 import { cancelPath } from "./pathbar.js";
 import { showTip } from "./tip.js";
 import "./entities-ui.js";
@@ -19,10 +19,27 @@ import "./text-ui.js";
 import "./group-ui.js";
 import "./path-ui.js";
 
+// ------------------------------------------------------------------ démarrage
+// Dans cet ordre, et seulement si les données sont là : load() (lire, décoder, construire), puis
+// wire() (les écouteurs de la carte et de la fenêtre, les pages du panneau, les commandes de la barre),
+// puis le premier dessin et la page du lien collé. Avant, seuls le menu et les liens des jeux répondent :
+// rien ne peut donc tourner sur des données absentes.
+const wiring = [];
+// un écouteur de la carte ou de la fenêtre : posé par wire(), une fois les données là
+const on = (target, type, f, options) => wiring.push(() => target.addEventListener(type, f, options));
+
+function wire() {
+  startPanel();
+  watchAddress();
+  for (const attach of wiring) attach();
+  for (const el of document.querySelectorAll(".seek, .drawer .links")) el.inert = false;
+  input.disabled = false;
+}
+
 // ------------------------------------------------------------------ pages du panneau
 // pages.js reçoit ici tout ce qui touche au DOM et à l'état partagé ; les sortes de pages se sont
 // enregistrées en important leur module (help-ui.js, text-ui.js, entities-ui.js…).
-startPages({
+const startPanel = () => startPages({
   panel,
   browser: {
     push: (state, url) => history.pushState(state, "", url),
@@ -94,7 +111,7 @@ async function load() {
   } catch {
     status.innerHTML = `Could not read <code>${dataPath("lore.json")}</code>. Run <code>python prepare.py</code>, ` +
       "then open the page through a local server: <code>python -m http.server -d web</code>.";
-    return;
+    return false;
   }
   // le format (lore.js) : un champ obligatoire absent est nommé dans la ligne d'état, sans carte à moitié tracée
   let data;
@@ -103,7 +120,7 @@ async function load() {
   } catch (err) {
     status.innerHTML = `${esc(err.message)}. Run <code>python prepare.py</code> again to rewrite ` +
       `<code>${dataPath("lore.json")}</code>.`;
-    return;
+    return false;
   }
   S.cats = data.categories;
   S.views = data.views;
@@ -128,8 +145,7 @@ async function load() {
   await loadTours();                            // data/<jeu>/tours.json, s'il y en a
   status.textContent = "";
   mode.textContent = "";                       // la ligne d'état ne parle que quand il y a du nouveau
-  resize();
-  openFirstPage(location.hash);                 // la page du lien collé, ou la carte seule
+  return true;
 }
 
 
@@ -137,7 +153,7 @@ async function load() {
 const pointers = new Map();
 let drag = null, pinch = null;
 
-canvas.addEventListener("pointerdown", e => {
+on(canvas, "pointerdown", e => {
   closeChooser();
   canvas.setPointerCapture(e.pointerId);
   pointers.set(e.pointerId, [e.clientX, e.clientY]);
@@ -148,7 +164,7 @@ canvas.addEventListener("pointerdown", e => {
     drag = null;
   }
 });
-canvas.addEventListener("pointermove", e => {
+on(canvas, "pointermove", e => {
   if (pointers.has(e.pointerId)) pointers.set(e.pointerId, [e.clientX, e.clientY]);
   if (pinch && pointers.size === 2) {
     const [a, b] = [...pointers.values()];
@@ -170,7 +186,7 @@ canvas.addEventListener("pointermove", e => {
   }
   if (e.pointerType === "mouse") updateHover(e.clientX, e.clientY);
 });
-canvas.addEventListener("pointerup", e => {
+on(canvas, "pointerup", e => {
   pointers.delete(e.pointerId);
   if (pointers.size < 2) pinch = null;
   canvas.classList.remove("dragging");
@@ -236,26 +252,26 @@ function aimAtCenter() {
   }
   announce(i >= 0 ? `Aiming at: ${S.docs[i].name}` : "No star at the center");
 }
-canvas.addEventListener("focus", () => { if (canvas.matches(":focus-visible")) { S.kbd = true; aimAtCenter(); draw(); } });
-canvas.addEventListener("blur", () => { S.kbd = false; setHover(-1); draw(); });
+on(canvas, "focus", () => { if (canvas.matches(":focus-visible")) { S.kbd = true; aimAtCenter(); draw(); } });
+on(canvas, "blur", () => { S.kbd = false; setHover(-1); draw(); });
 
-canvas.addEventListener("pointercancel", e => { pointers.delete(e.pointerId); drag = pinch = null; });
-canvas.addEventListener("pointerleave", () => { S.hoverLabel = null; setHover(-1); });
-canvas.addEventListener("wheel", e => {
+on(canvas, "pointercancel", e => { pointers.delete(e.pointerId); drag = pinch = null; });
+on(canvas, "pointerleave", () => { S.hoverLabel = null; setHover(-1); });
+on(canvas, "wheel", e => {
   e.preventDefault();
   zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * (e.deltaMode ? 0.05 : 0.0015)));
 }, { passive: false });
-canvas.addEventListener("dblclick", e => zoomAt(e.clientX, e.clientY, 2.2));
-addEventListener("resize", resize);
+on(canvas, "dblclick", e => zoomAt(e.clientX, e.clientY, 2.2));
+on(window, "resize", resize);
 // la barre du haut change de hauteur (largeur de fenêtre, polices chargées) : la carte se recale sous elle
-new ResizeObserver(() => { resize(); legendFade(); }).observe($(".topbar"));
+wiring.push(() => new ResizeObserver(() => { resize(); legendFade(); }).observe($(".topbar")));
 // catégories trop nombreuses pour la ligne : le bord droit s'estompe, sauf une fois arrivé au bout
 function legendFade() {
   const l = $("#legend");
   l.classList.toggle("scrolls", l.scrollWidth > l.clientWidth + 1);
   l.classList.toggle("at-end", l.scrollLeft + l.clientWidth >= l.scrollWidth - 1);
 }
-$("#legend").addEventListener("scroll", legendFade, { passive: true });
+on($("#legend"), "scroll", legendFade, { passive: true });
 // téléphone : « Menu » ouvre le reste de la barre par-dessus la carte ; un choix fait, il se referme
 const menuBtn = $(".menu-btn"), topbar = $(".topbar");
 function setMenu(open) {
@@ -264,7 +280,7 @@ function setMenu(open) {
 }
 menuBtn.addEventListener("click", () => setMenu(!topbar.classList.contains("open")));
 topbar.querySelectorAll(".links button, .games a").forEach(b => b.addEventListener("click", () => setMenu(false)));
-canvas.addEventListener("pointerdown", () => setMenu(false));
+on(canvas, "pointerdown", () => setMenu(false));
 // les images ne sont pas versionnées (images.py, icons.py) : une icône absente disparaît,
 // et sa fiche reprend la mise en page sans image
 addEventListener("error", e => {
@@ -274,7 +290,7 @@ addEventListener("error", e => {
   img.remove();
 }, true);
 
-addEventListener("keydown", e => {
+on(window, "keydown", e => {
   const typing = document.activeElement === input;
   if (e.key === "/" && !typing && !e.target.closest?.("textarea, input, select")) { e.preventDefault(); input.focus(); input.select(); return; }
   if (e.key === "Escape" && topbar.classList.contains("open")) { setMenu(false); menuBtn.focus(); return; }
@@ -401,4 +417,8 @@ function refreshVisible() {
   draw();
 }
 
-load();
+if (await load()) {
+  wire();
+  resize();
+  openFirstPage(location.hash);                 // la page du lien collé, ou la carte seule
+}

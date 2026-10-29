@@ -22,13 +22,13 @@
       <h1>The Lore Map</h1>
     </div>
     <button type="button" class="menu-btn" aria-expanded="false" aria-controls="bar-drawer">Menu</button>
-    <form class="seek" role="search">
+    <form class="seek" role="search" inert>
       <label for="q" class="visually-hidden">Search the texts</label>
-      <input id="q" type="search" placeholder="Search for a name, a place, a theme…" autocomplete="off" spellcheck="false">
+      <input id="q" type="search" placeholder="Search for a name, a place, a theme…" autocomplete="off" spellcheck="false" disabled>
     </form>
     <!-- grand écran : ses éléments se rangent dans la barre (display: contents) ; téléphone : le menu déroulant -->
     <div class="drawer" id="bar-drawer">
-      <nav class="links" aria-label="Explore">
+      <nav class="links" aria-label="Explore" inert>
         <button type="button" id="tours" class="nav-btn" hidden>Guided tours</button>
         <button type="button" id="index" class="nav-btn">Characters and places</button>
         <button type="button" id="history" class="nav-btn">History</button>
