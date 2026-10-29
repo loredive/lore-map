@@ -101,17 +101,18 @@ function clouds(k) {
 // nombre de nuages prêts pour la vue affichée (le test de la page vérifie qu'ils ne manquent pas)
 export const cloudCount = () => (cache.get(S.view) || []).length;
 
-// à l'écran : le groupe ouvert ou survolé s'allume, les autres s'effacent quand un groupe est ouvert
-export function drawClouds(toScreen, minCohesion) {
+// à l'écran : le groupe ouvert ou survolé s'allume, les autres s'effacent quand un groupe est ouvert.
+// cam : la copie de la caméra prise pour l'image par render.js ; toScreen : monde -> écran
+export function drawClouds({ s, width: W, height: H }, toScreen, minCohesion) {
   ctx.save();
   ctx.globalCompositeOperation = "lighter";
   const focus = S.cluster || S.hoverLabel;
   // de près, on lit les étoiles : le gaz s'efface (sinon un brouillard gris envahit l'écran)
-  const near = 1 / (1 + (S.cam.s / 3) ** 2);
+  const near = 1 / (1 + (s / 3) ** 2);
   for (const [c, t] of clouds(S.view)) {
     if (c.views[S.view].cohesion < minCohesion) continue;
     const [sx, sy] = toScreen(t.x0, t.y1), [ex, ey] = toScreen(t.x0 + t.wWorld, t.y1 - t.hWorld);
-    if (ex < 0 || ey < 0 || sx > S.W || sy > S.H) continue;
+    if (ex < 0 || ey < 0 || sx > W || sy > H) continue;
     const on = focus === c;
     ctx.globalAlpha = near * (on ? 1 : S.cluster ? 0.25 : S.hits || S.lit || S.path ? 0.4 : 0.72);
     ctx.drawImage(t.cv, sx, sy, ex - sx, ey - sy);
