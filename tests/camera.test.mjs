@@ -246,12 +246,10 @@ test("with reduced motion, or ms <= 0, the camera jumps straight to the target",
   }
 });
 
-test("the camera can hold a given state object, so S.cam stays the same object during the move", () => {
-  const state = { x: 0, y: 0, s: 1 };
-  startCamera({ onChange() {}, onFrame() {}, requestFrame: () => 0, cancelFrame() {}, now: () => 0 }, state);
-  setViewport({ width: 800, height: 600, top: 0 });
+test("the camera starts at the centre, at zoom 1, and a new start forgets the old position", () => {
+  start();
   flyTo(0.1, 0.2, 3, 0);
-  assert.deepEqual(state, { x: 0.1, y: 0.2, s: 3 });
-  state.x = 0.5;                                   // un appelant pas encore déménagé écrit dedans
-  assert.equal(camera().x, 0.5);
+  start();
+  const { x, y, s } = camera();
+  assert.deepEqual({ x, y, s }, { x: 0, y: 0, s: 1 });
 });

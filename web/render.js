@@ -1,6 +1,6 @@
 // Rendu du ciel sur le canvas : grille de sélection, étoiles, noms des groupes, caméra.
 import { S, $, canvas, ctx, panel, tip, GRACE, MIN_COHESION, reducedMotion, isPhone, colorOf, isHidden, membersIn } from "./state.js";
-import { startCamera, setViewport, camera, toScreen, toWorld, viewCenter, frameFrom as frameStars } from "./camera.js";
+import { startCamera, setViewport, camera, toScreen, toWorld, viewCenter } from "./camera.js";
 import { STYLE, drawNebulae, drawConstellations, drawThread, drawTrail, drawEntity, labelStyle, muteColor } from "./sky.js";
 import { drawClouds } from "./nebula.js";
 
@@ -148,13 +148,11 @@ export function buildSprites() {
 export function resize() {
   S.dpr = Math.min(devicePixelRatio || 1, 2);
   // la barre du haut couvre le haut du ciel : la carte se centre et se dimensionne sur ce qui reste visible
-  S.top = $(".topbar")?.getBoundingClientRect().bottom || 0;
-  document.documentElement.style.setProperty("--bar-h", `${S.top}px`);
-  setViewport({ width: innerWidth, height: innerHeight, top: S.top });   // redessine (groupé)
+  const top = $(".topbar")?.getBoundingClientRect().bottom || 0;
+  document.documentElement.style.setProperty("--bar-h", `${top}px`);
+  setViewport({ width: innerWidth, height: innerHeight, top });   // redessine (groupé)
   const cam = camera();
   canvas.width = cam.width * S.dpr; canvas.height = cam.height * S.dpr;
-  // pour les modules pas encore passés par la caméra
-  ({ width: S.W, height: S.H, cy: S.cy, base: S.base } = cam);
 }
 
 let frame = 0;
@@ -406,20 +404,13 @@ function drawClusterLabels(cam) {
 }
 
 // ------------------------------------------------------------------ caméra
-// La caméra (camera.js) tient S.cam lui-même pendant le déménagement ; un vol redessine à chaque
-// image tout de suite (render), un déplacement ponctuel par draw.
+// La caméra (camera.js) tient son état ; un vol redessine à chaque image tout de suite (render), un
+// déplacement ponctuel par draw.
 startCamera({
   visibleArea, onChange: draw, onFrame: render,
   requestFrame: f => requestAnimationFrame(f), cancelFrame: n => cancelAnimationFrame(n),
   now: () => performance.now(), reducedMotion,
-}, S.cam);
-export { toScreen, toWorld, flyTo, zoomAt, fitPoints, focusDoc, viewCenter } from "./camera.js";
-
-// Cadre des étoiles avec le texte d'où l'on vient (S.cameFrom), sans jamais zoomer : on garde le
-// contexte, et l'on voit où l'on est par rapport à là d'où l'on vient.
-export function frameFrom(points) {
-  frameStars(S.cameFrom >= 0 ? [...points, S.docs[S.cameFrom]] : points);
-}
+});
 
 export function setHover(i) {
   if (i === S.hover) return;

@@ -17,13 +17,12 @@ let anim = 0;
 
 // deps : visibleArea() -> { top, right, bottom } (la partie de l'écran où la carte se voit),
 // onChange() (redessine, groupé), onFrame() (redessine tout de suite, à chaque image d'un vol),
-// requestFrame / cancelFrame, now(), reducedMotion.
-// state : l'objet { x, y, s } à tenir (pendant le déménagement, S.cam lui-même) ; absent, un neuf.
-export function startCamera(d, state = { x: 0, y: 0, s: 1 }) {
+// requestFrame / cancelFrame, now(), reducedMotion. La caméra repart du centre, au zoom 1.
+export function startCamera(d) {
   deps.cancelFrame?.(anim);
   anim = 0;
   deps = d;
-  cam = state;
+  cam = { x: 0, y: 0, s: 1 };
 }
 
 // la fenêtre : appelée à chaque redimensionnement. La barre du haut couvre le haut du ciel : la carte

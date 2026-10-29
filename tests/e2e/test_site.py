@@ -260,8 +260,8 @@ def camera(page, stars=()):
     { x, y, s, k, width, height, cy, top }, k = s * base (pixels par unité du monde). Avec `stars`
     (des indices de textes), aussi `screen` : la position à l'écran de chacune, par toScreen."""
     return page.evaluate("""async stars => {
-        const { S } = await import('./state.js'), { toScreen } = await import('./render.js');
-        const at = () => [S.cam.x, S.cam.y, S.cam.s];
+        const { S } = await import('./state.js'), { camera, toScreen } = await import('./camera.js');
+        const at = () => { const { x, y, s } = camera(); return [x, y, s]; };
         let last = at(), calm = 0;
         for (const t0 = performance.now(); calm < 10 && performance.now() - t0 < 10000;) {
             await new Promise(r => requestAnimationFrame(r));
@@ -269,16 +269,18 @@ def camera(page, stars=()):
             calm = now.every((v, i) => v === last[i]) ? calm + 1 : 0;
             last = now;
         }
-        const c = { x: S.cam.x, y: S.cam.y, s: S.cam.s, k: S.cam.s * S.base,
-                    width: S.W, height: S.H, cy: S.cy, top: S.top };
+        const { x, y, s, k, width, height, cy, top } = camera(), c = { x, y, s, k, width, height, cy, top };
         if (stars.length) c.screen = stars.map(i => toScreen(S.docs[i].x, S.docs[i].y));
         return c; }""", list(stars))
 
 
 def move_camera(page, dx=0.0, dy=0.0, zoom=1.0):
-    """Déplace la caméra sans vol, en unités du monde : x += dx, y += dy, s *= zoom."""
-    page.evaluate("""async ([dx, dy, zoom]) => { const { S } = await import('./state.js');
-        S.cam.x += dx; S.cam.y += dy; S.cam.s *= zoom; }""", [dx, dy, zoom])
+    """Déplace la caméra sans vol (flyTo en 0 ms saute), en unités du monde : x += dx, y += dy,
+    s *= zoom. Rend la main une fois la carte redessinée."""
+    page.evaluate("""async ([dx, dy, zoom]) => { const { camera, flyTo } = await import('./camera.js');
+        const { x, y, s } = camera();
+        flyTo(x + dx, y + dy, s * zoom, 0);
+        await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))); }""", [dx, dy, zoom])
 
 
 @pytest.mark.parametrize("game", GAMES)

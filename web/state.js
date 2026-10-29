@@ -11,8 +11,11 @@ export const MIN_COHESION = 0.6;   // en dessous, un groupe est trop éparpillé
 export const MORPH_MS = 1100;
 export const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 // Le seuil du téléphone, écrit une fois en JS : le panneau monte du bas et prend toute la largeur.
-// Les règles de style.css doivent suivre : @media (max-width: 760px) et (min-width: 761px) ; une
-// requête média ne peut pas lire une variable, d'où ces nombres recopiés.
+// Les règles de style.css doivent suivre : les trois @media (max-width: 760px) (mise en page du
+// téléphone, portraits, fond de Bloodborne) et les quatre @media (min-width: 761px ...) (écran moyen,
+// .under-bar, panneau de tablette, mode lecture). Une requête média ne peut pas lire une variable,
+// d'où ces nombres recopiés. @container (min-width: 760px) mesure le panneau, pas la fenêtre : il
+// n'a pas à suivre.
 const phoneQuery = matchMedia("(max-width: 760px)");
 export const isPhone = () => phoneQuery.matches;
 
@@ -23,8 +26,7 @@ export const panel = $("#panel"), tip = $("#tip"), status = $("#status"), input 
 export const S = {
   game: DEFAULT_GAME, games: [], colors: {}, ui: {},   // jeu affiché, jeux disponibles, game.json
   docs: [], cats: [], clusters: [], meta: null,
-  cam: { x: 0, y: 0, s: 1 },
-  W: 0, H: 0, dpr: 1, base: 1,
+  dpr: 1,
   hover: -1, selected: -1,
   kbd: false,            // la carte a le focus clavier : viseur au centre
   views: [], view: 0, morphing: false,   // projections disponibles, vue affichée, transition en cours
