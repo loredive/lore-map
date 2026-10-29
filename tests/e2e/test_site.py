@@ -627,6 +627,25 @@ def test_arrow_keys_pan_by_a_fixed_number_of_pixels(browser, site, game, device)
     assert problems == []
 
 
+@pytest.mark.parametrize("game", GAMES)
+@DEVICES
+def test_the_map_focused_from_the_keyboard_aims_and_pans(browser, site, game, device):
+    page, problems = open_page(browser, f"{site}?game={game}", device)
+    page.evaluate("() => document.activeElement?.blur()")
+    for _ in range(40):                                 # Tab jusqu'à la carte : le focus est « visible »
+        page.keyboard.press("Tab")
+        if page.evaluate("() => document.activeElement?.id === 'sky'"):
+            break
+    assert page.evaluate("async () => (await import('./state.js')).S.kbd")
+    page.wait_for_function("() => /^(Aiming at: |No star at the center)/.test(document.querySelector('#announce').textContent)")
+    (x0, y0), = camera(page, [0])["screen"]
+    page.keyboard.press("ArrowLeft")
+    (x1, y1), = camera(page, [0])["screen"]
+    assert [x1 - x0, y1 - y0] == pytest.approx([80, 0], abs=1e-6)
+    page.evaluate("() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))")   # le viseur redessiné
+    assert problems == []
+
+
 def group_stars(page, trim):
     """Les étoiles du groupe ouvert entre les quantiles trim et 1 - trim, comme les garde fitPoints, puis
     les quatre qui font les bords de cette boîte : [gauche, droite, bas, haut] (en indices de textes)."""
