@@ -5,7 +5,7 @@
 import { S, ctx, isHidden, membersIn } from "./state.js";
 import { cloudOpacity } from "./focus.js";
 
-const TEX = 192;            // px, côté le plus long de l'image d'un groupe
+export const TEX = 192;            // px, côté le plus long de l'image d'un groupe
 const SPREAD = 0.85;        // rayon du souffle d'une étoile, en part du rayon du groupe
 const MAX_ALPHA = 0.42;     // opacité au cœur du nuage : du gaz, pas un aplat
 const BLUR = 0.06;          // flou avant le grain, en part de la taille de l'image
@@ -96,12 +96,16 @@ function clouds(k) {
   return cache.get(k);
 }
 
+// le bruit partagé, aussi pour le brouillard de l'ouverture (fog.js)
+export const grain = () => (noise ||= fractalNoise(TEX));
+
 // nombre de nuages prêts pour la vue affichée (le test de la page vérifie qu'ils ne manquent pas)
 export const cloudCount = () => (cache.get(S.view) || []).length;
 
 // à l'écran : le groupe ouvert ou survolé s'allume, les autres s'effacent quand un groupe est ouvert.
-// cam : la copie de la caméra prise pour l'image par render.js ; toScreen : monde -> écran
-export function drawClouds({ s, width: W, height: H }, toScreen, minCohesion) {
+// cam : la copie de la caméra prise pour l'image par render.js ; toScreen : monde -> écran ;
+// fade(c) : part du nuage déjà apparue pendant l'ouverture (intro.js), 1 ensuite
+export function drawClouds({ s, width: W, height: H }, toScreen, minCohesion, fade = () => 1) {
   ctx.save();
   ctx.globalCompositeOperation = "lighter";
   const focus = S.cluster || S.hoverLabel;
@@ -111,10 +115,11 @@ export function drawClouds({ s, width: W, height: H }, toScreen, minCohesion) {
     if (c.views[S.view].cohesion < minCohesion) continue;
     const [sx, sy] = toScreen(t.x0, t.y1), [ex, ey] = toScreen(t.x0 + t.wWorld, t.y1 - t.hWorld);
     if (ex < 0 || ey < 0 || sx > W || sy > H) continue;
-    const on = focus === c;
-    ctx.globalAlpha = near * cloudOpacity(S, on);
+    const on = focus === c, f = fade(c);
+    if (f <= 0) continue;
+    ctx.globalAlpha = near * cloudOpacity(S, on) * f;
     ctx.drawImage(t.cv, sx, sy, ex - sx, ey - sy);
-    if (on) { ctx.globalAlpha = 0.35 * near; ctx.drawImage(t.cv, sx, sy, ex - sx, ey - sy); }   // un souffle de plus
+    if (on) { ctx.globalAlpha = 0.35 * near * f; ctx.drawImage(t.cv, sx, sy, ex - sx, ey - sy); }   // un souffle de plus
   }
   ctx.restore();
 }

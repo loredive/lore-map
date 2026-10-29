@@ -303,3 +303,12 @@ test("the first page is the address's, or else the closed panel, which Back from
   assert.deepEqual(currentPage(), { page: "note", id: "b", q: "" });
   assert.equal(backLabel(), null);
 });
+
+test("the first page says whether the address opened a page (no fog intro then)", () => {
+  start();
+  assert.equal(openFirstPage("#note=b"), true);
+  start();
+  assert.equal(openFirstPage(""), false);
+  start();
+  assert.equal(openFirstPage("#nothing-matches"), false);
+});

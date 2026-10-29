@@ -819,3 +819,116 @@ def test_back_to_a_visible_text_keeps_the_camera(browser, site, game, device):
     wait_shown(page, ("doc", first))
     assert camera(page) == {k: v for k, v in before.items() if k != "screen"}
     assert problems == []
+
+
+# ------------------------------------------------------------------ ouverture dans le brouillard
+def intro_active(page):
+    return page.evaluate("async () => (await import('./render.js')).introActive()")
+
+
+@pytest.mark.parametrize("game", GAMES)
+def test_intro_plays_on_a_plain_load(browser, site, game):
+    page, problems = open_page(browser, f"{site}?game={game}", DESKTOP)
+    assert intro_active(page)                          # open_page attend 500 ms, l'ouverture en dure 7000
+    page.mouse.click(100, 400)
+    assert not intro_active(page)
+    assert problems == []
+
+
+@pytest.mark.parametrize("game", GAMES)
+def test_link_to_a_page_skips_the_intro(browser, site, game):
+    groups = [a for a in ADDRESSES[game] if a[0] == "group"]
+    page, problems = open_page(browser, f"{site}?game={game}{groups[0][1]}", DESKTOP)
+    assert shown(page) == ["cluster", groups[0][3]]
+    assert not intro_active(page)
+    entity = next(a for a in ADDRESSES[game] if a[0] == "entity")
+    paste_address(page, entity[1])
+    wait_shown(page, (entity[2], entity[3]))
+    assert not intro_active(page)
+    assert problems == []
+
+
+@pytest.mark.parametrize("game", GAMES)
+def test_click_during_intro_opens_the_star(browser, site, game):
+    first = FIRST_TEXT[game]
+    page, problems = open_page(browser, f"{site}?game={game}", DESKTOP)
+    i = doc_index(page, first)
+    c = camera(page)
+    x, y = page.evaluate("async i => { const d = (await import('./state.js')).S.docs[i]; return [d.x, d.y]; }", i)
+    move_camera(page, x - c["x"], y - c["y"], 8)        # de près : l'étoile seule sous le pointeur
+    assert intro_active(page)
+    sx, sy = camera(page, [i])["screen"][0]
+    page.mouse.click(sx, sy)
+    wait_shown(page, ("doc", first))
+    assert not intro_active(page)
+    assert problems == []
+
+
+# ------------------------------------------------------------------ musique d'ambiance
+def music_state(page):
+    return page.evaluate("async () => (await import('./music.js')).musicState()")
+
+
+def tracks_of(game):
+    return set(json.loads((WEB / "data" / game / "music.json").read_text(encoding="utf-8"))["tracks"])
+
+
+def wait_loaded(page):
+    page.wait_for_function("() => document.querySelector('#status').textContent === ''", timeout=20000)
+
+
+@pytest.mark.parametrize("game", GAMES)
+def test_music_starts_on_first_gesture(browser, site, game):
+    page, problems = open_page(browser, f"{site}?game={game}", DESKTOP)
+    assert music_state(page)["started"] is False
+    page.mouse.click(100, 400)
+    state = music_state(page)
+    assert state["started"] is True and state["mood"] in tracks_of(game)
+    assert problems == []
+
+
+@pytest.mark.parametrize("game", GAMES)
+def test_sound_button_and_preference(browser, site, game):
+    page, problems = open_page(browser, f"{site}?game={game}", DESKTOP)
+    assert page.is_visible("#sound")
+    assert page.get_attribute("#sound", "aria-pressed") == "true"
+    page.click("#sound")
+    assert page.evaluate("() => localStorage.getItem('lore-map:sound')") == "off"
+    page.reload()
+    wait_loaded(page)
+    page.mouse.click(100, 400)
+    page.mouse.click(120, 420)
+    assert music_state(page)["started"] is False
+    assert page.get_attribute("#sound", "aria-pressed") == "false"
+    assert problems == []
+
+
+@pytest.mark.parametrize("game", GAMES)
+def test_missing_audio_stays_quiet(browser, site, game):
+    context = browser.new_context(**DESKTOP)
+    page = context.new_page()
+    errors = []
+    page.on("pageerror", lambda e: errors.append(str(e)))
+    page.route("**/music/**", lambda route: route.fulfill(status=404, body=""))
+    page.goto(f"{site}?game={game}")
+    wait_loaded(page)
+    page.mouse.click(100, 400)
+    page.wait_for_timeout(500)
+    first = next(a for a in ADDRESSES[game] if a[0] == "group")
+    paste_address(page, first[1])
+    wait_shown(page, ("cluster", first[3]))
+    assert errors == []
+
+
+@pytest.mark.parametrize("game", GAMES)
+def test_no_music_file_no_button(browser, site, game):
+    context = browser.new_context(**DESKTOP)
+    page = context.new_page()
+    errors = []
+    page.on("pageerror", lambda e: errors.append(str(e)))
+    page.route("**/music.json", lambda route: route.fulfill(status=404, body=""))
+    page.goto(f"{site}?game={game}")
+    wait_loaded(page)
+    page.mouse.click(100, 400)
+    assert not page.is_visible("#sound")
+    assert errors == []

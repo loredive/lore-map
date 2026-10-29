@@ -1,6 +1,8 @@
 // Point d'entrée : chargement des données, souris, clavier, légende.
-import { S, $, canvas, panel, listColumn, tip, status, input, mode, esc, colorOf, announce, dataPath, DEFAULT_GAME, nameOf, groupName, resetContext, focusPanel } from "./state.js";
-import { buildGrid, buildSprites, computeHulls, resize, draw, nearest, setHover, starsNear } from "./render.js";
+import { S, $, canvas, panel, listColumn, tip, status, input, mode, esc, colorOf, announce, dataPath, DEFAULT_GAME, nameOf, groupName, resetContext, focusPanel, reducedMotion } from "./state.js";
+import { buildGrid, buildSprites, computeHulls, resize, draw, nearest, setHover, starsNear, startIntro, skipIntro } from "./render.js";
+import { introMode } from "./intro.js";
+import { startMusic } from "./music.js";
 import { camera, toWorld, panBy, zoomAt, canZoom, flyTo, viewCenter, frameFrom } from "./camera.js";
 import { buildViewSwitch } from "./views.js";
 import { decodeLore } from "./lore.js";
@@ -279,6 +281,10 @@ function setMenu(open) {
 menuBtn.addEventListener("click", () => setMenu(!topbar.classList.contains("open")));
 topbar.querySelectorAll(".links button, .games a").forEach(b => b.addEventListener("click", () => setMenu(false)));
 on(canvas, "pointerdown", () => setMenu(false));
+
+// l'ouverture dans le brouillard se passe au premier geste ; le geste fait aussi ce qu'il fait d'habitude
+for (const [target, type] of [[canvas, "pointerdown"], [canvas, "wheel"], [window, "keydown"], [input, "input"]])
+  on(target, type, skipIntro, { passive: true });
 // les images ne sont pas versionnées (images.py, icons.py) : une icône absente disparaît,
 // et sa fiche reprend la mise en page sans image
 addEventListener("error", e => {
@@ -417,6 +423,11 @@ function refreshVisible() {
 
 if (await load()) {
   wire();
+  startMusic(await optional(dataPath("music.json"), null));   // sans fichier : pas de musique ni de bouton
   resize();
-  openFirstPage(location.hash);                 // la page du lien collé, ou la carte seule
+  const opened = openFirstPage(location.hash);   // la page du lien collé, ou la carte seule
+  // brouillard sur la carte seule ; un simple fondu si le système demande moins d'animations
+  const intro = introMode({ opened, reducedMotion });
+  if (intro === "full") startIntro();
+  else if (intro === "fade") canvas.classList.add("fade-in");
 }

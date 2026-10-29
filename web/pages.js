@@ -140,9 +140,11 @@ export function openFromAddress(hash) {
 }
 
 // Au chargement : la page de l'adresse, ou sinon le premier état, la carte seule (panneau fermé),
-// pour que Retour depuis la page suivante y revienne.
+// pour que Retour depuis la page suivante y revienne. Renvoie true si l'adresse a ouvert une page.
 export function openFirstPage(hash) {
-  if (!openFromAddress(hash) && !current()) record({ page: "none" });
+  const opened = openFromAddress(hash);
+  if (!opened && !current()) record({ page: "none" });
+  return opened;
 }
 
 // La sorte et le nom d'une entrée ({ kind, label }), ou null si sa page ne se décrit pas.

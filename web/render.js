@@ -4,6 +4,8 @@ import { startCamera, setViewport, camera, toScreen, toWorld, viewCenter } from 
 import { STYLE, starWeight, drawNebulae, drawConstellations, drawThread, drawEntity, labelStyle, muteColor } from "./sky.js";
 import { drawClouds } from "./nebula.js";
 import { isQuiet, dimmer, showsHulls, showsGroupNames } from "./focus.js";
+import { createIntro, introLevels, fogLevel } from "./intro.js";
+import { drawFog } from "./fog.js";
 
 // Grille spatiale pour retrouver vite l'étoile sous le curseur
 const CELL = 0.02;
@@ -161,10 +163,30 @@ export function draw() {
   if (!frame) frame = requestAnimationFrame(() => { frame = 0; render(); });
 }
 
+// ------------------------------------------------------------------ ouverture dans le brouillard
+// intro.js dit à quel point chaque couche est apparue ; ici, on multiplie les opacités par groupe
+// (nuage, étoiles, nom) et on pose le brouillard par-dessus. Le rang d'un groupe : sa place dans
+// S.clusters (les plus gros d'abord).
+let intro = null, rankOf = new Map();
+const CLEAR = { nebula: 1, stars: 1, names: 1 };
+export function startIntro() {
+  rankOf = new Map(S.clusters.map((c, j) => [c.id, j]));
+  intro = createIntro(performance.now());
+  draw();
+}
+export function skipIntro() { if (intro) { intro.skip(); draw(); } }
+export const introActive = () => !!intro;
+
 // Une seule copie de la caméra par image : tout ce qui dépend du zoom ou de la taille de l'écran
 // la lit, et sky.js / nebula.js la reçoivent avec toScreen.
 export function render() {
   const cam = camera(), { width: W, height: H } = cam, { dpr } = S;
+  const now = performance.now(), t = intro ? intro.progress(now) : 1;
+  if (t >= 1) intro = null;
+  // pendant l'ouverture : les niveaux de chaque groupe, et ceux d'un texte sans groupe (le brouillard seul)
+  const levels = intro ? new Map(S.clusters.map(c => [c.id, introLevels(t, rankOf.get(c.id), S.clusters.length)])) : null;
+  const bare = 1 - fogLevel(t);
+  const reveal = id => (levels ? levels.get(id) ?? { nebula: bare, stars: bare, names: bare } : CLEAR);
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, W, H);
 
@@ -187,7 +209,7 @@ export function render() {
 
   // 0. nébuleuses (style c), contours des groupes, lignes de constellation (styles b et c)
   if (STYLE.nebula && !S.morphing) drawNebulae(cam, toScreen);
-  if (STYLE.clouds && !S.morphing) drawClouds(cam, toScreen, MIN_COHESION);
+  if (STYLE.clouds && !S.morphing) drawClouds(cam, toScreen, MIN_COHESION, c => reveal(c.id).nebula);
   else if (showsHulls(S) && !S.morphing) drawHulls(sel);
   if (STYLE.lines && !S.morphing) drawConstellations(cam, toScreen);
 
@@ -204,7 +226,7 @@ export function render() {
     const [sx, sy] = toScreen(d.x, d.y);
     if (sx < -pad || sy < -pad || sx > W + pad || sy > H + pad) continue;
     const rr = (STYLE.sizes ? R * starWeight(d.i) : R) * (STYLE.glow ? 0.6 + 0.4 * density : 1);   // « carrefours » du sens plus gros
-    ctx.globalAlpha = dims(d) ? off : on;
+    ctx.globalAlpha = (dims(d) ? off : on) * reveal(d.cluster).stars;
     ctx.drawImage(sprites[d.cat], sx - rr, sy - rr, 2 * rr, 2 * rr);
   }
   ctx.globalCompositeOperation = "source-over";
@@ -283,7 +305,7 @@ export function render() {
   // 4. noms des constellations (clusters), les plus grandes d'abord, sans chevauchement
   S.labelBoxes = [];
   if (S.view === S.shelves?.k && !S.morphing) drawShelfHeaders(cam);
-  if (showsGroupNames(S) && !S.morphing) drawClusterLabels(cam);   // une entité ouverte écrit son propre nom
+  if (showsGroupNames(S) && !S.morphing) drawClusterLabels(cam, reveal);   // une entité ouverte écrit son propre nom
 
   // 4 bis. au clavier : un viseur au centre de la partie visible de la carte
   if (S.kbd) {
@@ -306,6 +328,9 @@ export function render() {
     ctx.beginPath(); ctx.arc(sx, sy, r + 5, 0, Math.PI * 2); ctx.stroke();
   }
   ctx.globalAlpha = 1;
+
+  // 6. le brouillard de l'ouverture, par-dessus tout ; l'image suivante est demandée tant qu'il dure
+  if (intro) { drawFog(ctx, cam, fogLevel(t), now); draw(); }
 }
 
 // vue rayons : le nom de chaque colonne (sa catégorie) et son nombre de textes, au-dessus d'elle
@@ -354,7 +379,7 @@ function drawShelfHeaders({ k }) {
   ctx.restore();
 }
 
-function drawClusterLabels(cam) {
+function drawClusterLabels(cam, reveal) {
   const { width: W, height: H } = cam;
   // le titre, la recherche et la légende comptent comme déjà occupés : pas de nom dessous
   const placed = [".topbar", ".under-bar", ".credit"].map(s => {
@@ -368,8 +393,9 @@ function drawClusterLabels(cam) {
     const size = Math.max(12, Math.min(25, 9 + Math.sqrt(c.n) * 0.95)) * Math.min(1.25, 0.85 + cam.s * 0.08);
     const [sx, sy] = toScreen(c.x, c.y);
     if (sx < -100 || sy < -30 || sx > W + 100 || sy > H + 30) continue;
-    const st = labelStyle(c, size, r => r * cam.s * cam.base);
+    const st = labelStyle(c, size, r => r * cam.s * cam.base), shown = reveal(c.id).names;
     if (st.alpha < 0.05) continue;                // trop petit à ce zoom : il apparaîtra en zoomant
+    if (shown < 0.05) continue;                   // pas encore sorti du brouillard : ni dessiné, ni cliquable
     let fs = size;
     ctx.font = st.font;
     ctx.letterSpacing = st.spacing;
@@ -387,7 +413,7 @@ function drawClusterLabels(cam) {
     placed.push(box);
     S.labelBoxes.push([...box, c]);
     const on = S.cluster === c || S.hoverLabel === c;
-    ctx.globalAlpha = on ? 1 : 0.85 * st.alpha;
+    ctx.globalAlpha = (on ? 1 : 0.85 * st.alpha) * shown;
     ctx.lineWidth = 4;
     ctx.strokeStyle = "rgba(14,19,34,.8)";
     ctx.strokeText(st.text, lx, sy);
