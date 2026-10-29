@@ -3,6 +3,7 @@
 // dominante, grainé par un bruit fixe. Calculé une fois par groupe et par vue dans une petite
 // image hors écran, puis simplement posé à l'écran à chaque image : le déplacement reste fluide.
 import { S, ctx, isHidden, membersIn } from "./state.js";
+import { cloudOpacity } from "./focus.js";
 
 const TEX = 192;            // px, côté le plus long de l'image d'un groupe
 const SPREAD = 0.85;        // rayon du souffle d'une étoile, en part du rayon du groupe
@@ -111,7 +112,7 @@ export function drawClouds({ s, width: W, height: H }, toScreen, minCohesion) {
     const [sx, sy] = toScreen(t.x0, t.y1), [ex, ey] = toScreen(t.x0 + t.wWorld, t.y1 - t.hWorld);
     if (ex < 0 || ey < 0 || sx > W || sy > H) continue;
     const on = focus === c;
-    ctx.globalAlpha = near * (on ? 1 : S.cluster ? 0.25 : S.hits || S.lit || S.path ? 0.4 : 0.72);
+    ctx.globalAlpha = near * cloudOpacity(S, on);
     ctx.drawImage(t.cv, sx, sy, ex - sx, ey - sy);
     if (on) { ctx.globalAlpha = 0.35 * near; ctx.drawImage(t.cv, sx, sy, ex - sx, ey - sy); }   // un souffle de plus
   }

@@ -3,6 +3,7 @@ import { S, $, canvas, ctx, panel, tip, GRACE, MIN_COHESION, reducedMotion, isPh
 import { startCamera, setViewport, camera, toScreen, toWorld, viewCenter } from "./camera.js";
 import { STYLE, starWeight, drawNebulae, drawConstellations, drawThread, drawTrail, drawEntity, labelStyle, muteColor } from "./sky.js";
 import { drawClouds } from "./nebula.js";
+import { isQuiet, dimmer, showsHulls, showsHistory, showsGroupNames } from "./focus.js";
 
 // Grille spatiale pour retrouver vite l'étoile sous le curseur
 const CELL = 0.02;
@@ -182,17 +183,16 @@ export function render() {
   const R = r * 3.2;                                   // halo
   const pad = R + 2;
   const sel = S.selected >= 0 ? S.docs[S.selected] : null;
-  const echoSet = new Set(sel ? sel.echoes : []);
+  const dims = dimmer(S);
 
   // 0. nébuleuses (style c), contours des groupes, lignes de constellation (styles b et c)
   if (STYLE.nebula && !S.morphing) drawNebulae(cam, toScreen);
   if (STYLE.clouds && !S.morphing) drawClouds(cam, toScreen, MIN_COHESION);
-  else if (!S.hits && !S.morphing && !S.path) drawHulls(sel);
-  if (STYLE.lines && !S.morphing) drawConstellations(cam, toScreen, sel);
+  else if (showsHulls(S) && !S.morphing) drawHulls(sel);
+  if (STYLE.lines && !S.morphing) drawConstellations(cam, toScreen);
 
   // 1. toutes les étoiles visibles ; de loin et sans rien d'ouvert, couleurs atténuées (style c)
-  const quiet = !sel && !S.hits && !S.lit && !S.cluster && !S.path;
-  const sprites = STYLE.muted && quiet && cam.s < 2.5 ? S.spritesMuted : S.sprites;
+  const sprites = STYLE.muted && isQuiet(S) && cam.s < 2.5 ? S.spritesMuted : S.sprites;
   // halos additifs (style c) : les amas denses s'illuminent au lieu de se brouiller
   if (STYLE.glow) ctx.globalCompositeOperation = "lighter";
   // en additif, l'éclat suit la densité à l'écran : sur un petit écran vu de loin, les halos se
@@ -203,17 +203,15 @@ export function render() {
     if (isHidden(d)) continue;
     const [sx, sy] = toScreen(d.x, d.y);
     if (sx < -pad || sy < -pad || sx > W + pad || sy > H + pad) continue;
-    const dim = (S.path && !S.pathSet.has(d.i)) || (S.hits && !S.hits.has(d.i)) || (sel && d.i !== sel.i && !echoSet.has(d.i)) ||
-      (!sel && S.cluster && d.cluster !== S.cluster.id) || (!sel && S.lit && !S.lit.has(d.i));
     const rr = (STYLE.sizes ? R * starWeight(d.i) : R) * (STYLE.glow ? 0.6 + 0.4 * density : 1);   // « carrefours » du sens plus gros
-    ctx.globalAlpha = dim ? off : on;
+    ctx.globalAlpha = dims(d) ? off : on;
     ctx.drawImage(sprites[d.cat], sx - rr, sy - rr, 2 * rr, 2 * rr);
   }
   ctx.globalCompositeOperation = "source-over";
 
   // 1 bis. parcours de lecture : textes lus, derniers pas, texte d'où l'on vient (history-ui.js)
   // (pas pendant une visite, un chemin ou une recherche : leurs propres tracés suffisent)
-  if (!S.morphing && !S.path && !S.hits) drawTrail(cam, toScreen, R);
+  if (!S.morphing && showsHistory(S)) drawTrail(cam, toScreen, R);
 
   // 2. résultats de recherche : étoiles dorées, plus vives pour les premiers rangs
   if (S.hits && !sel) {
@@ -289,7 +287,7 @@ export function render() {
   // 4. noms des constellations (clusters), les plus grandes d'abord, sans chevauchement
   S.labelBoxes = [];
   if (S.view === S.shelves?.k && !S.morphing) drawShelfHeaders(cam);
-  if (!S.hits && !sel && !S.morphing && !S.path && !S.entity) drawClusterLabels(cam);   // une entité ouverte écrit son propre nom
+  if (showsGroupNames(S) && !S.morphing) drawClusterLabels(cam);   // une entité ouverte écrit son propre nom
 
   // 4 bis. au clavier : un viseur au centre de la partie visible de la carte
   if (S.kbd) {
