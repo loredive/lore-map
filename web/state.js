@@ -10,6 +10,11 @@ export const MAX_RESULTS = 40;
 export const MIN_COHESION = 0.6;   // en dessous, un groupe est trop éparpillé dans cette vue pour y porter un nom
 export const MORPH_MS = 1100;
 export const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+// Le seuil du téléphone, écrit une fois en JS : le panneau monte du bas et prend toute la largeur.
+// Les règles de style.css doivent suivre : @media (max-width: 760px) et (min-width: 761px) ; une
+// requête média ne peut pas lire une variable, d'où ces nombres recopiés.
+const phoneQuery = matchMedia("(max-width: 760px)");
+export const isPhone = () => phoneQuery.matches;
 
 export const $ = s => document.querySelector(s);
 export const canvas = $("#sky"), ctx = canvas.getContext("2d");
