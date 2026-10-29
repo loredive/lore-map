@@ -34,11 +34,7 @@ registerPage({
     read: v => (entityNamed(v) ? { name: v } : null),
   },
   backLabel: a => `Back to “${entityNamed(a.name)?.label || a.name}”`,
-  step: a => ({ kind: "entity", key: a.name }),
-  fromStep: {
-    kind: "entity", page: key => (entityNamed(key) ? { name: key } : null),
-    label: key => entityNamed(key)?.label || key, kindLabel: key => KIND_LABELS[entityNamed(key).kind][0],
-  },
+  describe: a => ({ kind: KIND_LABELS[entityNamed(a.name).kind][0], label: entityNamed(a.name).label }),
   render: ({ name }) => {
     const e = entityNamed(name);
     S.entity = e;
@@ -57,7 +53,7 @@ registerPage({
     const shared = new Map(related);
     return {
       announce: `${e.label}: ${e.docs.length} texts mention it`,
-      frame: docs,          // avec le texte d'où l'on vient, s'il y en a un
+      frame: docs,
       html: `<article class="card">
     <button type="button" class="to-index">All characters and places</button>
     <div class="cat">${KIND_LABELS[e.kind][0]}</div>

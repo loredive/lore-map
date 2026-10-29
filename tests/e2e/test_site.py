@@ -51,13 +51,10 @@ def browser():
         b.close()
 
 
-def open_page(browser, url, device, slow_data=False, storage=None):
+def open_page(browser, url, device, slow_data=False):
     """La page chargée, avec la liste de ce qui a mal tourné : erreurs JavaScript, ressources refusées par
     la politique de sécurité, requêtes en échec (sauf les icônes, absentes avant le déploiement)."""
     context = browser.new_context(**device)
-    if storage:     # localStorage du site avant tout chargement (une History enregistrée lors d'une visite passée)
-        context.add_init_script("".join(f"localStorage.setItem({json.dumps(k)}, {json.dumps(v)});"
-                                        for k, v in storage.items()))
     page = context.new_page()
     problems = []
     page.on("pageerror", lambda e: problems.append(f"page error: {e}"))
@@ -284,8 +281,8 @@ def test_back_to_and_from_help(browser, site, game):
     page.click("#help")
     wait_shown(page, ("help", "How to read this map"))
     assert page.text_content("#panel .panel-top .back").strip() == f"Back to “{first}”"
-    page.click("#history")
-    wait_shown(page, ("history", "History"))
+    page.click("#index")
+    wait_shown(page, ("index", "Characters and places"))
     assert page.text_content("#panel .panel-top .back").strip() == "Back to help"
     page.click("#panel .panel-top .back")
     wait_shown(page, ("help", "How to read this map"))
@@ -427,23 +424,6 @@ def test_typing_a_search_is_one_step(browser, site, game):
     page.go_back()
     wait_shown(page, ("doc", first))
     assert page.input_value("#q") == ""
-
-
-@pytest.mark.parametrize("game", GAMES)
-def test_saved_history_reopens_its_steps(browser, site, game):
-    first = FIRST_TEXT[game]
-    # le format enregistré d'aujourd'hui, sous la même clé : une History d'une visite passée se relit telle quelle
-    saved = json.dumps({"v": 2, "steps": [{"kind": "doc", "key": first}], "shown": False})
-    page, problems = open_page(browser, f"{site}?game={game}", DESKTOP, storage={f"lore-map:trail:{game}": saved})
-    page.click("#history")
-    wait_shown(page, ("history", "History"))
-    assert page.text_content("#panel .trail-list .name").strip() == first
-    page.click("#panel .tcontinue")
-    wait_shown(page, ("doc", first))
-    assert page.text_content("#panel .panel-top .back").strip() == "Back to your history"
-    page.go_back()
-    wait_shown(page, ("history", "History"))
-    assert problems == []
 
 
 # ------------------------------------------------------------------ focus de la carte, chemin d'échos
@@ -590,7 +570,7 @@ def test_tracing_a_path_from_a_text(browser, site, game):
 
 # ------------------------------------------------------------------ réaffichage sur place
 # Changer de langue ou masquer une catégorie réaffiche la page ouverte telle quelle : ni caméra qui
-# bouge, ni focus clavier déplacé, ni entrée d'historique, ni pas d'History, ni défilement perdu.
+# bouge, ni focus clavier déplacé, ni entrée d'historique, ni défilement perdu.
 def moved_aside(page):
     """Laisse finir le vol de l'ouverture, puis décale la caméra : un recadrage se verrait."""
     camera(page)
@@ -600,11 +580,8 @@ def moved_aside(page):
 def still(page):
     """Ce qu'un réaffichage sur place ne doit pas changer. Le défilement à 10 pixels près : une fois le
     panneau redessiné, le navigateur ajuste un peu la position pour garder le même passage à l'écran."""
-    rest = page.evaluate("""async () => { const { S } = await import('./state.js');
-        let steps = null;
-        try { steps = JSON.parse(localStorage.getItem('lore-map:trail:' + S.game)).steps.length; } catch {}
-        return { length: history.length, url: location.href, steps,
-                 scroll: Math.round(document.querySelector('#panel').scrollTop / 10) }; }""")
+    rest = page.evaluate("""() => ({ length: history.length, url: location.href,
+                 scroll: Math.round(document.querySelector('#panel').scrollTop / 10) })""")
     return {"cam": camera(page), **rest}
 
 
@@ -659,7 +636,7 @@ def open_by_click(page, site, kind):
     page.wait_for_function("k => document.querySelector('#panel').dataset.page === k", arg=kind)
 
 
-@pytest.mark.parametrize("kind", ["entity", "path", "dialogue", "tour", "results", "history", "help", "tours", "none"])
+@pytest.mark.parametrize("kind", ["entity", "path", "dialogue", "tour", "results", "index", "help", "tours", "none"])
 def test_both_triggers_redraw_any_page_in_place(browser, site, kind):
     by_address = {}
     for _, address, page_kind, _ in ADDRESSES["bloodborne"]:

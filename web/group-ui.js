@@ -15,11 +15,7 @@ registerPage({
     read: label => { const c = S.clusters.find(x => x.label === label); return c ? { id: c.id, label: c.label } : null; },
   },
   backLabel: ({ label }) => { const c = S.clusters.find(x => x.label === label); return `Back to the group “${c ? groupName(c) : label}”`; },
-  step: ({ label }) => ({ kind: "cluster", key: label }),
-  fromStep: {
-    kind: "cluster", page: key => { const c = clusterNamed(key); return c ? { id: c.id, label: c.label } : null; },
-    label: key => groupName(clusterNamed(key)), kindLabel: () => "Group of texts",
-  },
+  describe: ({ label }) => ({ kind: "Group of texts", label: groupName(clusterNamed(label)) }),
   render: args => {
     const c = groupOfArgs(args);
     if (!c) return { html: "" };
@@ -43,7 +39,7 @@ registerPage({
       bind: panel => panel.querySelectorAll("button[data-i]").forEach(b =>
         b.addEventListener("click", () => openInList(+b.dataset.i, visible.map(d => d.i)))),
       announce: `Group ${groupName(c)}: ${c.n} texts`,
-      frame: members,               // les étoiles du groupe à l'écran, avec le texte d'où l'on vient
+      frame: members,               // les étoiles du groupe à l'écran
     };
   },
 });

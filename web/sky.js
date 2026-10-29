@@ -5,7 +5,7 @@
 // Style d : nuages de gaz épousant les groupes (nebula.js) au lieu des contours, constellations
 // seulement pour le groupe survolé ou ouvert, poussière en parallaxe, ciel propre à chaque jeu.
 // Les couleurs atténuées de loin (muted) ont été essayées puis écartées : les catégories doivent rester lisibles.
-import { S, ctx, colorOf, isHidden, membersIn, nameOf, groupName } from "./state.js";
+import { S, ctx, colorOf, isHidden, membersIn, groupName } from "./state.js";
 import { isQuiet } from "./focus.js";
 
 const STYLES = {
@@ -128,43 +128,9 @@ export function drawThread(toScreen, R) {
   ctx.restore();
 }
 
-// Historique de lecture (history-ui.js) : un anneau léger autour des textes déjà lus, le texte d'où l'on
-// vient, nommé, et, si le visiteur l'a demandé, les derniers textes reliés en pointillé.
-export function drawTrail({ width: W, height: H }, toScreen, R) {
-  ctx.save();
-  ctx.strokeStyle = "#f0dc9f"; ctx.lineWidth = 1.5;
-  ctx.globalAlpha = 0.55;
-  for (const i of S.visited) {
-    const d = S.docs[i];
-    if (isHidden(d)) continue;
-    const [x, y] = toScreen(d.x, d.y);
-    if (x < -R || y < -R || x > W + R || y > H + R) continue;
-    ctx.beginPath(); ctx.arc(x, y, R * 0.9 + 3, 0, Math.PI * 2); ctx.stroke();
-  }
-  const pts = S.trailShown ? S.trailDocs.map(i => toScreen(S.docs[i].x, S.docs[i].y)) : [];
-  ctx.setLineDash([4, 6]); ctx.lineWidth = 2;
-  for (let k = 1; k < pts.length; k++) {
-    ctx.globalAlpha = 0.25 + 0.65 * k / (pts.length - 1);
-    ctx.beginPath(); ctx.moveTo(...pts[k - 1]); ctx.lineTo(...pts[k]); ctx.stroke();
-  }
-  ctx.setLineDash([]);
-  if (S.cameFrom >= 0 && S.cameFrom !== S.selected) {
-    const d = S.docs[S.cameFrom];
-    const [x, y] = toScreen(d.x, d.y);
-    ctx.globalAlpha = 1; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.arc(x, y, R * 1.3 + 5, 0, Math.PI * 2); ctx.stroke();
-    ctx.font = `italic 600 17px "Cormorant Garamond", Georgia, serif`;
-    ctx.textAlign = "left"; ctx.textBaseline = "middle";
-    const label = `from ${nameOf(d)}`, lx = x + R * 1.3 + 11;
-    ctx.lineWidth = 4; ctx.strokeStyle = "rgba(14,19,34,.85)"; ctx.strokeText(label, lx, y);
-    ctx.fillStyle = "#f0dc9f"; ctx.fillText(label, lx, y);
-  }
-  ctx.restore();
-}
-
 // Fiche d'une entité ouverte : ses textes en or, les plus pertinents (en tête de e.docs, rangés par
 // prepare.py) gros et vifs, les autres petits et pâles ; son nom écrit là où elle revient le plus
-// (son groupe principal), relié en pointillé au texte d'où l'on vient.
+// (son groupe principal).
 const ENTITY_TOP = 10;
 export function drawEntity(toScreen, R) {
   const e = S.entity;
@@ -177,18 +143,7 @@ export function drawEntity(toScreen, R) {
     ctx.globalAlpha = rank < ENTITY_TOP ? 1 : 0.32;
     ctx.drawImage(S.sprites.grace, x - R * k, y - R * k, 2 * R * k, 2 * R * k);
   });
-  const [ax, a0] = toScreen(...entityAnchor(docs));
-  let ay = a0;
-  if (S.cameFrom >= 0 && S.cameFrom !== S.selected) {
-    const d = S.docs[S.cameFrom];
-    const [x, y] = toScreen(d.x, d.y);
-    // le nom tomberait sur « from … » (le texte d'où l'on vient est dans le groupe principal) :
-    // il monte au-dessus, relié à sa place par un trait
-    if (Math.abs(y - ay) < 56 && ax > x - 140 && ax < x + 260) ay = y - 62;
-    ctx.strokeStyle = "#f0dc9f"; ctx.globalAlpha = 0.8; ctx.lineWidth = 2; ctx.setLineDash([4, 6]);
-    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(ax, ay); ctx.stroke();
-    ctx.setLineDash([]);
-  }
+  const [ax, ay] = toScreen(...entityAnchor(docs));
   const name = e.label, count = `${e.docs.length} ${e.docs.length === 1 ? "text" : "texts"}`;
   ctx.textAlign = "center"; ctx.textBaseline = "alphabetic"; ctx.globalAlpha = 1;
   ctx.font = `italic 600 22px "Cormorant Garamond", Georgia, serif`;

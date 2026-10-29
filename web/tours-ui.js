@@ -1,7 +1,7 @@
 // Visites guidées (data/<jeu>/tours.json, écrites à la main) : une suite de textes, chacun avec
 // une phrase qui le situe. La carte trace la visite comme un chemin numéroté (render.js), l'étape
 // en cours entourée ; le panneau lit l'étape, avec Précédent / Suivant.
-import { S, $, esc, colorOf, portrait, dataPath, nameOf, textOf, textLang, withCameFrom } from "./state.js";
+import { S, $, esc, colorOf, portrait, dataPath, nameOf, textOf, textLang } from "./state.js";
 import { fitPoints, frameFrom } from "./camera.js";
 import { registerPage, openPage } from "./pages.js";
 import { linkText, bindEntityButtons, dlcBadge } from "./links.js";
@@ -56,7 +56,6 @@ registerPage({
     read: v => { const [id, k] = v.split("/"); return stepArgs(id, (+k || 1) - 1); },
   },
   backLabel: a => `Back to “${tourById(a.id)?.title || a.id}”, step ${a.k + 1}`,
-  step: a => ({ kind: "doc", key: S.docs[a.i].name }),          // une étape de visite : un texte lu
   render: ({ id, k }, { from }) => {
     const t = tourById(id);
     // on arrive dans la visite (d'ailleurs, Retour compris) ou on y passe d'une étape à l'autre ?
@@ -69,7 +68,7 @@ registerPage({
     return {
       announce: `${t.title}, step ${k + 1} of ${t.steps.length}: ${nameOf(d)}`,
       // au départ, toute la visite à l'écran ; ensuite, l'étape avec la précédente, sans zoomer
-      frame: () => (fresh ? fitPoints(t.steps.map(s => S.docs[s.i]), 0) : frameFrom(withCameFrom([d]))),
+      frame: () => (fresh ? fitPoints(t.steps.map(s => S.docs[s.i]), 0) : frameFrom([d])),
       html: `<article class="card tour">
     <div class="cat">Guided tour · step ${k + 1} of ${t.steps.length}</div>
     <h2>${esc(t.title)}</h2>

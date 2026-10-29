@@ -6,7 +6,7 @@ import { readFileSync, readdirSync } from "node:fs";
 
 const WEB = new URL("../web/", import.meta.url);
 const PAGES = ["help-ui.js", "entities-ui.js", "dialogue-ui.js", "tours-ui.js", "text-ui.js", "group-ui.js",
-  "path-ui.js", "search-ui.js", "history-ui.js"];
+  "path-ui.js", "search-ui.js"];
 const BANNED = new Set([...PAGES, "panel.js", "nav.js"]);
 
 const importsOf = f => [...readFileSync(new URL(f, WEB), "utf8").matchAll(/^import\s[^;]*?from\s+"\.\/([^"]+)"/gm)]

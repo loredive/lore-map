@@ -203,6 +203,7 @@ registerPage({
   name: "results",
   replacesPrevious: true,
   backLabel: a => `Back to the results for “${a.q}”`,
+  describe: a => ({ kind: "Search results", label: `“${a.q}”` }),
   render: ({ q }) => {
     if (q !== S.query) { input.value = q; runSearch(keepResults); }
     return resultsPage();

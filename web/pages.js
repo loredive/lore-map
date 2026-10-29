@@ -11,9 +11,8 @@
 //                     clés françaises comprises (lues, jamais écrites) ; sans keys, read reçoit l'adresse
 //                     entière et n'est essayé qu'en dernier (un nom de texte).
 //   backLabel(args)   « Back to … » quand cette page est la précédente
-//   step(args)        le pas d'History qu'elle ajoute, {kind, key}, ou null
-//   fromStep          { kind, page(key) -> args | null, label(key), kindLabel(key) } : les pas de cette sorte
-//                     rouvrent cette page ; label et kindLabel les nomment dans la page History
+//   describe(args)    { kind, label } : sa sorte (« Group of texts ») et son nom, en titre d'une liste
+//                     gardée à côté d'un texte (text-ui.js)
 //   replacesPrevious  true : une nouvelle entrée remplace la précédente de la même sorte (les résultats) ;
 //                     sinon seule une entrée identique se remplace
 //   keepsFocus        true : garde le focus de la carte (le texte) ; sinon on repart d'un focus neuf
@@ -27,7 +26,7 @@
 //                     frame : les étoiles à cadrer (deps.frame), ou une fonction qui cadre elle-même (le chemin) ;
 //                     side : { html, bind(column) }, la colonne à gauche du panneau (la liste d'où vient un
 //                     texte), cachée sans elle ; from : l'entrée d'où l'on vient (la page quittée, Retour compris), ou null
-import { startNav, record, current, previous, goBack as navBack, onRecord } from "./nav.js";
+import { startNav, record, current, previous, goBack as navBack } from "./nav.js";
 
 const kinds = new Map();
 let deps = null;
@@ -105,8 +104,8 @@ export function rerenderPage() {
 
 export function closePage() { show({ page: "none" }); }
 
-// Rouvre une entrée de l'historique : Retour (nav.js n'enregistre alors rien), ou un pas d'History
-// repris comme un nouveau pas.
+// Rouvre une entrée de l'historique : Retour (nav.js n'enregistre alors rien), ou une page gardée
+// (la liste à côté d'un texte) reprise comme un nouveau pas.
 export function reopen(e, from = current()) {
   deps.onReopen?.(e);
   show(e, { from });
@@ -115,9 +114,10 @@ export function reopen(e, from = current()) {
 export function currentPage() { return current(); }
 export function goBack() { navBack(); }
 
-export function backLabel() { return labelOf(previous()); }
-// « Back to … » pour une entrée quelconque (la page d'une liste, dans la colonne)
-export function labelOf(e) { return (e && kinds.get(e.page)?.backLabel?.(argsOf(e))) ?? null; }
+export function backLabel() {
+  const e = previous();
+  return (e && kinds.get(e.page)?.backLabel?.(argsOf(e))) ?? null;
+}
 
 // Ouvre la page d'une adresse (#group=…, un nom de texte…) ; false si elle n'en désigne aucune.
 export function openFromAddress(hash) {
@@ -145,28 +145,5 @@ export function openFirstPage(hash) {
   if (!openFromAddress(hash) && !current()) record({ page: "none" });
 }
 
-// History : le pas qu'ajoute une entrée, et l'entrée que rouvre un pas (null : pas de page enregistrée).
-export function stepOf(e) { return kinds.get(e.page)?.step?.(argsOf(e)) ?? null; }
-const kindOfStep = s => [...kinds.values()].find(k => k.fromStep?.kind === s.kind);
-export function pageOfStep(s) {
-  const kind = kindOfStep(s);
-  const args = kind?.fromStep.page(s.key);
-  return args ? { page: kind.name, ...args } : null;
-}
-// Le nom d'un pas et sa sorte (« Dialogue », « Group of texts »…), donnés par la page qu'il rouvre.
-export function describeStep(s) {
-  const from = kindOfStep(s)?.fromStep;
-  return from ? { label: from.label(s.key), kind: from.kindLabel(s.key) } : null;
-}
-// Le nom et la sorte d'une entrée, comme pour son pas d'History ; null pour une page sans pas (les résultats)
-export function describeEntry(e) {
-  const s = stepOf(e);
-  return s ? describeStep(s) : null;
-}
-// Prévient f du pas d'History de chaque page ouverte, Retour compris (null : une page qui n'en ajoute pas).
-export function onStep(f) { onRecord(e => f(stepOf(e))); }
-// Rouvre la page d'un pas d'History (« Continue where you left off ») ; rien si elle n'existe plus.
-export function openStep(s) {
-  const e = pageOfStep(s);
-  if (e) reopen(e);
-}
+// La sorte et le nom d'une entrée ({ kind, label }), ou null si sa page ne se décrit pas.
+export function describeEntry(e) { return kinds.get(e.page)?.describe?.(argsOf(e)) ?? null; }

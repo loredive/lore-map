@@ -1,5 +1,5 @@
 // Point d'entrée : chargement des données, souris, clavier, légende.
-import { S, $, canvas, panel, listColumn, tip, status, input, mode, esc, colorOf, announce, dataPath, DEFAULT_GAME, nameOf, groupName, resetContext, focusPanel, withCameFrom } from "./state.js";
+import { S, $, canvas, panel, listColumn, tip, status, input, mode, esc, colorOf, announce, dataPath, DEFAULT_GAME, nameOf, groupName, resetContext, focusPanel } from "./state.js";
 import { buildGrid, buildSprites, computeHulls, resize, draw, nearest, setHover, starsNear } from "./render.js";
 import { camera, toWorld, panBy, zoomAt, canZoom, flyTo, viewCenter, frameFrom } from "./camera.js";
 import { buildViewSwitch } from "./views.js";
@@ -11,7 +11,6 @@ import { panelTop, bindPanelTop, watchAddress } from "./panel.js";
 import { cancelPath } from "./pathbar.js";
 import { showTip } from "./tip.js";
 import "./entities-ui.js";
-import { initHistory } from "./history-ui.js";
 import { loadTours } from "./tours-ui.js";
 import { startPages, openFirstPage, rerenderPage, openPage, closePage } from "./pages.js";
 import "./help-ui.js";
@@ -55,7 +54,7 @@ const startPanel = () => startPages({
   top: panelTop,
   bindTop: bindPanelTop,
   focus: focusPanel,
-  frame: stars => frameFrom(withCameFrom(stars)),   // avec le texte d'où l'on vient
+  frame: stars => frameFrom(stars),
   draw,
   // revenir à une page ouverte avant la recherche efface la recherche (les résultats portent la leur)
   onReopen: e => { if (!e.q && S.query) resetSearch(); },
@@ -141,7 +140,6 @@ async function load() {
   legendFade();
   buildViewSwitch();
   buildLangSwitch();
-  initHistory();                                // avant openFirstPage : le lien collé est un premier pas
   await loadTours();                            // data/<jeu>/tours.json, s'il y en a
   status.textContent = "";
   mode.textContent = "";                       // la ligne d'état ne parle que quand il y a du nouveau

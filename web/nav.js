@@ -11,7 +11,6 @@ let restoring = false;   // pendant qu'on rejoue une entrée : ne rien enregistr
 let popped = null;       // adresse rétablie par popstate (le hashchange qui suit n'est pas un lien collé)
 let browser = null;      // l'historique du navigateur : push, replace, back, href, plain, onPop
 let pages = null;        // addressOf(e), replaces(a, b), query(), reopen(e, from) : fournis par pages.js
-let watcher = null;      // prévenu de chaque entrée ouverte (pages.js, pour l'History)
 
 export function startNav(b, p) {
   browser = b;
@@ -23,15 +22,12 @@ export function startNav(b, p) {
   b.onPop(restore);
 }
 
-export function onRecord(f) { watcher = f; }
-
 export function record(entry) {
   if (restoring) return;
   popped = null;
   // la recherche en cours fait partie de l'état : revenir à une page ouverte avant elle l'efface
   // (les résultats portent déjà la leur)
   if (!("q" in entry)) entry = { ...entry, q: pages.query() || "" };
-  watcher?.(entry);
   const url = pages.addressOf(entry) ?? browser.plain();
   if (pos >= 0 && pages.replaces(stack[pos], entry)) {
     stack[pos] = entry;
@@ -65,7 +61,6 @@ function restore(state) {
   popped = browser.href();
   const left = stack[pos];       // la page qu'on quitte : celle d'où l'on vient
   pos = k;
-  watcher?.(stack[k]);           // revenir à une page, c'est aussi la relire (avant : la caméra en dépend)
   restoring = true;
   try { pages.reopen(stack[k], left); } finally { restoring = false; }
 }

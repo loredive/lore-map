@@ -119,8 +119,7 @@ export function fitPoints(points, trim = 0.1, maxScale = FRAME[1]) {
 }
 
 // Cadre des étoiles sans jamais zoomer : on garde le contexte. Rien ne bouge si tout est déjà
-// visible ; sinon la caméra se déplace, et recule s'il le faut. (L'appelant ajoute aux points le
-// texte d'où l'on vient.)
+// visible ; sinon la caméra se déplace, et recule s'il le faut.
 export function frameFrom(points) {
   if (!points.length) return;
   const { right, top: t, bottom } = visibleBox();

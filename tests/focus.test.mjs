@@ -1,7 +1,7 @@
 // Le focus de la carte (web/focus.js) : ce qui s'éteint, ce qui reste dessiné, ce qu'il faut recadrer.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { isQuiet, dimmer, showsHulls, showsHistory, showsGroupNames, cloudOpacity, focusStars } from "../web/focus.js";
+import { isQuiet, dimmer, showsHulls, showsGroupNames, cloudOpacity, focusStars } from "../web/focus.js";
 
 // six textes : 0-2 dans le groupe 0, 3-5 dans le groupe 1 ; 0 a pour échos 1 et 4
 const docs = [0, 1, 2, 3, 4, 5].map(i => ({ i, x: i, y: -i, cluster: i < 3 ? 0 : 1, echoes: i === 0 ? [1, 4] : [] }));
@@ -35,14 +35,12 @@ test("a path or search results keep only their texts, even with an open text", (
   assert.deepEqual(dimmed(state()), []);
 });
 
-test("hulls, History and group names step aside for what draws its own", () => {
+test("hulls and group names step aside for what draws its own", () => {
   const hits = { hits: new Map([[1, 0]]) }, path = { path: [0], pathSet: new Set([0]) };
-  for (const f of [showsHulls, showsHistory]) {
-    assert.equal(f(state()), true);
-    assert.equal(f(state(hits)), false);
-    assert.equal(f(state(path)), false);
-    assert.equal(f(state({ selected: 0 })), true);
-  }
+  assert.equal(showsHulls(state()), true);
+  assert.equal(showsHulls(state(hits)), false);
+  assert.equal(showsHulls(state(path)), false);
+  assert.equal(showsHulls(state({ selected: 0 })), true);
   assert.equal(showsGroupNames(state()), true);
   for (const over of [hits, path, { selected: 0 }, { entity: { docs: [] } }]) assert.equal(showsGroupNames(state(over)), false);
   assert.equal(showsGroupNames(state({ cluster: group1 })), true);
