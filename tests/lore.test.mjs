@@ -17,11 +17,22 @@ test("a doc has every field, its views and the shelves position last", () => {
     i: 0, name: "Épée de Lune", cat: 0, text: "Ligne 0\n« citée » é", jp: "テキスト0", jpName: "名前0",
     alt: "Texte 0 (fr)", altName: "Nom 0 (fr)", dlc: false,
     views: [[0.1, 0.2], [-0.3, 0.4], pos[0]], x: 0.1, y: 0.2, cluster: 0, echoes: [1, 2], echoedBy: 5,
+    speaker: null, part: null,
   });
   assert.equal(L.docs[6].dlc, true);
   assert.deepEqual([L.docs[3].alt, L.docs[3].altName], ["", ""]);
   assert.equal(L.docs[7].cluster, -1);
   assert.deepEqual(L.docs.map(d => d.i), [0, 1, 2, 3, 4, 5, 6, 7]);
+});
+
+test("a dialogue passage is named by its speaker and number, from its name", () => {
+  const json = plain();
+  json.docs[5][0] = "Gehrman — passage 2";
+  json.docs[6][0] = "Gehrman — passage 10";
+  const L = decodeLore(json);
+  assert.deepEqual([L.docs[5].speaker, L.docs[5].part], ["Gehrman", 2]);
+  assert.deepEqual([L.docs[6].speaker, L.docs[6].part], ["Gehrman", 10]);
+  assert.deepEqual([L.docs[1].speaker, L.docs[1].part], [null, null]);   // « Lame — « brisée » » : pas un passage
 });
 
 test("echoedBy counts the texts that list a doc among their echoes", () => {

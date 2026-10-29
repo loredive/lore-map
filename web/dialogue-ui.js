@@ -5,15 +5,11 @@ import { S, esc, portrait, textOf, textLang } from "./state.js";
 import { registerPage, openPage } from "./pages.js";
 import { linkText, bindEntityButtons } from "./links.js";
 
-const PASSAGE = /^(.*) — passage (\d+)$/;
-
+// speaker et part d'un passage viennent de son nom (lore.js)
 export function buildDialogues() {
   S.dialogues = new Map();          // interlocuteur -> indices de ses passages, dans l'ordre
   for (const d of S.docs) {
-    const m = PASSAGE.exec(d.name);
-    if (!m) continue;
-    d.speaker = m[1];
-    d.part = +m[2];
+    if (d.speaker === null) continue;
     if (!S.dialogues.has(d.speaker)) S.dialogues.set(d.speaker, []);
     S.dialogues.get(d.speaker).push(d.i);
   }

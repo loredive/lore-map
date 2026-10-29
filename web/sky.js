@@ -39,12 +39,14 @@ function constellation(pts) {
   return edges.filter(e => e[2] <= limit).map(([a, b]) => [a, b]);
 }
 
+// poids d'une étoile : combien d'autres textes la comptent parmi leurs échos (un « carrefour » du sens),
+// d'après echoedBy (lore.js) ; gardé ici plutôt qu'écrit sur les textes
+let weights = new Float64Array(0);
+export const starWeight = i => weights[i];
+
 export function prepareSky() {
-  // poids d'une étoile : combien d'autres textes la comptent parmi leurs échos (un « carrefour » du sens)
-  const indeg = new Float64Array(S.docs.length);
-  for (const d of S.docs) for (const e of d.echoes) indeg[e]++;
-  const ref = [...indeg].sort((a, b) => a - b)[Math.floor(indeg.length * 0.95)] || 1;
-  for (const d of S.docs) d.w = 0.72 + 0.68 * Math.min(1, indeg[d.i] / ref);
+  const ref = S.docs.map(d => d.echoedBy).sort((a, b) => a - b)[Math.floor(S.docs.length * 0.95)] || 1;
+  weights = Float64Array.from(S.docs, d => 0.72 + 0.68 * Math.min(1, d.echoedBy / ref));
 
   for (const c of S.clusters) {
     const members = S.docs.filter(d => d.cluster === c.id);
