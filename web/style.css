@@ -68,8 +68,6 @@ body {
   color: var(--moon); font: 1rem var(--body); white-space: nowrap;
 }
 .nav-btn:hover, .nav-btn:focus-visible { background: rgba(167, 182, 214, .1); color: var(--parch); }
-/* musique coupée : barré, comme une catégorie masquée */
-#sound[aria-pressed="false"] { color: var(--dim); text-decoration: line-through; }
 .menu-btn {
   display: none; order: 2; padding: .3rem .9rem; min-height: 36px; border: 1px solid var(--rim-strong); border-radius: 999px;
   background: none; color: var(--moon); font: 1rem var(--body); cursor: pointer;
