@@ -2,6 +2,7 @@ import { S, $, esc, MORPH_MS, reducedMotion } from "./state.js";
 import { buildGrid, draw, render, setHover } from "./render.js";
 import { focusDoc, fitPoints } from "./camera.js";
 import { SHELVES } from "./shelves.js";
+import { focusStars } from "./focus.js";
 
 // ------------------------------------------------------------------ vues (projections)
 // Les mêmes textes et les mêmes groupes, aplatis autrement : passer d'une vue à l'autre
@@ -39,10 +40,9 @@ export function setView(k) {
   };
   // à l'arrivée, ce qui est ouvert revient au centre (sinon le texte choisi peut sortir de l'écran)
   const recenter = () => {
-    if (S.selected >= 0) focusDoc(S.docs[S.selected]);
-    else if (S.path) fitPoints(S.path.map(i => S.docs[i]), 0);
-    else if (S.cluster) fitPoints(S.docs.filter(d => d.cluster === S.cluster.id));
-    else if (S.entity) fitPoints(S.entity.docs.map(i => S.docs[i]));
+    const f = focusStars(S);
+    if (f?.doc) focusDoc(f.doc);
+    else if (f) fitPoints(f.points, f.trim);
   };
   const done = () => { S.morphing = false; buildGrid(); recenter(); draw(); };
   cancelAnimationFrame(morph);

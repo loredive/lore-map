@@ -6,6 +6,7 @@
 // seulement pour le groupe survolé ou ouvert, poussière en parallaxe, ciel propre à chaque jeu.
 // Les couleurs atténuées de loin (muted) ont été essayées puis écartées : les catégories doivent rester lisibles.
 import { S, ctx, colorOf, isHidden, membersIn, nameOf, groupName } from "./state.js";
+import { isQuiet } from "./focus.js";
 
 const STYLES = {
   a: {},
@@ -92,7 +93,7 @@ export function drawNebulae({ k, width: W, height: H }, toScreen) {
   ctx.restore();
 }
 
-export function drawConstellations({ s, width: W, height: H }, toScreen, sel) {
+export function drawConstellations({ s, width: W, height: H }, toScreen) {
   ctx.save();
   ctx.strokeStyle = "#a7b6d6";
   ctx.lineWidth = 0.7;
@@ -100,7 +101,7 @@ export function drawConstellations({ s, width: W, height: H }, toScreen, sel) {
   const base = STYLE.clouds ? 0 : Math.min(0.32, 0.1 + 0.03 * s);
   for (const c of S.clusters) {
     const on = S.cluster === c || S.hoverLabel === c;
-    if ((S.cluster || sel || S.lit || S.hits || S.path) && !on) continue;   // un mode actif : seul le groupe concerné
+    if (!isQuiet(S) && !on) continue;   // quelque chose d'ouvert : seul le groupe concerné
     if (!on && !base) continue;
     ctx.globalAlpha = on ? 0.5 : base;
     ctx.beginPath();
