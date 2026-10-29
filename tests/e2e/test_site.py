@@ -90,6 +90,27 @@ def test_clouds_survive_slow_data(browser, site, game):
     assert page.evaluate("async () => (await import('./nebula.js')).cloudCount()") > 0
 
 
+@pytest.mark.parametrize("game", GAMES)
+def test_broken_data_names_the_missing_field(browser, site, game):
+    """Un lore.json sans le champ obligatoire « xy » : la ligne d'état le nomme, et la page ne plante pas."""
+    lore = json.loads((WEB / "data" / game / "lore.json").read_text(encoding="utf-8"))
+    k = lore["fields"].index("xy")
+    broken = {**lore, "fields": [f for i, f in enumerate(lore["fields"]) if i != k],
+              "docs": [[v for i, v in enumerate(r) if i != k] for r in lore["docs"]]}
+    context = browser.new_context(**DESKTOP)
+    page = context.new_page()
+    problems = []
+    page.on("pageerror", lambda e: problems.append(f"page error: {e}"))
+    page.route("**/lore.json", lambda route: route.fulfill(content_type="application/json", body=json.dumps(broken)))
+    page.goto(f"{site}?game={game}")
+    page.wait_for_function("() => document.querySelector('#status').textContent.includes('xy')", timeout=20000)
+    page.wait_for_timeout(300)
+    message = page.locator("#status").text_content()
+    assert 'missing required field "xy"' in message and "prepare.py" in message
+    assert problems == []
+    context.close()
+
+
 def test_phone_menu_names_the_categories(browser, site):
     page, _ = open_page(browser, site, PHONE)
     assert not page.is_visible("#legend")

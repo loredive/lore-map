@@ -2,7 +2,8 @@
 import { S, $, canvas, panel, tip, status, input, mode, esc, colorOf, announce, dataPath, DEFAULT_GAME, nameOf, groupName, resetContext, focusPanel, withCameFrom } from "./state.js";
 import { buildGrid, buildSprites, computeHulls, resize, draw, nearest, setHover, starsNear } from "./render.js";
 import { camera, toWorld, panBy, zoomAt, canZoom, flyTo, viewCenter, frameFrom } from "./camera.js";
-import { buildViewSwitch, addShelves } from "./views.js";
+import { buildViewSwitch } from "./views.js";
+import { decodeLore } from "./lore.js";
 import { prepareSky } from "./sky.js";
 import { buildDialogues } from "./dialogue-ui.js";
 import { buildIndex, runSearch, resetSearch } from "./search-ui.js";
@@ -95,29 +96,24 @@ async function load() {
       "then open the page through a local server: <code>python -m http.server -d web</code>.";
     return;
   }
-  const F = Object.fromEntries(lore.fields.map((f, i) => [f, i]));
-  S.cats = lore.categories;
-  S.clusters = lore.clusters.sort((a, b) => b.n - a.n);
+  // le format (lore.js) : un champ obligatoire absent est nommé dans la ligne d'état, sans carte à moitié tracée
+  let data;
+  try {
+    data = decodeLore(lore);
+  } catch (err) {
+    status.innerHTML = `${esc(err.message)}. Run <code>python prepare.py</code> again to rewrite ` +
+      `<code>${dataPath("lore.json")}</code>.`;
+    return;
+  }
+  S.cats = data.categories;
+  S.views = data.views;
+  S.docs = data.docs;
+  S.clusters = data.clusters;
+  S.entities = data.entities;
+  S.docEntities = data.docEntities;
+  S.shelves = data.shelves;
   S.meta = meta;
   S.images = new Map(Object.entries(images));
-  // chaque texte a une position par vue ([x1, y1, x2, y2…]) ; la première est la carte principale
-  S.views = lore.views || ["Map"];
-  S.docs = lore.docs.map((r, i) => {
-    const xy = F.xy !== undefined ? r[F.xy] : [r[F.x], r[F.y]];
-    const views = S.views.map((_, k) => [xy[2 * k], xy[2 * k + 1]]);
-    return { i, name: r[F.name], cat: r[F.cat], text: r[F.text], jp: r[F.jp], jpName: r[F.jpName],
-             alt: F.alt !== undefined ? r[F.alt] : "", altName: F.altName !== undefined ? r[F.altName] : "",
-             dlc: F.dlc !== undefined && !!r[F.dlc],
-             views, x: views[0][0], y: views[0][1], cluster: r[F.cluster], echoes: r[F.echoes] };
-  });
-  for (const c of S.clusters) {
-    c.views = c.views || [{ x: c.x, y: c.y, cohesion: 1 }];
-    Object.assign(c, { x: c.views[0].x, y: c.views[0].y });
-  }
-  addShelves();
-  S.entities = (lore.entities || []).sort((a, b) => b.docs.length - a.docs.length);
-  S.docEntities = S.docs.map(() => []);
-  S.entities.forEach(e => e.docs.forEach(i => S.docEntities[i].push(e)));
   buildIndex();
   buildGrid();
   computeHulls();
