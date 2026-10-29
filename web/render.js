@@ -1,6 +1,6 @@
 // Rendu du ciel sur le canvas : grille de sélection, étoiles, noms des groupes, caméra.
 import { S, $, canvas, ctx, panel, tip, GRACE, MIN_COHESION, reducedMotion, isPhone, colorOf, isHidden, membersIn } from "./state.js";
-import { startCamera, setViewport, camera, toScreen, toWorld, frameFrom as frameStars } from "./camera.js";
+import { startCamera, setViewport, camera, toScreen, toWorld, viewCenter, frameFrom as frameStars } from "./camera.js";
 import { STYLE, drawNebulae, drawConstellations, drawThread, drawTrail, drawEntity, labelStyle, muteColor } from "./sky.js";
 import { drawClouds } from "./nebula.js";
 
@@ -147,13 +147,14 @@ export function buildSprites() {
 
 export function resize() {
   S.dpr = Math.min(devicePixelRatio || 1, 2);
-  S.W = innerWidth; S.H = innerHeight;
-  canvas.width = S.W * S.dpr; canvas.height = S.H * S.dpr;
   // la barre du haut couvre le haut du ciel : la carte se centre et se dimensionne sur ce qui reste visible
   S.top = $(".topbar")?.getBoundingClientRect().bottom || 0;
   document.documentElement.style.setProperty("--bar-h", `${S.top}px`);
-  setViewport({ width: S.W, height: S.H, top: S.top });   // redessine
-  ({ cy: S.cy, base: S.base } = camera());   // pour les modules pas encore passés par la caméra
+  setViewport({ width: innerWidth, height: innerHeight, top: S.top });   // redessine (groupé)
+  const cam = camera();
+  canvas.width = cam.width * S.dpr; canvas.height = cam.height * S.dpr;
+  // pour les modules pas encore passés par la caméra
+  ({ width: S.W, height: S.H, cy: S.cy, base: S.base } = cam);
 }
 
 let frame = 0;
@@ -161,42 +162,44 @@ export function draw() {
   if (!frame) frame = requestAnimationFrame(() => { frame = 0; render(); });
 }
 
+// Une seule copie de la caméra par image : tout ce qui dépend du zoom ou de la taille de l'écran
+// la lit, et sky.js / nebula.js la reçoivent avec toScreen.
 export function render() {
-  const { W, H, dpr } = S;
+  const cam = camera(), { width: W, height: H } = cam, { dpr } = S;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, W, H);
 
   ctx.fillStyle = "#c9d3ee";
   // poussière : fixe (styles a à c) ou en parallaxe (style d), les grains les plus gros (les plus
   // « proches ») glissant plus vite quand on se déplace
-  const drift = STYLE.parallax ? S.base * 0.35 : 0;
+  const drift = STYLE.parallax ? cam.base * 0.35 : 0;
   for (const [u, v, r, a] of S.dust) {
     ctx.globalAlpha = a;
     const f = drift * r * r;
-    const x = ((u * W - S.cam.x * f) % W + W) % W, y = ((v * H + S.cam.y * f) % H + H) % H;
+    const x = ((u * W - cam.x * f) % W + W) % W, y = ((v * H + cam.y * f) % H + H) % H;
     ctx.fillRect(x, y, r, r);
   }
 
-  const r = Math.min(2.2 * Math.sqrt(S.cam.s), 9);   // rayon visuel d'une étoile
+  const r = Math.min(2.2 * Math.sqrt(cam.s), 9);   // rayon visuel d'une étoile
   const R = r * 3.2;                                   // halo
   const pad = R + 2;
   const sel = S.selected >= 0 ? S.docs[S.selected] : null;
   const echoSet = new Set(sel ? sel.echoes : []);
 
   // 0. nébuleuses (style c), contours des groupes, lignes de constellation (styles b et c)
-  if (STYLE.nebula && !S.morphing) drawNebulae(toScreen);
-  if (STYLE.clouds && !S.morphing) drawClouds(toScreen, MIN_COHESION);
+  if (STYLE.nebula && !S.morphing) drawNebulae(cam, toScreen);
+  if (STYLE.clouds && !S.morphing) drawClouds(cam, toScreen, MIN_COHESION);
   else if (!S.hits && !S.morphing && !S.path) drawHulls(sel);
-  if (STYLE.lines && !S.morphing) drawConstellations(toScreen, sel);
+  if (STYLE.lines && !S.morphing) drawConstellations(cam, toScreen, sel);
 
   // 1. toutes les étoiles visibles ; de loin et sans rien d'ouvert, couleurs atténuées (style c)
   const quiet = !sel && !S.hits && !S.lit && !S.cluster && !S.path;
-  const sprites = STYLE.muted && quiet && S.cam.s < 2.5 ? S.spritesMuted : S.sprites;
+  const sprites = STYLE.muted && quiet && cam.s < 2.5 ? S.spritesMuted : S.sprites;
   // halos additifs (style c) : les amas denses s'illuminent au lieu de se brouiller
   if (STYLE.glow) ctx.globalCompositeOperation = "lighter";
   // en additif, l'éclat suit la densité à l'écran : sur un petit écran vu de loin, les halos se
   // superposent tant qu'ils brûleraient en blanc
-  const density = Math.min(1, (S.base / 380) * Math.sqrt(S.cam.s));
+  const density = Math.min(1, (cam.base / 380) * Math.sqrt(cam.s));
   const [on, off] = STYLE.glow ? [Math.max(0.16, 0.55 * density), 0.06] : [0.9, 0.13];
   for (const d of S.docs) {
     if (isHidden(d)) continue;
@@ -212,7 +215,7 @@ export function render() {
 
   // 1 bis. parcours de lecture : textes lus, derniers pas, texte d'où l'on vient (history-ui.js)
   // (pas pendant une visite, un chemin ou une recherche : leurs propres tracés suffisent)
-  if (!S.morphing && !S.path && !S.hits) drawTrail(toScreen, R);
+  if (!S.morphing && !S.path && !S.hits) drawTrail(cam, toScreen, R);
 
   // 2. résultats de recherche : étoiles dorées, plus vives pour les premiers rangs
   if (S.hits && !sel) {
@@ -287,8 +290,8 @@ export function render() {
 
   // 4. noms des constellations (clusters), les plus grandes d'abord, sans chevauchement
   S.labelBoxes = [];
-  if (S.view === S.shelves?.k && !S.morphing) drawShelfHeaders();
-  if (!S.hits && !sel && !S.morphing && !S.path && !S.entity) drawClusterLabels();   // une entité ouverte écrit son propre nom
+  if (S.view === S.shelves?.k && !S.morphing) drawShelfHeaders(cam);
+  if (!S.hits && !sel && !S.morphing && !S.path && !S.entity) drawClusterLabels(cam);   // une entité ouverte écrit son propre nom
 
   // 4 bis. au clavier : un viseur au centre de la partie visible de la carte
   if (S.kbd) {
@@ -314,9 +317,8 @@ export function render() {
 }
 
 // vue rayons : le nom de chaque colonne (sa catégorie) et son nombre de textes, au-dessus d'elle
-function drawShelfHeaders() {
+function drawShelfHeaders({ k }) {
   const { columns, cell } = S.shelves;
-  const k = S.cam.s * S.base;
   const size = Math.max(11, Math.min(18, cell * k * 2.2));
   const font = px => `600 ${px}px "Cormorant Garamond", Georgia, serif`;
   ctx.save();
@@ -360,7 +362,8 @@ function drawShelfHeaders() {
   ctx.restore();
 }
 
-function drawClusterLabels() {
+function drawClusterLabels(cam) {
+  const { width: W, height: H } = cam;
   // le titre, la recherche et la légende comptent comme déjà occupés : pas de nom dessous
   const placed = [".topbar", ".under-bar", ".credit"].map(s => {
     const r = $(s).getBoundingClientRect();
@@ -370,23 +373,23 @@ function drawClusterLabels() {
   ctx.textBaseline = "middle";
   for (const c of S.clusters) {
     if (c.views[S.view].cohesion < MIN_COHESION) continue;
-    const size = Math.max(12, Math.min(25, 9 + Math.sqrt(c.n) * 0.95)) * Math.min(1.25, 0.85 + S.cam.s * 0.08);
+    const size = Math.max(12, Math.min(25, 9 + Math.sqrt(c.n) * 0.95)) * Math.min(1.25, 0.85 + cam.s * 0.08);
     const [sx, sy] = toScreen(c.x, c.y);
-    if (sx < -100 || sy < -30 || sx > S.W + 100 || sy > S.H + 30) continue;
-    const st = labelStyle(c, size, r => r * S.cam.s * S.base);
+    if (sx < -100 || sy < -30 || sx > W + 100 || sy > H + 30) continue;
+    const st = labelStyle(c, size, r => r * cam.s * cam.base);
     if (st.alpha < 0.05) continue;                // trop petit à ce zoom : il apparaîtra en zoomant
     let fs = size;
     ctx.font = st.font;
     ctx.letterSpacing = st.spacing;
     let w = ctx.measureText(st.text).width;
-    if (w + 16 > S.W) {                       // plus large que l'écran (mobile) : en plus petit
+    if (w + 16 > W) {                       // plus large que l'écran (mobile) : en plus petit
       const px = parseFloat(st.font.match(/([\d.]+)px/)[1]);   // la taille réelle (capitales : 78 %)
-      fs = fs * (S.W - 16) / w;
-      ctx.font = st.font.replace(/[\d.]+px/, `${Math.floor(px * (S.W - 16) / w)}px`);
+      fs = fs * (W - 16) / w;
+      ctx.font = st.font.replace(/[\d.]+px/, `${Math.floor(px * (W - 16) / w)}px`);
       w = ctx.measureText(st.text).width;
     }
     // un nom qui déborderait de l'écran est rentré vers l'intérieur plutôt que coupé
-    const lx = Math.min(Math.max(sx, w / 2 + 8), S.W - w / 2 - 8);
+    const lx = Math.min(Math.max(sx, w / 2 + 8), W - w / 2 - 8);
     const box = [lx - w / 2 - 6, sy - fs * 0.6 - 3, lx + w / 2 + 6, sy + fs * 0.6 + 3];
     if (placed.some(b => box[0] < b[2] && box[2] > b[0] && box[1] < b[3] && box[3] > b[1])) continue;
     placed.push(box);
