@@ -4,7 +4,7 @@ import { BM25, tokenize, corpusText, lexicalRanking, hybridRanking, semanticScor
 import { S, panel, input, mode, esc, fold, docRow, announce, dataPath, MAX_HITS_ON_MAP, MAX_RESULTS, isHidden, nameOf, textOf } from "./state.js";
 import { draw } from "./render.js";
 import { registerPage, openPage, rerenderPage, currentPage, goBack } from "./pages.js";
-import { bindEntityButtons, snippet, mark } from "./links.js";
+import { bindEntityButtons, snippet, mark, openInList } from "./links.js";
 
 const TRANSFORMERS_URL = "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1";   // version exacte : une nouvelle version ne peut pas entrer dans la page à notre insu
 
@@ -237,7 +237,7 @@ function resultsPage() {
     <p class="hint search-tip">${preciseTip()}</p>`,
     bind: panel => {
       panel.querySelectorAll("button[data-i]").forEach(b =>
-        b.addEventListener("click", () => openPage("doc", { i: +b.dataset.i })));
+        b.addEventListener("click", () => openInList(+b.dataset.i, shown)));
       bindEntityButtons();
       if (focused !== undefined) (panel.querySelector(`button[data-i="${focused}"]`) || panel.querySelector(".results button"))?.focus();
     },

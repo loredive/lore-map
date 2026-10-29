@@ -57,6 +57,8 @@
   <!-- le panneau suit la recherche dans l'ordre de tabulation ; il n'est pas une région « live » :
        un court message dans #announce dit ce qui vient de s'ouvrir -->
   <main>
+    <!-- la liste d'où vient le texte ouvert, à gauche du panneau (pages.js : side) -->
+    <nav id="list-column" class="list-column" aria-label="Texts in this list" hidden></nav>
     <aside id="panel" aria-label="Details" hidden></aside>
   </main>
   <div id="announce" class="visually-hidden" role="status"></div>

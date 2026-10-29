@@ -21,7 +21,7 @@ export const isPhone = () => phoneQuery.matches;
 
 export const $ = s => document.querySelector(s);
 export const canvas = $("#sky"), ctx = canvas.getContext("2d");
-export const panel = $("#panel"), tip = $("#tip"), status = $("#status"), input = $("#q"), mode = $("#mode");
+export const panel = $("#panel"), listColumn = $("#list-column"), tip = $("#tip"), status = $("#status"), input = $("#q"), mode = $("#mode");
 
 export const S = {
   game: DEFAULT_GAME, games: [], colors: {}, ui: {},   // jeu affiché, jeux disponibles, game.json

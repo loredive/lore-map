@@ -20,7 +20,7 @@ function fakeBrowser() {
 }
 
 // démarre le module avec des faux, et note ce que chaque appel a fait
-function start() {
+function start(more = {}) {
   const log = [];
   const panel = { hidden: true, dataset: {}, innerHTML: "", scrollTop: 0 };
   const browser = fakeBrowser();
@@ -34,6 +34,7 @@ function start() {
     focus: msg => log.push(`focus ${msg}`),
     frame: stars => log.push(`frame ${stars}`),
     draw: () => log.push("draw"),
+    ...more,
   });
   return { log, panel, browser, urls: () => browser.entries.map(e => e.url) };
 }
@@ -282,6 +283,28 @@ test("re-render keeps the panel's scroll position, even when the page scrolls it
   panel.scrollTop = 80;
   rerenderPage();
   assert.equal(panel.scrollTop, 80);
+});
+
+test("a page's side column shows beside it, keeps its scroll from one page to the next, and hides without one", () => {
+  const side = { hidden: true, innerHTML: "", scrollTop: 0, contains: () => false, ownerDocument: {}, querySelector: () => null };
+  const { log } = start({ side, frame: () => log.push(`frame, side ${side.hidden ? "hidden" : "shown"}`) });
+  registerPage({ name: "item", render: a => ({ html: `<h2>${a.id}</h2>`, frame: [a.id],
+    side: a.inList && { html: `<ol ${a.id}>`, bind: c => { c.bound = a.id; } } }) });
+  openPage("item", { id: "a", inList: true });
+  assert.equal(side.hidden, false);
+  assert.equal(side.innerHTML, "<ol a>");
+  assert.equal(side.bound, "a");
+  assert.ok(log.includes("frame, side shown"));     // montrée avant le cadrage : elle cache une part de la carte
+  side.scrollTop = 300;
+  openPage("item", { id: "b", inList: true });
+  assert.equal(side.scrollTop, 300);
+  openPage("item", { id: "c" });
+  assert.equal(side.hidden, true);
+  assert.equal(side.innerHTML, "");
+  openPage("item", { id: "d", inList: true });
+  assert.equal(side.scrollTop, 0);                  // rouverte : depuis le haut
+  closePage();
+  assert.equal(side.hidden, true);
 });
 
 test("a page is told which page the reader came from, on opening and on Back", () => {

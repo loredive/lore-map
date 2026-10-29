@@ -1,7 +1,7 @@
 // Personnages, lieux, factions et notions : l'index et la fiche de chacun.
 import { S, $, esc, fold, clusterById, docRow, isHidden, nameOf, textOf, groupName } from "./state.js";
 import { registerPage, openPage } from "./pages.js";
-import { KIND_LABELS, entityChips, bindEntityButtons, speakersFor, dialogueButtons, bindDialogueButtons, snippet, mark } from "./links.js";
+import { KIND_LABELS, entityChips, bindEntityButtons, speakersFor, dialogueButtons, bindDialogueButtons, snippet, mark, openInList } from "./links.js";
 
 registerPage({
   name: "index",
@@ -79,7 +79,7 @@ registerPage({
         p.querySelector(".to-index").addEventListener("click", () => openPage("index"));
         bindDialogueButtons(-1, p);
         bindEntityButtons(p);
-        p.querySelectorAll("button[data-i]").forEach(b => b.addEventListener("click", () => openPage("doc", { i: +b.dataset.i })));
+        p.querySelectorAll("button[data-i]").forEach(b => b.addEventListener("click", () => openInList(+b.dataset.i, visible.map(d => d.i))));
         p.querySelectorAll("button[data-c]").forEach(b => b.addEventListener("click", () => {
           const c = clusterById(+b.dataset.c);
           openPage("cluster", { id: c.id, label: c.label });
