@@ -3,8 +3,6 @@
 An interactive map of the texts in Elden Ring and Bloodborne: item descriptions, weapons, armor,
 NPC dialogue. Each star is a text, and texts about the same things sit close together. You can
 search by meaning, follow guided tours, or browse by category. Everything runs in the browser.
-Ambient music follows the part of the sky you are looking at; the tracks are CC0, credited in
-`web/music/CREDITS.md`.
 
 ## Run it
 
