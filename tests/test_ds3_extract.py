@@ -26,8 +26,10 @@ def lang_tables(text, line):
     return {"アイテム名": {1: "Estus Flask", 2: "Soul Arrow", 3: "Ember"},
             "アイテムうんちく": {1: f"{text} estus", 2: f"{text} arrow", 3: f"{text} ember"},
             "武器名": {10: "Dagger", 11: ""}, "武器うんちく": {10: f"{text} dagger", 11: f"{text} nameless"},
-            "防具名": {}, "防具うんちく": {}, "アクセサリ名": {}, "アクセサリうんちく": {},
-            "魔法名": {20: "Soul Arrow"}, "魔法うんちく": {20: f"{text} arrow"},
+            "防具名": {30: "No Travel Gear / Head"}, "防具うんちく": {30: "No Travel Gear / Head"},
+            "アクセサリ名": {}, "アクセサリうんちく": {},
+            "魔法名": {3000: "Soul Arrow", 1300000: "Soul Arrow", 3100: "Karmic Justice"},
+            "魔法うんちく": {3000: f"{text} old arrow", 1300000: f"{text} arrow", 3100: f"{text} karma"},
             "会話": {200000: line, 200001: f"{line} again"}, "ムービー字幕": {}}
 
 
@@ -38,13 +40,14 @@ def test_build_writes_each_category_in_three_languages():
     assert data["weapon"]["10"] == {"name_en": "Dagger", "caption_en": "lore dagger", "name_jp": "Dagger",
                                     "caption_jp": "知 dagger", "name_fr": "Dagger", "caption_fr": "savoir dagger"}
     assert "11" not in data["weapon"]                       # sans nom : une variante, pas un objet
+    assert data["protector"] == {}                          # sa description n'est que son nom : un emplacement vide
     assert data["dialog"]["Fire Keeper"]["info_fr"] == "[200000] Bienvenue.<br/><br/>[200001] Bienvenue. again"
 
 
 def test_a_spell_is_shown_once_under_spells_not_again_as_an_item():
     tables = {lang: lang_tables(t, "Welcome.") for lang, t in [("en", "lore"), ("jp", "知"), ("fr", "savoir")]}
     data = ds3.build(tables, {}, SPEAKERS)
-    assert list(data["magic"]) == ["20"]
+    assert list(data["magic"]) == ["1300000"]                # les anciens sorts (< 1 000 000) : jamais en jeu
     assert sorted(data["goods"]) == ["1", "3"]               # « Soul Arrow » n'est plus un objet
 
 

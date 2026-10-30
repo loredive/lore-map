@@ -39,6 +39,9 @@ TABLES = {
     "magic":     ("魔法名", "魔法うんちく"),
 }
 SPELLS = "magic"
+# 魔法うんちく garde aussi un ancien jeu de sorts (identifiants à 4 chiffres : textes abrégés, et des sorts
+# de Dark Souls 1 et 2 absents du jeu) ; les sorts du jeu ont un identifiant d'objet, à partir d'ici
+SPELL_FIRST_ID = 1_000_000
 DUMMY = "(dummyText)"
 
 
@@ -76,13 +79,17 @@ def build(tables: dict, dlc: dict[str, set[int]], speakers: dict) -> dict:
     """Le JSON pour prepare.py, dans la forme du dump d'Elden Ring : {catégorie: {id: {name_en,
     caption_en, …, dlc?}}, dialog: {…}}."""
     en = tables["en"]
-    spells = set(en[TABLES[SPELLS][1]].values())
+    spells = {t for i, t in en[TABLES[SPELLS][1]].items() if i >= SPELL_FIRST_ID}
     out = {}
     for key, (names, lore) in TABLES.items():
         recs = {}
         for i in en[lore]:
             if not en[names].get(i, "").strip():
                 continue                  # sans nom : une variante ou un prototype
+            if key == SPELLS and i < SPELL_FIRST_ID:
+                continue                  # un ancien sort, jamais en jeu
+            if en[lore][i].strip() == en[names][i].strip():
+                continue                  # la description n'est que le nom (« No Travel Gear / Head »)
             if key != SPELLS and en[lore][i] in spells:
                 continue                  # un sort, déjà dans les sorts
             recs[str(i)] = {f"{f}_{lang}": tables[lang][t].get(i, "")
