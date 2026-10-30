@@ -1,0 +1,179 @@
+{
+  "id": "dark-souls-1",
+  "title": "Dark Souls",
+  "source": "message archives of the player's Steam copy of Dark Souls: Prepare to Die Edition (DATA/dvdbnd*.bdt, read in place), read by games/dark-souls-1/extract.py",
+  "text_lang": "en",
+  "alt_lang": "fr",
+  "min_chars": 15,
+  "categories": {
+    "goods": {
+      "label": "Items",
+      "text_fields": [
+        "caption_en"
+      ],
+      "jp_field": "caption_jp"
+    },
+    "weapon": {
+      "label": "Weapons",
+      "text_fields": [
+        "caption_en"
+      ],
+      "jp_field": "caption_jp"
+    },
+    "protector": {
+      "label": "Armor",
+      "text_fields": [
+        "caption_en"
+      ],
+      "jp_field": "caption_jp"
+    },
+    "accessory": {
+      "label": "Rings",
+      "text_fields": [
+        "caption_en"
+      ],
+      "jp_field": "caption_jp"
+    },
+    "magic": {
+      "label": "Spells",
+      "text_fields": [
+        "caption_en"
+      ],
+      "jp_field": "caption_jp"
+    }
+  },
+  "dialog_label": "Dialogue",
+  "colors": {
+    "Items": "#d9c48e",
+    "Weapons": "#cf8e66",
+    "Armor": "#9db8a3",
+    "Rings": "#c7a3d1",
+    "Spells": "#7fc0cc",
+    "Dialogue": "#a7b6d6"
+  },
+  "junk": [
+    "For Test",
+    "[ERROR]",
+    "%null%"
+  ],
+  "extra_stop": [
+    "thou",
+    "thee",
+    "thy",
+    "thine",
+    "thyself",
+    "hath",
+    "doth",
+    "art",
+    "ye",
+    "upon",
+    "shall",
+    "unto",
+    "also",
+    "used",
+    "use",
+    "uses",
+    "using",
+    "increases",
+    "increase",
+    "increased",
+    "boosts",
+    "boost",
+    "raises",
+    "raise",
+    "greatly",
+    "slightly",
+    "temporarily",
+    "reduces",
+    "reduce",
+    "attack",
+    "attacks",
+    "damage",
+    "hp",
+    "stamina",
+    "weapon",
+    "weapons",
+    "item",
+    "items",
+    "effect",
+    "effects",
+    "one",
+    "two",
+    "may",
+    "can",
+    "will",
+    "would",
+    "could",
+    "said",
+    "known",
+    "like",
+    "even",
+    "still",
+    "yet",
+    "whose",
+    "within",
+    "among",
+    "well",
+    "i'm",
+    "i'll",
+    "i've",
+    "you're",
+    "you'll",
+    "it's",
+    "that's",
+    "there's",
+    "don't",
+    "can't",
+    "won't",
+    "oh",
+    "ah",
+    "yes",
+    "fp",
+    "focus",
+    "spell",
+    "spells",
+    "sorcery",
+    "sorceries",
+    "miracle",
+    "miracles",
+    "pyromancy",
+    "pyromancies",
+    "catalyst",
+    "skill",
+    "attunement",
+    "slot",
+    "slots",
+    "armor",
+    "ring",
+    "rings",
+    "thou'rt",
+    "mm",
+    "hmm",
+    "ahh"
+  ],
+  "speaker_names": {},
+  "min_cluster": 12,
+  "min_samples": 4,
+  "max_cluster": 80,
+  "images": "game-files",
+  "ui": {
+    "tagline": "Every star is a text from Dark Souls. The more two texts talk about the same things, the closer they sit.",
+    "aria": "Map of Dark Souls's texts: each star is a text, and texts close together talk about the same things. Arrow keys to move, plus and minus to zoom, Enter to open the targeted star.",
+    "credit": "Dark Souls texts © FromSoftware / Bandai Namco. Non-commercial fan project.",
+    "alt_label": "French",
+    "alt_lang": "fr",
+    "search_examples": [
+      "who links the fire",
+      "Artorias"
+    ],
+    "precise": {
+      "phrase": "Lord Gwyn",
+      "both": "Seath + crystal",
+      "exclude": "-Artorias",
+      "category": "in:rings"
+    },
+    "entity_examples": "Gwyn or Anor Londo",
+    "empty_hint": "Artorias, Oolacile",
+    "dlc_label": "Artorias of the Abyss"
+  }
+}
