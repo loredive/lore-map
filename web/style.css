@@ -449,6 +449,8 @@ body.sky-d[data-game="bloodborne"] {
   background: #06070d; --fog: #6c6f80; --fog-veil: #06070d;
   --bg: url("bg/bloodborne.webp"); --bg-at: 82% 100%; --bg-at-narrow: 90% 100%;
 }
+/* Dark Souls : pas encore de paysage, un ciel de crépuscule sombre */
+body.sky-d[data-game="dark-souls-1"] { background: #0c0b10; --fog: #7a7782; --fog-veil: #0d0c12; }
 body.sky-d[data-game="dark-souls-3"] {
   background: #0b0a0c; --fog: #7d7670; --fog-veil: #0e0d10;
   --bg: url("bg/dark-souls-3.webp"); --bg-at: 70% 100%; --bg-at-narrow: 73% 100%;

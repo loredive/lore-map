@@ -1,6 +1,6 @@
 # Lore Map
 
-An interactive map of the texts in Elden Ring, Bloodborne and Dark Souls III: item descriptions, weapons, armor,
+An interactive map of the texts in Elden Ring, Bloodborne, Dark Souls and Dark Souls III: item descriptions, weapons, armor,
 NPC dialogue. Each star is a text, and texts about the same things sit close together. You can
 search by meaning, follow guided tours, or browse by category. Everything runs in the browser.
 
@@ -26,6 +26,8 @@ of the game, then `prepare.py --game bloodborne` builds the map. Dark Souls III 
 from the Steam copy, once its `msg/` folder is unpacked with UXM: `games/dark-souls-3/extract.py`,
 then `prepare.py --game dark-souls-3`, then `games/dark-souls-3/icons.py` for its icons. These read the game's
 encrypted item tables with the key published by the modding community, and Paramdex for their layout.
+Dark Souls (Prepare to Die Edition) needs no unpacking: `games/dark-souls-1/extract.py` and `icons.py` read
+the Steam copy's archives in place, then `prepare.py --game dark-souls-1` builds the map.
 
 ## Tests
 
