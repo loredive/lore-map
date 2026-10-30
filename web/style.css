@@ -434,7 +434,7 @@ ol.script .text { margin: 0; white-space: pre-line; line-height: 1.6; }
 /* ---------- atmosphère (style d) : sous les étoiles, un calque fixe propre à chaque jeu ---------- */
 /* vignette et grain communs ; sous la barre du haut, un paysage par jeu (bg/<jeu>.webp) :
    Elden Ring : l'Arbre-Monde au-dessus des ruines ; Bloodborne : Yharnam sous la lune ;
-   Dark Souls III : une terre de cendre sous l'éclipse */
+   Dark Souls : le lac de cendre et ses arbres-archons ; Dark Souls III : une terre de cendre sous l'éclipse */
 body.sky-d::before {
   content: ""; position: fixed; inset: 0; pointer-events: none;
   background:
@@ -449,21 +449,23 @@ body.sky-d[data-game="bloodborne"] {
   background: #06070d; --fog: #6c6f80; --fog-veil: #06070d;
   --bg: url("bg/bloodborne.webp"); --bg-at: 82% 100%; --bg-at-narrow: 90% 100%;
 }
-/* Dark Souls : pas encore de paysage, un ciel de crépuscule sombre */
-body.sky-d[data-game="dark-souls-1"] { background: #0c0b10; --fog: #7a7782; --fog-veil: #0d0c12; }
+body.sky-d[data-game="dark-souls-1"] {
+  background: #0a0d14; --fog: #7a7f8c; --fog-veil: #0b0e15;
+  --bg: url("bg/dark-souls-1.webp"); --bg-at: 50% 100%; --bg-at-narrow: 12% 100%;
+}
 body.sky-d[data-game="dark-souls-3"] {
   background: #0b0a0c; --fog: #7d7670; --fog-veil: #0e0d10;
   --bg: url("bg/dark-souls-3.webp"); --bg-at: 70% 100%; --bg-at-narrow: 73% 100%;
 }
 /* sous les étoiles (z-index -1 : au-dessus du fond de la page, sous la carte) ; le sol reste en bas,
-   la lune, l'Arbre ou l'éclipse à droite, même quand l'écran rogne l'image */
+   la lune, l'Arbre ou l'éclipse à droite (l'arbre-archon à gauche), même quand l'écran rogne l'image */
 body.sky-d[data-game]::after {
   content: ""; position: fixed; z-index: -1; top: var(--bar-h, 100px); left: 0; right: 0; bottom: 0;
   pointer-events: none;
   background: var(--bg, none) var(--bg-at, 50% 100%) / cover no-repeat;
 }
 @media (max-width: 760px) {
-  /* écran en hauteur : on ne voit qu'une bande de l'image, décalée pour garder la lune, l'Arbre ou l'éclipse */
+  /* écran en hauteur : on ne voit qu'une bande de l'image, décalée pour garder la lune, l'Arbre, l'arbre-archon ou l'éclipse */
   body.sky-d[data-game]::after { background-position: var(--bg-at-narrow, 50% 100%); }
 }
 
