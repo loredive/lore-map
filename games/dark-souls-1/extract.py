@@ -9,12 +9,17 @@ reste hors du dépôt.
 
 Chaque table a une part <table>パッチ (le correctif d'Artorias of the Abyss) : une entrée qui y est seule
 vient du DLC et est marquée « dlc » ; une entrée qui est aussi dans le jeu de base en est la correction
-et la remplace. Les sorts sont aussi des objets : un objet dont la description est celle d'un sort n'est
-gardé qu'une fois, en sort. Les descriptions d'armes commencent par leur type et leur type d'attaque,
-retirés. Les interlocuteurs des dialogues viennent de speakers.json (blocs d'identifiants -> nom).
+et la remplace. Les sorts sont aussi des objets : un objet dont la description est celle d'un sort, ou
+qui porte son nom (« Sorcery: Crystal Soul Spear »), n'est gardé qu'une fois, en sort. Les descriptions
+d'armes commencent par leur type et leur type d'attaque, retirés.
+Les fichiers de texte gardent aussi des textes absents du jeu (anneaux et objets coupés) : seul un texte
+dont la ligne, dans les tables d'objets du jeu (/param/GameParam/GameParam.parambnd.dcx), a une icône
+est gardé ; la disposition de ces lignes vient de Paramdex (icons.py --download).
+Les interlocuteurs des dialogues viennent de speakers.json (blocs d'identifiants -> nom).
 
 Usage :
-    python games/dark-souls-1/extract.py \\
+    python games/dark-souls-1/icons.py --download ../dark-souls-1-text/paramdex
+    python games/dark-souls-1/extract.py --paramdex ../dark-souls-1-text/paramdex \\
         --data "/mnt/c/Games/Steam/steamapps/common/Dark Souls Prepare to Die Edition/DATA" \\
         --out ../dark-souls-1-text/ds1_text.json
 """
@@ -28,8 +33,12 @@ from pathlib import Path
 HERE = Path(__file__).parent
 sys.path.insert(0, str(HERE.parent.parent))      # souls_formats.py, à la racine du dépôt
 from souls_formats import (  # noqa: E402
+    DS1_ITEMS,
+    DS1_LAYOUTS,
     dialog,
     gender_twin,
+    icon_ids,
+    param_rows_32,
     path_hash,
     read_bhd5,
     read_bnd3,
@@ -53,6 +62,7 @@ TABLES = {
 }
 SPELLS = "magic"
 JUNK = {"For Test"}                    # textes de test laissés dans les tables
+SPELL_ITEM = re.compile(r"^(Sorcery|Pyromancy|Miracle): ")       # un objet qui porte le nom d'un sort
 # les deux lignes de jeu en tête d'une description d'arme (« Weapon type: … », « Type d'arme : … »)
 GAMEPLAY_LINE = re.compile(r"^\s*(Weapon type|Attack type|Type d'arme|Type d'attaque|武器種別|攻撃属性)\s*[:：].*$",
                            re.M)
@@ -103,17 +113,27 @@ def load_tables(archives: Archives) -> tuple[dict[str, dict[str, dict[int, str]]
     return out, dlc
 
 
+def shown_items(archives: Archives, paramdex: Path) -> dict[str, set[int]]:
+    """{catégorie: identifiants des objets que le jeu montre}, ceux dont la ligne a une icône."""
+    params = read_bnd3(read_dcx(archives.read("/param/GameParam/GameParam.parambnd.dcx")))
+    layouts = {t: (paramdex / f"{n}.xml").read_text(encoding="utf-8-sig") for t, n in DS1_LAYOUTS.items()}
+    return {cat: {i for i, n in ids.items() if n}
+            for cat, ids in icon_ids(params, layouts, DS1_ITEMS, rows=param_rows_32).items()}
+
+
 # ---------------------------------------------------------------- documents
 def lore_only(text: str) -> str:
     """La description sans les lignes de jeu d'une arme (type, type d'attaque)."""
     return GAMEPLAY_LINE.sub("", text).strip()
 
 
-def build(tables: dict, dlc: dict[str, set[int]], speakers: dict) -> dict:
+def build(tables: dict, dlc: dict[str, set[int]], speakers: dict, shown: dict[str, set[int]] | None = None) -> dict:
     """Le JSON pour prepare.py, dans la forme du dump d'Elden Ring : {catégorie: {id: {name_en,
-    caption_en, …, dlc?}}, dialog: {…}}."""
+    caption_en, …, dlc?}}, dialog: {…}}. shown (shown_items) : un texte que le jeu ne montre jamais
+    reste dehors."""
     en = tables["en"]
     spells = {lore_only(t) for t in en[TABLES[SPELLS][1]].values()}
+    spell_names = set(en[TABLES[SPELLS][0]].values())
     out = {}
     for key, (names, lore) in TABLES.items():
         recs = {}
@@ -121,10 +141,12 @@ def build(tables: dict, dlc: dict[str, set[int]], speakers: dict) -> dict:
             text = lore_only(en[lore][i])
             if not en[names].get(i, "").strip():
                 continue                  # sans nom : une variante ou un prototype
+            if shown is not None and i not in shown[key]:
+                continue                  # sans ligne ni icône dans les tables du jeu : jamais en jeu
             if text in JUNK or text == en[names][i].strip():
                 continue                  # un texte de test, ou rien que le nom
-            if key != SPELLS and text in spells:
-                continue                  # un sort, déjà dans les sorts
+            if key != SPELLS and (text in spells or SPELL_ITEM.sub("", en[names][i]) in spell_names):
+                continue                  # un sort, déjà dans les sorts (« Sorcery: Soul Arrow »)
             recs[str(i)] = {f"{f}_{lang}": (lore_only(tables[lang][t].get(i, "")) if f == "caption"
                                             else tables[lang][t].get(i, ""))
                             for lang in LANGS for f, t in (("name", names), ("caption", lore))}
@@ -139,11 +161,13 @@ def build(tables: dict, dlc: dict[str, set[int]], speakers: dict) -> dict:
 def main():
     p = argparse.ArgumentParser(description=__doc__.split("\n\n")[1])
     p.add_argument("--data", type=Path, required=True, help="dossier DATA/ du jeu (dvdbnd*.bhd5 et .bdt)")
+    p.add_argument("--paramdex", type=Path, required=True, help="dispositions écrites par icons.py --download")
     p.add_argument("--out", type=Path, required=True)
     a = p.parse_args()
     speakers = json.loads((HERE / "speakers.json").read_text(encoding="utf-8"))
-    tables, dlc = load_tables(Archives(a.data))
-    data = build(tables, dlc, speakers)
+    archives = Archives(a.data)
+    tables, dlc = load_tables(archives)
+    data = build(tables, dlc, speakers, shown_items(archives, a.paramdex))
     a.out.parent.mkdir(parents=True, exist_ok=True)
     a.out.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
     for key, recs in data.items():

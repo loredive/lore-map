@@ -44,8 +44,24 @@ def test_build_writes_each_category_in_three_languages_lore_only():
     assert data["dialog"]["Oscar of Astora"]["info_en"] == "[10000000] Hello.<br/><br/>[10000001] Hello. again"
 
 
+def test_an_item_named_after_a_spell_is_that_spell():
+    # « Sorcery: Soul Arrow » : un objet du jeu de base, dont le texte n'a pas reçu la correction du sort
+    tables = {lang: lang_tables(t, "Hello.") for lang, t in [("en", "lore"), ("jp", "知"), ("fr", "savoir")]}
+    for lang in tables:
+        tables[lang]["アイテム名"][4] = "Sorcery: Soul Arrow"
+        tables[lang]["アイテムうんちく"][4] = "old arrow text"
+    assert "4" not in ds1.build(tables, {}, SPEAKERS)["goods"]
+
+
 def test_texts_only_in_the_patch_are_marked_dlc():
     tables = {lang: lang_tables(t, "Hello.") for lang, t in [("en", "lore"), ("jp", "知"), ("fr", "savoir")]}
     data = ds1.build(tables, {"武器うんちく": {10}, "会話": {10000001}}, SPEAKERS)
     assert data["weapon"]["10"]["dlc"] is True and "dlc" not in data["goods"]["1"]
     assert data["dialog"]["Oscar of Astora"]["dlc_lines"] == [10000001]
+
+
+def test_a_text_the_game_never_shows_is_left_out():
+    tables = {lang: lang_tables(t, "Hello.") for lang, t in [("en", "lore"), ("jp", "知"), ("fr", "savoir")]}
+    shown = {"goods": set(), "weapon": {10}, "protector": set(), "accessory": set(), "magic": {3000}}
+    data = ds1.build(tables, {}, SPEAKERS, shown)
+    assert data["goods"] == {} and list(data["weapon"]) == ["10"]   # l'estus n'a ni ligne ni icône ici

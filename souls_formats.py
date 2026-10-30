@@ -22,6 +22,14 @@ DS3_LAYOUTS = {"EquipParamGoods": "EQUIP_PARAM_GOODS_ST", "EquipParamWeapon": "E
 DS3_ITEMS = {"goods": ("EquipParamGoods", ["iconId"]), "weapon": ("EquipParamWeapon", ["iconId"]),
              "protector": ("EquipParamProtector", ["iconIdM", "iconIdF"]),
              "accessory": ("EquipParamAccessory", ["iconId"]), "magic": ("EquipParamGoods", ["iconId"])}
+# Dark Souls : table de paramètres -> fichier de disposition de Paramdex (dossier DS1), et catégorie du
+# texte -> (table, champs d'icône) ; les sorts ont leur propre table
+DS1_LAYOUTS = {"EquipParamGoods": "EquipParamGoods", "EquipParamWeapon": "EquipParamWeapon",
+               "EquipParamProtector": "EquipParamProtector", "EquipParamAccessory": "EquipParamAccessory",
+               "Magic": "MagicParam"}
+DS1_ITEMS = {"goods": ("EquipParamGoods", ["iconId"]), "weapon": ("EquipParamWeapon", ["iconId"]),
+             "protector": ("EquipParamProtector", ["iconIdM", "iconIdF"]),
+             "accessory": ("EquipParamAccessory", ["iconId"]), "magic": ("Magic", ["iconId"])}
 TYPE_SIZE = {"s8": 1, "u8": 1, "dummy8": 1, "s16": 2, "u16": 2, "s32": 4, "u32": 4, "f32": 4}
 SUBTITLES_SPEAKER = "Cutscenes"
 GENDER_OFFSET = 50                 # réplique adressée à une chasseuse : celle d'un chasseur + 50
@@ -134,6 +142,12 @@ def param_rows(p: bytes) -> dict[int, int]:
     return dict(struct.unpack_from("<i4xq", p, 0x40 + 24 * k) for k in range(count))
 
 
+def param_rows_32(p: bytes) -> dict[int, int]:
+    """PARAM de Dark Souls (décalages 32 bits) : {identifiant de ligne: début de ses données}."""
+    count, = struct.unpack_from("<H", p, 0x0A)
+    return {rid: at for rid, at, _name in (struct.unpack_from("<iII", p, 0x30 + 12 * k) for k in range(count))}
+
+
 def read_regulation(raw: bytes, key: bytes) -> dict[str, bytes]:
     """Paramètres chiffrés du PC (Data0.bdt de Dark Souls III) : 16 octets d'IV, puis un DCX (BND4 de
     .param) chiffré en AES-256-CBC. {nom du fichier: contenu}."""
@@ -163,18 +177,20 @@ def layout_offsets(xml: str) -> tuple[dict[str, int], int]:
     return offsets, off + (unit if bit else 0)
 
 
-def icon_ids(params: dict[str, bytes], layouts: dict[str, str], wanted: dict = DS3_ITEMS) -> dict[str, dict[int, int]]:
+def icon_ids(params: dict[str, bytes], layouts: dict[str, str], wanted: dict = DS3_ITEMS,
+             rows=param_rows) -> dict[str, dict[int, int]]:
     """{catégorie: {identifiant de l'objet: numéro d'icône}} (0 : pas d'icône). Une disposition qui ne
-    tombe pas sur la taille des lignes arrête tout : ses décalages seraient faux."""
+    tombe pas sur la taille des lignes arrête tout : ses décalages seraient faux. rows : param_rows_32
+    pour Dark Souls."""
     out = {}
     for cat, (table, fields) in wanted.items():
         offsets, size = layout_offsets(layouts[table])
-        p, rows = params[f"{table}.param"], param_rows(params[f"{table}.param"])
-        starts = sorted(rows.values())
+        p, at_rows = params[f"{table}.param"], rows(params[f"{table}.param"])
+        starts = sorted(at_rows.values())
         if len(starts) > 1 and starts[1] - starts[0] != size:
             raise ValueError(f"{table} : lignes de {starts[1] - starts[0]} octets, la disposition en annonce {size}")
         out[cat] = {rid: next((i for i in (struct.unpack_from("<h", p, at + offsets[f])[0] for f in fields) if i > 0), 0)
-                    for rid, at in rows.items()}
+                    for rid, at in at_rows.items()}
     return out
 
 

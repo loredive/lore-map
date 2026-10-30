@@ -4,7 +4,7 @@ import struct
 
 from test_bloodborne_extract import make_dcx
 
-from souls_formats import path_hash, read_bhd5, read_bnd3, read_dcx, read_fmg
+from souls_formats import icon_ids, param_rows_32, path_hash, read_bhd5, read_bnd3, read_dcx, read_fmg
 
 
 def make_fmg1(entries):
@@ -80,3 +80,23 @@ def test_reads_texts_through_dcx_bnd3_and_fmg_version_1():
     files = read_bnd3(read_dcx(make_dcx(make_bnd3({"武器名.fmg": fmg, "空.fmg": make_fmg1({1: "x"})}))))
     assert set(files) == {"武器名.fmg", "空.fmg"}
     assert read_fmg(files["武器名.fmg"]) == {10: "Dagger", 11: "Straight Sword Hilt", 300: "Estus Flask"}
+
+
+def make_param32(rows: dict[int, bytes]) -> bytes:
+    """PARAM de Dark Souls (décalages 32 bits) : en-tête de 0x30 octets, lignes (id, données, nom), données."""
+    head = bytearray(0x30)
+    struct.pack_into("<H", head, 0x0A, len(rows))
+    table, data, at = b"", b"", 0x30 + 12 * len(rows)
+    for rid, row in rows.items():
+        table += struct.pack("<iII", rid, at + len(data), 0)
+        data += row
+    return bytes(head) + table + data
+
+
+def test_icons_are_read_from_32_bit_param_rows():
+    layout = """<PARAMDEF><Fields><Field Def="s32 refId" /><Field Def="u16 iconId" />
+        <Field Def="dummy8 pad[2]" /></Fields></PARAMDEF>"""
+    p = make_param32({100: struct.pack("<iHxx", -1, 7), 101: struct.pack("<iHxx", -1, 0)})
+    assert param_rows_32(p) == {100: 0x30 + 24, 101: 0x30 + 24 + 8}
+    out = icon_ids({"Magic.param": p}, {"Magic": layout}, {"magic": ("Magic", ["iconId"])}, rows=param_rows_32)
+    assert out == {"magic": {100: 7, 101: 0}}
