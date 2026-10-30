@@ -77,6 +77,17 @@ jobs:
             echo "No Dark Souls III icons in the release, it is deployed without icons"
           fi
 
+      # Dark Souls icons too: cut from the game's menu sheets, uploaded once to the same release
+      - name: Dark Souls icons
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release download icons --pattern img-dark-souls-1.zip --dir /tmp; then
+            mkdir -p web/img/dark-souls-1 && unzip -q -o /tmp/img-dark-souls-1.zip -d web/img/dark-souls-1
+          else
+            echo "No Dark Souls icons in the release, it is deployed without icons"
+          fi
+
       - uses: actions/upload-pages-artifact@v5
         with:
           path: web

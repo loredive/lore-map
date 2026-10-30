@@ -1,0 +1,792 @@
+[
+ {
+  "name": "Gwyn",
+  "kind": "personnage",
+  "aliases": [
+   "Lord Gwyn",
+   "Gwyn, Lord of Cinder",
+   "Gwen",
+   "Seigneur Gwen",
+   "Gwen, Seigneur des Cendres"
+  ]
+ },
+ {
+  "name": "Gwyndolin",
+  "kind": "personnage",
+  "aliases": [
+   "Dark Sun Gwyndolin",
+   "Gwendolin",
+   "Gwendolin le Soleil noir"
+  ]
+ },
+ {
+  "name": "Gwynevere",
+  "kind": "personnage",
+  "aliases": [
+   "Gwynevere, Princess of Sunlight",
+   "Princess Gwynevere",
+   "Gwenevere"
+  ]
+ },
+ {
+  "name": "Seath",
+  "kind": "personnage",
+  "aliases": [
+   "Seath the Scaleless",
+   "Seath l'écorché"
+  ]
+ },
+ {
+  "name": "Nito",
+  "kind": "personnage",
+  "aliases": [
+   "Gravelord Nito",
+   "Seigneur des tombes Nito"
+  ]
+ },
+ {
+  "name": "Witch of Izalith",
+  "kind": "personnage",
+  "aliases": [
+   "Sorcière d'Izalith"
+  ]
+ },
+ {
+  "name": "Quelaag",
+  "kind": "personnage",
+  "aliases": [
+   "Chaos Witch Quelaag",
+   "Quelaag la Sorcière du Chaos"
+  ]
+ },
+ {
+  "name": "Quelana",
+  "kind": "personnage",
+  "aliases": [
+   "Quelana of Izalith",
+   "Quelaana",
+   "Quelaana d'Izalith"
+  ]
+ },
+ {
+  "name": "Quelaag's Sister",
+  "kind": "personnage",
+  "aliases": [
+   "Fair Lady"
+  ]
+ },
+ {
+  "name": "Artorias",
+  "kind": "personnage",
+  "aliases": [
+   "Knight Artorias",
+   "Artorias the Abysswalker",
+   "Chevalier Artorias",
+   "Artorias le Marche-abysses"
+  ]
+ },
+ {
+  "name": "Ornstein",
+  "kind": "personnage",
+  "aliases": [
+   "Dragon Slayer Ornstein",
+   "Dragonslayer Ornstein",
+   "Ornstein le Tueur de Dragons"
+  ]
+ },
+ {
+  "name": "Smough",
+  "kind": "personnage",
+  "aliases": [
+   "Executioner Smough",
+   "Smough le Bourreau"
+  ]
+ },
+ {
+  "name": "Gough",
+  "kind": "personnage",
+  "aliases": [
+   "Hawkeye Gough",
+   "Gough l'Œil de Faucon"
+  ]
+ },
+ {
+  "name": "Ciaran",
+  "kind": "personnage",
+  "aliases": [
+   "Lord's Blade Ciaran"
+  ]
+ },
+ {
+  "name": "Sif",
+  "kind": "personnage",
+  "aliases": [
+   "Great Grey Wolf Sif",
+   "Sif le Grand Loup gris"
+  ]
+ },
+ {
+  "name": "Manus",
+  "kind": "personnage",
+  "aliases": [
+   "Manus, Father of the Abyss",
+   "Manus, Père des Abysses"
+  ]
+ },
+ {
+  "name": "Kalameet",
+  "kind": "personnage",
+  "aliases": [
+   "Black Dragon Kalameet",
+   "Kamaleet"
+  ]
+ },
+ {
+  "name": "Priscilla",
+  "kind": "personnage",
+  "aliases": [
+   "Crossbreed Priscilla",
+   "Priscilla la Métissée"
+  ]
+ },
+ {
+  "name": "Velka",
+  "kind": "personnage",
+  "aliases": [
+   "Velka, the Goddess of Sin",
+   "Goddess of Sin",
+   "Déesse du Péché"
+  ]
+ },
+ {
+  "name": "Frampt",
+  "kind": "personnage",
+  "aliases": [
+   "Kingseeker Frampt",
+   "Frampt le Cherche-roi"
+  ]
+ },
+ {
+  "name": "Kaathe",
+  "kind": "personnage",
+  "aliases": [
+   "Darkstalker Kaathe",
+   "Kaathe Rôde-ténèbres"
+  ]
+ },
+ {
+  "name": "Havel",
+  "kind": "personnage",
+  "aliases": [
+   "Havel the Rock"
+  ]
+ },
+ {
+  "name": "Solaire",
+  "kind": "personnage",
+  "aliases": [
+   "Solaire of Astora",
+   "Knight Solaire",
+   "Solarius",
+   "Solarius d'Astora"
+  ]
+ },
+ {
+  "name": "Oscar",
+  "kind": "personnage",
+  "aliases": [
+   "Oscar, Knight of Astora",
+   "Oscar of Astora"
+  ]
+ },
+ {
+  "name": "Logan",
+  "kind": "personnage",
+  "aliases": [
+   "Big Hat Logan",
+   "Logan le Galurin"
+  ]
+ },
+ {
+  "name": "Griggs",
+  "kind": "personnage",
+  "aliases": [
+   "Griggs of Vinheim"
+  ]
+ },
+ {
+  "name": "Siegmeyer",
+  "kind": "personnage",
+  "aliases": [
+   "Siegmeyer of Catarina"
+  ]
+ },
+ {
+  "name": "Sieglinde",
+  "kind": "personnage",
+  "aliases": [
+   "Sieglinde of Catarina"
+  ]
+ },
+ {
+  "name": "Lautrec",
+  "kind": "personnage",
+  "aliases": [
+   "Knight Lautrec",
+   "Knight Lautrec of Carim"
+  ]
+ },
+ {
+  "name": "Petrus",
+  "kind": "personnage",
+  "aliases": [
+   "Petrus of Thorolund"
+  ]
+ },
+ {
+  "name": "Reah",
+  "kind": "personnage",
+  "aliases": [
+   "Reah of Thorolund"
+  ]
+ },
+ {
+  "name": "Patches",
+  "kind": "personnage",
+  "aliases": [
+   "Trusty Patches",
+   "Pat la Bonne foi"
+  ]
+ },
+ {
+  "name": "Andre",
+  "kind": "personnage",
+  "aliases": [
+   "Andre of Astora",
+   "André",
+   "André d'Astora"
+  ]
+ },
+ {
+  "name": "Vamos",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Ingward",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Laurentius",
+  "kind": "personnage",
+  "aliases": [
+   "Laurentius of the Great Swamp"
+  ]
+ },
+ {
+  "name": "Eingyi",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Alvina",
+  "kind": "personnage",
+  "aliases": [
+   "Alvina of the Darkroot Wood"
+  ]
+ },
+ {
+  "name": "Shiva",
+  "kind": "personnage",
+  "aliases": [
+   "Shiva of the East"
+  ]
+ },
+ {
+  "name": "Dusk",
+  "kind": "personnage",
+  "aliases": [
+   "Dusk of Oolacile"
+  ]
+ },
+ {
+  "name": "Elizabeth",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Chester",
+  "kind": "personnage",
+  "aliases": [
+   "Marvelous Chester"
+  ]
+ },
+ {
+  "name": "Anastacia",
+  "kind": "personnage",
+  "aliases": [
+   "Anastacia of Astora"
+  ]
+ },
+ {
+  "name": "Tarkus",
+  "kind": "personnage",
+  "aliases": [
+   "Black Iron Tarkus",
+   "Iron Tarkus",
+   "Tarkas",
+   "Tarkas Fer Noir"
+  ]
+ },
+ {
+  "name": "Arstor",
+  "kind": "personnage",
+  "aliases": [
+   "Arstor, Earl of Carim",
+   "Sir Arstor"
+  ]
+ },
+ {
+  "name": "Fire Keeper",
+  "kind": "personnage",
+  "aliases": [
+   "Fire Keepers",
+   "Gardienne du Feu",
+   "Gardiennes du Feu"
+  ]
+ },
+ {
+  "name": "Crestfallen Warrior",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Lordran",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Anor Londo",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Izalith",
+  "kind": "lieu",
+  "aliases": [
+   "Lost Izalith",
+   "Izalith la perdue"
+  ]
+ },
+ {
+  "name": "Oolacile",
+  "kind": "lieu",
+  "aliases": [
+   "Oolacile Township",
+   "Ville d'Oolacile"
+  ]
+ },
+ {
+  "name": "New Londo",
+  "kind": "lieu",
+  "aliases": [
+   "New Londo Ruins",
+   "Nouvelle Londo",
+   "Ruines de la Nouvelle Londo"
+  ]
+ },
+ {
+  "name": "Firelink Shrine",
+  "kind": "lieu",
+  "aliases": [
+   "Sanctuaire de Lige-feu"
+  ]
+ },
+ {
+  "name": "Undead Asylum",
+  "kind": "lieu",
+  "aliases": [
+   "Northern Undead Asylum",
+   "Refuge Nord des Mort-vivants",
+   "Refuge des Mort-vivants"
+  ]
+ },
+ {
+  "name": "Undead Burg",
+  "kind": "lieu",
+  "aliases": [
+   "Village des Mort-vivants"
+  ]
+ },
+ {
+  "name": "Blighttown",
+  "kind": "lieu",
+  "aliases": [
+   "Hameau du crépuscule"
+  ]
+ },
+ {
+  "name": "Sen's Fortress",
+  "kind": "lieu",
+  "aliases": [
+   "Forteresse de Sen"
+  ]
+ },
+ {
+  "name": "Archives",
+  "kind": "lieu",
+  "aliases": [
+   "Regal Archives",
+   "Duke's Archives",
+   "Duke's Archive",
+   "Archives du Duc",
+   "Tour des Archives"
+  ],
+  "label": "Duke's Archives"
+ },
+ {
+  "name": "Darkroot Garden",
+  "kind": "lieu",
+  "aliases": [
+   "Jardin de Noiresouche"
+  ]
+ },
+ {
+  "name": "Painted World of Ariamis",
+  "kind": "lieu",
+  "aliases": [
+   "Painted World",
+   "Monde d'Ariamis",
+   "Monde d'Aramis"
+  ]
+ },
+ {
+  "name": "Tomb of the Giants",
+  "kind": "lieu",
+  "aliases": [
+   "Tombeau des Géants"
+  ]
+ },
+ {
+  "name": "Catacombs",
+  "kind": "lieu",
+  "aliases": [
+   "The Catacombs",
+   "Catacombes"
+  ]
+ },
+ {
+  "name": "Ash Lake",
+  "kind": "lieu",
+  "aliases": [
+   "Lac cendré"
+  ]
+ },
+ {
+  "name": "Astora",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Vinheim",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Carim",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Catarina",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Thorolund",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Balder",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Zena",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Four Knights",
+  "kind": "faction",
+  "aliases": [
+   "Four Knights of Gwyn",
+   "Quatre Chevaliers"
+  ]
+ },
+ {
+  "name": "Four Kings",
+  "kind": "faction",
+  "aliases": [
+   "Quatre Rois"
+  ]
+ },
+ {
+  "name": "Silver Knights",
+  "kind": "faction",
+  "aliases": [
+   "Silver Knight",
+   "Chevaliers d'argent",
+   "Chevalier d'argent"
+  ]
+ },
+ {
+  "name": "Way of White",
+  "kind": "faction",
+  "aliases": [
+   "Voie immaculée"
+  ]
+ },
+ {
+  "name": "Darkmoon",
+  "kind": "faction",
+  "aliases": [
+   "Blade of the Darkmoon",
+   "Darkmoon Blade",
+   "Lune noire"
+  ]
+ },
+ {
+  "name": "Darkwraiths",
+  "kind": "faction",
+  "aliases": [
+   "Darkwraith",
+   "Spectres sombres",
+   "Spectre sombre"
+  ]
+ },
+ {
+  "name": "Warriors of Sunlight",
+  "kind": "faction",
+  "aliases": [
+   "Warrior of Sunlight",
+   "Guerrier solaire",
+   "Guerriers solaires"
+  ]
+ },
+ {
+  "name": "Daughters of Chaos",
+  "kind": "faction",
+  "aliases": [
+   "Daughter of Chaos",
+   "Fille du Chaos",
+   "Filles du Chaos"
+  ]
+ },
+ {
+  "name": "Forest Hunters",
+  "kind": "faction",
+  "aliases": [
+   "Forest Hunter",
+   "Chasseur sylvestre",
+   "Chasseurs sylvestres"
+  ]
+ },
+ {
+  "name": "Primordial serpents",
+  "kind": "faction",
+  "aliases": [
+   "primordial serpent",
+   "Serpent originel",
+   "serpent originel",
+   "Serpents originels"
+  ]
+ },
+ {
+  "name": "Vinheim Dragon School",
+  "kind": "faction",
+  "aliases": [
+   "Dragon School",
+   "Académie draconique de Vinheim",
+   "Académie draconique"
+  ]
+ },
+ {
+  "name": "Channelers",
+  "kind": "faction",
+  "aliases": [
+   "Channeler",
+   "Canalisateurs",
+   "Canalisateur"
+  ]
+ },
+ {
+  "name": "First Flame",
+  "kind": "notion",
+  "aliases": [
+   "Première Flamme"
+  ]
+ },
+ {
+  "name": "Age of Fire",
+  "kind": "notion",
+  "aliases": [
+   "Âge du Feu"
+  ]
+ },
+ {
+  "name": "Abyss",
+  "kind": "notion",
+  "aliases": [
+   "abyss",
+   "Abysses",
+   "abysses"
+  ],
+  "broad": true
+ },
+ {
+  "name": "Hollow",
+  "kind": "notion",
+  "aliases": [
+   "Hollows",
+   "hollow",
+   "Carcasse",
+   "Carcasses",
+   "carcasse"
+  ],
+  "label": "Hollows",
+  "broad": true
+ },
+ {
+  "name": "Humanity",
+  "kind": "notion",
+  "aliases": [
+   "humanity",
+   "Humanité",
+   "humanité"
+  ],
+  "broad": true
+ },
+ {
+  "name": "Dark Soul",
+  "kind": "notion",
+  "aliases": [
+   "Âme sombre"
+  ]
+ },
+ {
+  "name": "Lord Souls",
+  "kind": "notion",
+  "aliases": [
+   "Lord Soul",
+   "Âme du Seigneur",
+   "Âme de Seigneur"
+  ]
+ },
+ {
+  "name": "Darksign",
+  "kind": "notion",
+  "aliases": []
+ },
+ {
+  "name": "Chaos",
+  "kind": "notion",
+  "aliases": [
+   "chaos"
+  ],
+  "broad": true
+ },
+ {
+  "name": "Pyromancy",
+  "kind": "notion",
+  "aliases": [
+   "pyromancy",
+   "Pyromancie",
+   "pyromancie"
+  ],
+  "broad": true
+ },
+ {
+  "name": "Titanite",
+  "kind": "notion",
+  "aliases": [
+   "titanite"
+  ],
+  "broad": true
+ },
+ {
+  "name": "Path of the Dragon",
+  "kind": "faction",
+  "aliases": [
+   "dragon apostles",
+   "Apôtres des Dragons anciens",
+   "Apôtres des Dragons"
+  ]
+ },
+ {
+  "name": "Darkmoon Knightess",
+  "kind": "personnage",
+  "aliases": [
+   "Chevalière de la Lune noire"
+  ]
+ },
+ {
+  "name": "Beatrice",
+  "kind": "personnage",
+  "aliases": [
+   "Witch Beatrice",
+   "Béatrice",
+   "Sorcière rebelle Béatrice"
+  ]
+ },
+ {
+  "name": "Lordvessel",
+  "kind": "notion",
+  "aliases": [
+   "Calice royal"
+  ]
+ },
+ {
+  "name": "Bell of Awakening",
+  "kind": "notion",
+  "aliases": [
+   "Bells of Awakening",
+   "Cloche de l'éveil",
+   "Cloches de l'éveil"
+  ]
+ },
+ {
+  "name": "Undead Church",
+  "kind": "lieu",
+  "aliases": [
+   "Église des Mort-vivants",
+   "Undead Parish",
+   "Paroisse des Mort-vivants"
+  ]
+ },
+ {
+  "name": "Rendal",
+  "kind": "personnage",
+  "aliases": [
+   "Knight King Rendal"
+  ]
+ },
+ {
+  "name": "Kirk",
+  "kind": "personnage",
+  "aliases": [
+   "Knight of Thorns",
+   "Kirk, Knight of Thorns",
+   "Chevalier des Ronces"
+  ]
+ },
+ {
+  "name": "Iron Golem",
+  "kind": "personnage",
+  "aliases": [
+   "Golem de fer"
+  ]
+ }
+]

@@ -19,7 +19,7 @@ import pytest
 sync_api = pytest.importorskip("playwright.sync_api")
 
 WEB = Path(__file__).resolve().parents[2] / "web"
-GAMES = ["bloodborne", "dark-souls-3", "elden-ring"]
+GAMES = ["bloodborne", "dark-souls-1", "dark-souls-3", "elden-ring"]
 DESKTOP = {"viewport": {"width": 1280, "height": 800}}
 PHONE = {"viewport": {"width": 390, "height": 844}, "is_mobile": True, "has_touch": True}
 
@@ -187,6 +187,16 @@ ADDRESSES = {
         ("tour", "#tour=paleblood/3", "tour", "Paleblood and the Moon"),
         ("old-french-entity", "#entite=Gehrman", "entity", "Gehrman"),
     ],
+    "dark-souls-1": [
+        ("text", "#Darksign", "doc", "Darksign"),
+        ("group", "#group=Common%20weapons", "cluster", "Common weapons"),
+        ("old-french-group", "#groupe=Common%20weapons", "cluster", "Common weapons"),
+        ("entity", "#entity=Gwyn", "entity", "Gwyn"),
+        ("path", "#path=Darksign&Lordvessel", "path", "Darksign → Lordvessel"),
+        ("dialogue", "#dialogue=Siegmeyer%20of%20Catarina", "dialogue", "Siegmeyer of Catarina"),
+        ("tour", "#tour=abyss/3", "tour", "Artorias and the Abyss"),
+        ("old-french-entity", "#entite=Gwyn", "entity", "Gwyn"),
+    ],
     "dark-souls-3": [
         ("text", "#Coiled%20Sword", "doc", "Coiled Sword"),
         ("group", "#group=Shields", "cluster", "Shields"),
@@ -209,10 +219,12 @@ ADDRESSES = {
         ("old-french-entity", "#entite=Marika", "entity", "Marika"),
     ],
 }
-TOURS = {"bloodborne": ("paleblood", "Paleblood and the Moon"), "dark-souls-3": ("londor", "Londor and the Lord of Hollows"),
+TOURS = {"bloodborne": ("paleblood", "Paleblood and the Moon"), "dark-souls-1": ("abyss", "Artorias and the Abyss"),
+         "dark-souls-3": ("londor", "Londor and the Lord of Hollows"),
          "elden-ring": ("story", "The story of the Lands Between")}
-ENTITIES = {"bloodborne": "Gehrman", "dark-souls-3": "Aldrich", "elden-ring": "Marika"}
-FIRST_TEXT = {"bloodborne": "Hunter's Mark", "dark-souls-3": "Coiled Sword", "elden-ring": "Tarnished's Furled Finger"}
+ENTITIES = {"bloodborne": "Gehrman", "dark-souls-1": "Gwyn", "dark-souls-3": "Aldrich", "elden-ring": "Marika"}
+FIRST_TEXT = {"bloodborne": "Hunter's Mark", "dark-souls-1": "Darksign", "dark-souls-3": "Coiled Sword",
+              "elden-ring": "Tarnished's Furled Finger"}
 
 
 def shown(page):
@@ -438,8 +450,9 @@ def test_typing_a_search_is_one_step(browser, site, game):
 
 
 # ------------------------------------------------------------------ focus de la carte, chemin d'échos
-ENTITY = {"bloodborne": "Gehrman", "dark-souls-3": "Aldrich", "elden-ring": "Marika"}
-DIALOGUE = {"bloodborne": "Alfred, Hunter of Vilebloods", "dark-souls-3": "Yuria of Londor", "elden-ring": "Ranni the Witch"}
+ENTITY = {"bloodborne": "Gehrman", "dark-souls-1": "Gwyn", "dark-souls-3": "Aldrich", "elden-ring": "Marika"}
+DIALOGUE = {"bloodborne": "Alfred, Hunter of Vilebloods", "dark-souls-1": "Siegmeyer of Catarina",
+            "dark-souls-3": "Yuria of Londor", "elden-ring": "Ranni the Witch"}
 
 
 def focus(page):
@@ -713,7 +726,8 @@ def test_both_triggers_redraw_any_page_in_place(browser, site, kind):
 # la déplacer dans son propre module. Les valeurs attendues sont calculées dans la page (toScreen, le
 # bord du panneau), pas recopiées.
 DEVICES = pytest.mark.parametrize("device", [DESKTOP, PHONE], ids=["desktop", "phone"])
-GROUPS = {"bloodborne": "Valtr and the League", "dark-souls-3": "Shields", "elden-ring": "Bell Bearings of the departed"}
+GROUPS = {"bloodborne": "Valtr and the League", "dark-souls-1": "Embers of ascension", "dark-souls-3": "Shields",
+          "elden-ring": "Bell Bearings of the departed"}
 
 
 def visible_area(page):

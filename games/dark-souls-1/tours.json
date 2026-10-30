@@ -1,0 +1,269 @@
+[
+ {
+  "id": "story",
+  "title": "The Age of Fire",
+  "intro": "Start here: where fire came from, why the Undead are cursed, and the choice the Chosen Undead faces at the end. The other tours tell each part in depth.",
+  "steps": [
+   {
+    "text": "Cutscenes — passage 1",
+    "note": "The beginning: \"In the Age of Ancients, the world was unformed, shrouded by fog.\" Then came Fire, and four beings \"found the Souls of Lords within the flame\": Nito, the Witch of Izalith, Gwyn, and \"the furtive pygmy, so easily forgotten.\""
+   },
+   {
+    "text": "Cutscenes — passage 2",
+    "note": "With those souls they defeated the dragons, and \"Thus began the Age of Fire.\" But \"soon, the flames will fade, and only Dark will remain\", and the accursed Darksign appears among the living."
+   },
+   {
+    "text": "Darksign",
+    "note": "The curse itself: \"Those branded with it are reborn after death, but will one day lose their mind and go Hollow.\""
+   },
+   {
+    "text": "Cutscenes — passage 4",
+    "note": "The Undead are locked away in the north, but a legend says \"one day an Undead shall be chosen to leave the Undead Asylum, in pilgrimage, to the land of the Ancient Lords, Lordran.\""
+   },
+   {
+    "text": "Oscar, Knight of Astora — passage 2",
+    "note": "A dying knight passes the mission on: \"When thou ringeth the Bell of Awakening, the fate of the Undead thou shalt know.\""
+   },
+   {
+    "text": "Kingseeker Frampt — passage 1",
+    "note": "The bell wakes a primordial serpent, \"close friend of the Great Lord Gwyn\", who tells the Undead: \"Your fate...is to succeed the Great Lord Gwyn.\""
+   },
+   {
+    "text": "Kingseeker Frampt — passage 2",
+    "note": "The first step: \"you must visit Anor Londo, and acquire the Lordvessel.\" Frampt opens Sen's Fortress, the way to the city of the gods."
+   },
+   {
+    "text": "Gwynevere, Princess of Sunlight — passage 1",
+    "note": "In Anor Londo, Gwyn's daughter hands over the vessel: \"I bequeath the Lordvessel to thee. And beseech thee. Succeed Lord Gwyn.\""
+   },
+   {
+    "text": "Darkmoon Blade Covenant Ring",
+    "note": "Not all is as it seems in Anor Londo: Gwyndolin \"created the illusion of a sister Gwynevere, who helps him guard over Anor Londo.\""
+   },
+   {
+    "text": "Kingseeker Frampt — passage 6",
+    "note": "To open the way to Gwyn, the vessel must be filled with the great souls: \"Gravelord Nito, the Witch of Izalith, the Four Kings of New Londo... and Lord Gwyn's former confidant, Seath the Scaleless.\""
+   },
+   {
+    "text": "Bequeathed Lord Soul Shard",
+    "note": "Gwyn shared his own soul: he \"granted them their ranks and the fragments of a great soul\", to the Four Kings of New Londo and to Seath."
+   },
+   {
+    "text": "Darkstalker Kaathe — passage 3",
+    "note": "The other serpent tells another story: Gwyn \"trembled at the Dark\" and, \"in dire fear of humans, and the Dark Lord who would one day be born amongst them\", sacrificed himself to link the Fire."
+   },
+   {
+    "text": "Darkstalker Kaathe — passage 4",
+    "note": "Kaathe's offer: \"destroy the fading Lord Gwyn, who has coddled Fire and resisted nature, and become the Fourth Lord, so that you may usher in an Age of Dark!\""
+   },
+   {
+    "text": "Black Knight Armor",
+    "note": "What became of those who followed Gwyn into the flame: \"they were burned to ashes in the newly kindled flame, wandering the world as disembodied spirits ever after.\""
+   },
+   {
+    "text": "Soul of Gwyn, Lord of Cinder",
+    "note": "At the Kiln of the First Flame waits Gwyn himself, who \"bequeathed most of his power to the Gods, and burned as cinder for the First Flame.\" Linking the fire again, or letting it fade, is the last choice."
+   }
+  ]
+ },
+ {
+  "id": "gwyn",
+  "title": "Gwyn's family and knights",
+  "intro": "The gods of Anor Londo: Gwyn's children, the Four Knights, and the city they left behind when Gwyn went to link the Fire.",
+  "steps": [
+   {
+    "text": "Silver Knight Armor",
+    "note": "\"When Lord Gwyn departed to link the Fire, his knights split into two groups. The Silver Knights remained in the forsaken capital in the service of their goddess.\""
+   },
+   {
+    "text": "Ornstein's Armor",
+    "note": "Ornstein the dragonslayer \"is believed to be the captain of the Four Knights\", and still guards Anor Londo's cathedral."
+   },
+   {
+    "text": "Smough's Armor",
+    "note": "Beside him stands Smough, \"the Executioner, protector of the cathedral at the forsaken city of Anor Londo.\""
+   },
+   {
+    "text": "Wolf Ring",
+    "note": "The four knights each received a ring. \"The Wolf Ring belongs to Artorias the Abysswalker\", who \"had an unbendable will of steel.\""
+   },
+   {
+    "text": "Hawk Ring",
+    "note": "\"The Hawk Ring belonged to Hawkeye Gough, who led the Greatarchers\", whose great bow \"took down high-flying dragons.\""
+   },
+   {
+    "text": "Gold Tracer",
+    "note": "The last of the four: \"the Lord's Blade Ciaran\", who \"brandishes her sword in a mesmerizing dance.\""
+   },
+   {
+    "text": "Ring of the Sun's Firstborn",
+    "note": "Gwyn's firstborn was \"a god of war, but his foolishness led to a loss of the annals, and rescinding of his deific status. Today, even his name is not known.\""
+   },
+   {
+    "text": "Sunlight Medal",
+    "note": "Yet \"the old God of War still watches closely over his warriors\", the Warriors of Sunlight."
+   },
+   {
+    "text": "Gwynevere, Princess of Sunlight — passage 2",
+    "note": "Gwynevere's plea: \"Without Fire, all shall be a frigid and frightful Dark.\""
+   },
+   {
+    "text": "Soul of Gwyndolin",
+    "note": "The one god who truly stayed: \"Darkmoon Gwyndolin, god of the Dark Sun and guardian of deserted Anor Londo\", Gwyn's lastborn."
+   },
+   {
+    "text": "Crown of the Dark Sun",
+    "note": "\"The image of the sun manifests Gwyndolin's deep adoration of the sun.\""
+   },
+   {
+    "text": "Darkmoon Seance Ring",
+    "note": "\"The Dark Sun Gwyndolin is the only remaining deity in Anor Londo. His followers are few, but their tasks are of vital importance.\""
+   }
+  ]
+ },
+ {
+  "id": "abyss",
+  "title": "Artorias and the Abyss",
+  "intro": "The Artorias of the Abyss story: the legend of the knight who walked the Abyss, and what really happened in Oolacile. Turn on the DLC texts to see all of it.",
+  "steps": [
+   {
+    "text": "Crest of Artorias",
+    "note": "It starts at a sealed door: \"The door leads to the grave of Sir Artorias the Abysswalker.\""
+   },
+   {
+    "text": "Soul of Sif",
+    "note": "His grave is guarded by \"Sif the Great Grey Wolf\", who \"inherited the divine knightsword.\""
+   },
+   {
+    "text": "Covenant of Artorias",
+    "note": "This ring \"symbolizes Knight Artorias's covenant with the beasts of the Abyss. Its wearer, like Artorias himself, can traverse the Abyss.\""
+   },
+   {
+    "text": "Dusk of Oolacile — passage 6",
+    "note": "In the past, Princess Dusk remembers: \"Long ago, in my homeland of Oolacile, I was beset by a creature from the Abyss. I would have perished then, were it not for the great knight Artorias.\""
+   },
+   {
+    "text": "Hawkeye Gough — passage 8",
+    "note": "Gough sees the land being lost: \"the Dark of the Abyss, which swallowed poor Artorias, threatens to devour our entire land of Oolacile.\" And \"They awoke that thing themselves, and drove it mad.\""
+   },
+   {
+    "text": "Cleansing Greatshield",
+    "note": "Artorias's last act of loyalty: \"used this to form a barrier to protect his compatriot Sif.\""
+   },
+   {
+    "text": "Abyss Greatsword",
+    "note": "His sword was \"Swallowed by the Dark with its master\", and \"its strength reflects its wielder's humanity.\""
+   },
+   {
+    "text": "Soul of Artorias",
+    "note": "The truth behind the legend: \"The legend that Artorias repelled the Abyss only told half of the story.\""
+   },
+   {
+    "text": "Hawkeye Gough — passage 9",
+    "note": "\"The Dark emanates from Manus himself.\""
+   },
+   {
+    "text": "Soul of Manus",
+    "note": "\"Ancient Manus was clearly once human. But he became the Father of the Abyss after his humanity went wild, eternally seeking his precious broken pendant.\""
+   },
+   {
+    "text": "Broken Pendant",
+    "note": "The pendant he sought: \"Half of a broken stone pendant\", with \"a distinct air consisting of both reverence and nostalgia.\""
+   },
+   {
+    "text": "Bloated Head",
+    "note": "What became of Oolacile's people: \"an Oolacile resident whose humanity went wild after being devoured by the Dark of Manus.\""
+   }
+  ]
+ },
+ {
+  "id": "izalith",
+  "title": "The Witch of Izalith",
+  "intro": "One of the first Lords, her daughters, and the Flame of Chaos that turned them into demons.",
+  "steps": [
+   {
+    "text": "Cutscenes — passage 1",
+    "note": "Among the first Lords: \"the Witch of Izalith, and her Daughters of Chaos.\""
+   },
+   {
+    "text": "Gold-Hemmed Black Hood",
+    "note": "One daughter is \"Quelana of Izalith, mother of pyromancy and Daughter of Chaos\", who wore it \"before even the Age of Fire.\""
+   },
+   {
+    "text": "Quelana of Izalith — passage 4",
+    "note": "Her warning about pyromancy: \"Always fear the flame, lest you be devoured by it, and lose yourself.\" She \"abandoned my mother and sisters and fled to this land.\""
+   },
+   {
+    "text": "Quelana of Izalith — passage 5",
+    "note": "What went wrong: the Witch tried \"to light a flame of her own, but she failed to control it. The Flame of Chaos engulfed Mother and my sisters, and moulded them into deformed creatures.\""
+   },
+   {
+    "text": "Soul of Quelaag",
+    "note": "Quelaag, \"once daughter of the Witch of Izalith, but now a chaos demon.\""
+   },
+   {
+    "text": "Quelaag's Sister — passage 2",
+    "note": "Her blind sister, who took the blight into herself: \"The eggs...it hurts.\""
+   },
+   {
+    "text": "Eingyi — passage 1",
+    "note": "Eingyi serves \"Our Fair Lady\" and asks every newcomer: \"Are you a new servant?\""
+   },
+   {
+    "text": "Chaos Blade",
+    "note": "The sword from Quelaag's soul \"inherits only the chaotic nature of Quelaag.\""
+   },
+   {
+    "text": "Chaos Flame Ember",
+    "note": "\"Chaos Flame Ember is an art of the lost city of Izalith.\" Chaos weapons \"are demon weapons augmented by humanity.\""
+   },
+   {
+    "text": "Quelana of Izalith — passage 6",
+    "note": "If the Chaos is put to rest: \"Mother's ambitions were misguided, no doubt, but surely a thousand years of atonement is enough!\""
+   }
+  ]
+ },
+ {
+  "id": "new-londo",
+  "title": "New Londo and the Dark",
+  "intro": "The Four Kings who fell to the Dark, the Darkwraiths, and the city drowned to hold them back.",
+  "steps": [
+   {
+    "text": "Bequeathed Lord Soul Shard",
+    "note": "\"Lord Gwyn recognized the foresight of these four great leaders of New Londo, and granted them their ranks and the fragments of a great soul.\""
+   },
+   {
+    "text": "Ingward — passage 10",
+    "note": "\"Long ago, the Four Kings were powerful men. Only, their hearts were weak. When an evil serpent dangled the art of Lifedrain before them, they were unable to resist.\""
+   },
+   {
+    "text": "Dark Armor",
+    "note": "Their knights became the Darkwraiths, \"former knights of New Londo who descended into Dark\", with \"their diabolical art of Lifedrain.\""
+   },
+   {
+    "text": "Dark Hand",
+    "note": "\"The Darkwraiths, incited by Kaathe, use the power of the dark soul to absorb humanity.\""
+   },
+   {
+    "text": "Key to the Seal",
+    "note": "The price of stopping them: \"The Sealers flooded New Londo to banish the Darkwraiths and the Four Kings\", knowing \"that countless lives, and the robust culture of the city, would be lost.\""
+   },
+   {
+    "text": "Mask of the Sealer",
+    "note": "The Sealers swore to keep the seal shut, \"but two of the three forsook New Londo upon tiring of their duty.\""
+   },
+   {
+    "text": "Ingward — passage 9",
+    "note": "The one who stayed: \"I am the Guardian of the Seal. I watch over the Four Kings, the masters of the Darkwraiths.\""
+   },
+   {
+    "text": "Ingward — passage 4",
+    "note": "To reach the Kings below, \"you cannot proceed without being able to traverse the Abyss. According to legend, the knight Artorias crossed the Abyss.\""
+   },
+   {
+    "text": "Darkstalker Kaathe — passage 1",
+    "note": "In the Abyss waits the serpent who tempted the Kings: \"I am the primordial serpent Darkstalker Kaathe. I can guide thee, and illuminate the truth.\""
+   }
+  ]
+ }
+]
