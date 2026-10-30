@@ -152,8 +152,8 @@
     "ahh"
   ],
   "speaker_names": {},
-  "min_cluster": 12,
-  "min_samples": 4,
+  "min_cluster": 10,
+  "min_samples": 3,
   "max_cluster": 80,
   "images": "game-files",
   "ui": {
