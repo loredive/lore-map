@@ -1,6 +1,6 @@
 # Lore Map
 
-An interactive map of the texts in Elden Ring and Bloodborne: item descriptions, weapons, armor,
+An interactive map of the texts in Elden Ring, Bloodborne and Dark Souls III: item descriptions, weapons, armor,
 NPC dialogue. Each star is a text, and texts about the same things sit close together. You can
 search by meaning, follow guided tours, or browse by category. Everything runs in the browser.
 
@@ -22,7 +22,9 @@ uv run python images.py              # Elden Ring icons, from the Elden Ring Fan
 
 The Elden Ring text comes from [EldenRingTextExplorer](https://github.com/EldenRingExplorer/EldenRingTextExplorer).
 Bloodborne has no public text dump: `games/bloodborne/extract.py` and `icons.py` read your own copy
-of the game, then `prepare.py --game bloodborne` builds the map.
+of the game, then `prepare.py --game bloodborne` builds the map. Dark Souls III works the same way
+from the Steam copy, once its `msg/` folder is unpacked with UXM: `games/dark-souls-3/extract.py`,
+then `prepare.py --game dark-souls-3`.
 
 ## Tests
 

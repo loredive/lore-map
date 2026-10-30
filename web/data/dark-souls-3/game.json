@@ -27,7 +27,7 @@
   },
   "entity_examples": "Aldrich or Lothric",
   "empty_hint": "Aldrich, Londor",
-  "dlc_label": "Ashes of Ariandel & The Ringed City"
+  "dlc_label": "Ariandel & Ringed City"
  },
- "tours": false
+ "tours": true
 }
