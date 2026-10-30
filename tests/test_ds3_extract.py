@@ -141,3 +141,12 @@ def test_speakers_with_few_confirmed_lines_are_marked_uncertain():
     assert unsure["Darkdiver Grandahl"] == "Named from what the lines say; no source confirms it."
     assert unsure["Unknown NPC"] == "No source says who speaks these lines."
     assert "Narrator" not in unsure                                  # SURE : ses répliques suffisent
+
+
+def test_a_text_the_game_never_shows_is_left_out():
+    tables = {lang: lang_tables(t, "Welcome.") for lang, t in [("en", "lore"), ("jp", "知"), ("fr", "savoir")]}
+    shown = {"goods": {1, 1300000}, "weapon": set(), "protector": set(), "accessory": set(), "magic": {1300000}}
+    data = ds3.build(tables, {}, SPEAKERS, shown)
+    assert list(data["goods"]) == ["1"]                      # Ember (3) : sans icône dans les tables, jamais en jeu
+    assert data["weapon"] == {} and list(data["magic"]) == ["1300000"]
+    assert "Fire Keeper" in data["dialog"]                   # les dialogues ne sont pas filtrés

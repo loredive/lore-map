@@ -189,8 +189,8 @@ ADDRESSES = {
     ],
     "dark-souls-3": [
         ("text", "#Coiled%20Sword", "doc", "Coiled Sword"),
-        ("group", "#group=Keys%20and%20cells", "cluster", "Keys and cells"),
-        ("old-french-group", "#groupe=Keys%20and%20cells", "cluster", "Keys and cells"),
+        ("group", "#group=Shields", "cluster", "Shields"),
+        ("old-french-group", "#groupe=Shields", "cluster", "Shields"),
         ("entity", "#entity=Aldrich", "entity", "Aldrich"),
         ("path", "#path=Coiled%20Sword&Firelink%20Greatsword", "path", "Coiled Sword → Firelink Greatsword"),
         ("dialogue", "#dialogue=Yuria%20of%20Londor", "dialogue", "Yuria of Londor"),
@@ -678,7 +678,7 @@ def test_both_triggers_redraw_any_page_in_place(browser, site, kind):
 # la déplacer dans son propre module. Les valeurs attendues sont calculées dans la page (toScreen, le
 # bord du panneau), pas recopiées.
 DEVICES = pytest.mark.parametrize("device", [DESKTOP, PHONE], ids=["desktop", "phone"])
-GROUPS = {"bloodborne": "Valtr and the League", "dark-souls-3": "Keys and cells", "elden-ring": "Bell Bearings of the departed"}
+GROUPS = {"bloodborne": "Valtr and the League", "dark-souls-3": "Shields", "elden-ring": "Bell Bearings of the departed"}
 
 
 def visible_area(page):
