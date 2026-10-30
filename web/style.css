@@ -194,6 +194,10 @@ body {
 .results .head .dot, .echoes .head .dot { transform: translateY(-1px); }
 .results .name, .echoes .name { font: 600 1.08rem/1.25 var(--display); color: var(--parch); }
 .results .snip { display: block; margin: .15rem 0 0 1rem; color: var(--faint); font-size: .9rem; line-height: 1.4; }
+/* l'en-tête d'un interlocuteur dans un groupe, au-dessus de ses passages (group-ui.js) */
+.results .speaker-head { margin: .9rem 0 .1rem; padding: 0 .5rem; font: italic 600 1rem/1.2 var(--display); color: var(--grace); }
+.results li:first-child .speaker-head { margin-top: .2rem; }
+.results .speaker-head span { font: .8rem var(--body); color: var(--faint); }
 mark { background: none; color: var(--grace); }
 .count .refined { color: var(--dim); font-style: italic; }
 .understood { margin: 0 0 .4rem; color: var(--moon); font-style: italic; font-size: .92rem; }
@@ -428,36 +432,37 @@ ol.script .text { margin: 0; white-space: pre-line; line-height: 1.6; }
 }
 
 /* ---------- atmosphère (style d) : sous les étoiles, un calque fixe propre à chaque jeu ---------- */
-/* vignette et grain communs ; Elden Ring : une lueur dorée qui monte du bas ;
-   Bloodborne : Yharnam sous la lune (bg/bloodborne.webp), posée sous la barre du haut ;
-   Dark Souls III : un ciel de cendre, la braise d'un feu mourant tout en bas */
+/* vignette et grain communs ; sous la barre du haut, un paysage par jeu (bg/<jeu>.webp) :
+   Elden Ring : l'Arbre-Monde au-dessus des ruines ; Bloodborne : Yharnam sous la lune ;
+   Dark Souls III : une terre de cendre sous l'éclipse */
 body.sky-d::before {
   content: ""; position: fixed; inset: 0; pointer-events: none;
   background:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
-    radial-gradient(ellipse 75% 70% at 50% 45%, transparent 55%, rgba(4, 6, 12, .6) 100%),
-    var(--atmo, none);
+    radial-gradient(ellipse 75% 70% at 50% 45%, transparent 55%, rgba(4, 6, 12, .6) 100%);
 }
 body.sky-d[data-game="elden-ring"] {
-  --fog: #8a8678; --fog-veil: #0d1220;
-  --atmo: radial-gradient(ellipse 38% 55% at 50% 108%, rgba(240, 210, 140, .16), rgba(240, 210, 140, .05) 55%, transparent 75%);
+  background: #0b0e17; --fog: #8a8678; --fog-veil: #0d1220;
+  --bg: url("bg/elden-ring.webp"); --bg-at: 80% 100%; --bg-at-narrow: 88% 100%;
 }
-body.sky-d[data-game="bloodborne"] { background: #06070d; --fog: #6c6f80; --fog-veil: #06070d; }
+body.sky-d[data-game="bloodborne"] {
+  background: #06070d; --fog: #6c6f80; --fog-veil: #06070d;
+  --bg: url("bg/bloodborne.webp"); --bg-at: 82% 100%; --bg-at-narrow: 90% 100%;
+}
 body.sky-d[data-game="dark-souls-3"] {
-  background: radial-gradient(ellipse 120% 90% at 50% 40%, #1d1b1d 0%, #121114 55%, #0b0a0c 100%);
-  --fog: #7d7670; --fog-veil: #0e0d10;
-  --atmo: radial-gradient(ellipse 34% 40% at 50% 110%, rgba(232, 120, 60, .16), rgba(232, 120, 60, .05) 55%, transparent 75%);
+  background: #0b0a0c; --fog: #7d7670; --fog-veil: #0e0d10;
+  --bg: url("bg/dark-souls-3.webp"); --bg-at: 70% 100%; --bg-at-narrow: 73% 100%;
 }
-/* sous les étoiles (z-index -1 : au-dessus du fond de la page, sous la carte) ; la ville reste en bas,
-   la lune à droite, même quand l'écran rogne l'image */
-body.sky-d[data-game="bloodborne"]::after {
+/* sous les étoiles (z-index -1 : au-dessus du fond de la page, sous la carte) ; le sol reste en bas,
+   la lune, l'Arbre ou l'éclipse à droite, même quand l'écran rogne l'image */
+body.sky-d[data-game]::after {
   content: ""; position: fixed; z-index: -1; top: var(--bar-h, 100px); left: 0; right: 0; bottom: 0;
   pointer-events: none;
-  background: url("bg/bloodborne.webp") 82% 100% / cover no-repeat;
+  background: var(--bg, none) var(--bg-at, 50% 100%) / cover no-repeat;
 }
 @media (max-width: 760px) {
-  /* écran en hauteur : on ne voit qu'une bande de l'image, décalée pour garder toute la lune */
-  body.sky-d[data-game="bloodborne"]::after { background-position: 90% 100%; }
+  /* écran en hauteur : on ne voit qu'une bande de l'image, décalée pour garder la lune, l'Arbre ou l'éclipse */
+  body.sky-d[data-game]::after { background-position: var(--bg-at-narrow, 50% 100%); }
 }
 
 /* noms cités dans un texte : lien discret vers la fiche de l'entité */

@@ -98,6 +98,7 @@ LINE_RE = re.compile(r"\[(\d+)\]\s*(.*?)(?=<br/><br/>\s*\[\d+\]|$)", re.S)
 def dialog_docs(data, game, max_chars=550):
     """Découpe chaque dialogue de PNJ en passages de quelques répliques consécutives."""
     docs, seen = [], set()      # certains dialogues (didascalies) répètent les mêmes passages
+    shown = {}                  # interlocuteur -> passages déjà nommés : sa numérotation suit ses fichiers
     for rec in data.get("dialog", {}).values():
         raw = re.sub(r"\s+dialog$", "", rec.get("name_en", "").strip(), flags=re.I)
         npc = speaker_name(raw, game.speaker_names)
@@ -114,9 +115,10 @@ def dialog_docs(data, game, max_chars=550):
             text = "\n".join(chunk).strip()
             if len(text) >= game.min_chars and text not in seen:
                 seen.add(text)
+                shown[npc] = shown.get(npc, 0) + 1
                 # le nom affiché est nettoyé, mais les embeddings gardent celui du dump :
                 # corriger un libellé ne doit pas déplacer les textes sur la carte
-                doc = {"name": f"{npc} — passage {part}", "embed_name": f"{raw} — passage {part}",
+                doc = {"name": f"{npc} — passage {shown[npc]}", "embed_name": f"{raw} — passage {part}",
                        "cat": game.dialog_label, "text": text, "jp": "", "jp_name": "",
                        # un passage vient du DLC quand la plupart de ses répliques en viennent
                        "dlc": 2 * sum(k in dlc_lines for k in ids) > len(ids)}

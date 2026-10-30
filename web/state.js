@@ -92,8 +92,9 @@ export function resetContext() { S.cluster = S.entity = S.lit = S.path = S.pathS
 export function clusterById(id) { return S.clusters.find(c => c.id === id); }
 
 // Une ligne de liste de textes (résultats, groupe, entité, chemin) : nom et extrait déjà en HTML.
-export function docRow(d, nameHtml, snipHtml, lead = "") {
-  return `<li><button type="button" data-i="${d.i}">
+// above : ce qui précède le bouton dans la ligne (l'en-tête d'un interlocuteur, group-ui.js)
+export function docRow(d, nameHtml, snipHtml, lead = "", above = "") {
+  return `<li>${above}<button type="button" data-i="${d.i}">
     <span class="head">${lead}<span class="dot" style="--c:${colorOf(d.cat)}"></span><span class="name">${nameHtml}</span></span>
     <span class="snip">${snipHtml}</span></button></li>`;
 }
