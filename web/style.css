@@ -432,10 +432,10 @@ body.sky-d::before {
     var(--atmo, none);
 }
 body.sky-d[data-game="elden-ring"] {
-  --fog: #8a8678;
+  --fog: #8a8678; --fog-veil: #0d1220;
   --atmo: radial-gradient(ellipse 38% 55% at 50% 108%, rgba(240, 210, 140, .16), rgba(240, 210, 140, .05) 55%, transparent 75%);
 }
-body.sky-d[data-game="bloodborne"] { background: #06070d; --fog: #6c6f80; }
+body.sky-d[data-game="bloodborne"] { background: #06070d; --fog: #6c6f80; --fog-veil: #06070d; }
 /* sous les étoiles (z-index -1 : au-dessus du fond de la page, sous la carte) ; la ville reste en bas,
    la lune à droite, même quand l'écran rogne l'image */
 body.sky-d[data-game="bloodborne"]::after {
