@@ -616,6 +616,41 @@ def test_language_switch_redraws_the_text_in_place(browser, site):
 
 
 @pytest.mark.parametrize("game", GAMES)
+def test_a_group_lists_each_speakers_passages_together_and_in_order(browser, site, game):
+    """Le groupe où le plus d'interlocuteurs parlent : les passages de chacun se suivent, dans l'ordre
+    du jeu, sous un en-tête, et la colonne d'un texte ouvert les garde dans ce même ordre."""
+    lore = json.loads((WEB / "data" / game / "lore.json").read_text(encoding="utf-8"))
+    name = lore["fields"].index("name")
+    by = {}
+    for r in lore["docs"]:
+        if " — passage " in r[name]:
+            by.setdefault(r[lore["fields"].index("cluster")], set()).add(r[name].split(" — passage ")[0])
+    cid = max((c for c in by if c != -1), key=lambda c: len(by[c]))
+    label = next(c["label"] for c in lore["clusters"] if c["id"] == cid)
+    page, problems = open_page(browser, f"{site}?game={game}#group={quote(label)}", DESKTOP)
+    page.wait_for_function("() => document.querySelector('#panel').dataset.page === 'cluster'")
+    rows = page.evaluate("""() => [...document.querySelectorAll('#panel .results li')].map(li => ({
+        name: li.querySelector('.name').textContent.trim(),
+        head: li.querySelector('.speaker-head')?.textContent.trim() ?? null }))""")
+    said = [(r["name"].split(" — passage ")[0], int(r["name"].split(" — passage ")[1]), r["head"])
+            for r in rows if " — passage " in r["name"]]
+    speakers = [s for s, _, _ in said]
+    assert len(set(speakers)) > 1
+    for s in set(speakers):
+        at = [k for k, x in enumerate(speakers) if x == s]
+        assert at == list(range(at[0], at[0] + len(at))), f"{s}'s passages are apart"
+        parts = [said[k][1] for k in at]
+        assert parts == sorted(parts)
+        assert [said[k][2] for k in at] == ([f"{s} · {len(at)} passages"] + [None] * (len(at) - 1)
+                                            if len(at) > 1 else [None])
+    page.click("#panel .results button")
+    assert column(page)["current"] == rows[0]["name"]
+    assert page.evaluate("() => [...document.querySelectorAll('#list-column li .name')].map(n => n.textContent.trim())") \
+        == [r["name"] for r in rows]
+    assert problems == []
+
+
+@pytest.mark.parametrize("game", GAMES)
 def test_hiding_a_category_updates_the_open_group_in_place(browser, site, game):
     _, address, _, group = ADDRESSES[game][1]
     page, problems = open_page(browser, f"{site}?game={game}{address}", DESKTOP)

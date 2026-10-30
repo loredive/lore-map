@@ -1,7 +1,9 @@
-// La page d'un groupe de textes : son nom, sa description, ses textes (ceux du cœur d'abord).
+// La page d'un groupe de textes : son nom, sa description, ses textes (ceux du cœur d'abord,
+// les passages d'un interlocuteur ensemble : group-order.js).
 import { S, esc, clusterById, docRow, isHidden, nameOf, textOf, groupName, groupDesc } from "./state.js";
 import { registerPage } from "./pages.js";
 import { snippet, openInList } from "./links.js";
+import { groupOrder } from "./group-order.js";
 
 const groupOfArgs = ({ id, label }) => clusterById(id) || S.clusters.find(x => x.label === label);
 
@@ -21,10 +23,9 @@ registerPage({
     if (!c) return { html: "" };
     S.cluster = c;
     const members = S.docs.filter(d => d.cluster === c.id);
-    // les textes du cœur du groupe d'abord
     const dist = d => (d.x - c.x) ** 2 + (d.y - c.y) ** 2;
-    members.sort((a, b) => dist(a) - dist(b));
-    const visible = members.filter(d => !isHidden(d));
+    const rows = groupOrder(members.filter(d => !isHidden(d)), dist);
+    const visible = rows.map(r => r.doc);
     const keywords = c.keywords && c.keywords !== c.label
       ? `<p class="keywords"><span>Keywords</span> ${esc(c.keywords)}</p>` : "";
     return {
@@ -34,7 +35,8 @@ registerPage({
     ${groupDesc(c) ? `<p class="text">${esc(groupDesc(c))}</p>` : ""}
     <p class="count">${c.n} texts${visible.length < members.length ? `, ${visible.length} of them shown` : ""}.</p>
     ${keywords}
-    <ol class="results">${visible.map(d => docRow(d, esc(nameOf(d)), esc(snippet(textOf(d), [])))).join("")}</ol>
+    <ol class="results">${rows.map(({ doc: d, heading: h }) => docRow(d, esc(nameOf(d)), esc(snippet(textOf(d), [])), "",
+      h ? `<p class="speaker-head">${esc(h.speaker)} <span>· ${h.n} passages</span></p>` : "")).join("")}</ol>
   </article>`,
       bind: panel => panel.querySelectorAll("button[data-i]").forEach(b =>
         b.addEventListener("click", () => openInList(+b.dataset.i, visible.map(d => d.i)))),

@@ -194,6 +194,10 @@ body {
 .results .head .dot, .echoes .head .dot { transform: translateY(-1px); }
 .results .name, .echoes .name { font: 600 1.08rem/1.25 var(--display); color: var(--parch); }
 .results .snip { display: block; margin: .15rem 0 0 1rem; color: var(--faint); font-size: .9rem; line-height: 1.4; }
+/* l'en-tête d'un interlocuteur dans un groupe, au-dessus de ses passages (group-ui.js) */
+.results .speaker-head { margin: .9rem 0 .1rem; padding: 0 .5rem; font: italic 600 1rem/1.2 var(--display); color: var(--grace); }
+.results li:first-child .speaker-head { margin-top: .2rem; }
+.results .speaker-head span { font: .8rem var(--body); color: var(--faint); }
 mark { background: none; color: var(--grace); }
 .count .refined { color: var(--dim); font-style: italic; }
 .understood { margin: 0 0 .4rem; color: var(--moon); font-style: italic; font-size: .92rem; }
