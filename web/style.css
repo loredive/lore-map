@@ -177,6 +177,12 @@ body {
 }
 
 .count { margin: 0 0 .6rem; color: var(--faint); font-size: .85rem; }
+/* interlocuteur incertain : un « ? » discret à côté du nom, la raison sous le titre du dialogue */
+.unsure {
+  display: inline-grid; place-items: center; width: 1.15em; height: 1.15em; margin-left: .3em; vertical-align: .15em;
+  border: 1px solid var(--rim-strong); border-radius: 50%; color: var(--faint); font: 600 .55em var(--body); cursor: help;
+}
+.unsure-note { margin: 0 0 .6rem; color: var(--faint); font-size: .85rem; font-style: italic; }
 .results { list-style: none; margin: 0; padding: 0; }
 .results button, .echoes button {
   display: block; width: 100%; padding: .55rem .5rem; border: 0; border-radius: 4px;
@@ -423,7 +429,8 @@ ol.script .text { margin: 0; white-space: pre-line; line-height: 1.6; }
 
 /* ---------- atmosphère (style d) : sous les étoiles, un calque fixe propre à chaque jeu ---------- */
 /* vignette et grain communs ; Elden Ring : une lueur dorée qui monte du bas ;
-   Bloodborne : Yharnam sous la lune (bg/bloodborne.webp), posée sous la barre du haut */
+   Bloodborne : Yharnam sous la lune (bg/bloodborne.webp), posée sous la barre du haut ;
+   Dark Souls III : un ciel de cendre, la braise d'un feu mourant tout en bas */
 body.sky-d::before {
   content: ""; position: fixed; inset: 0; pointer-events: none;
   background:
@@ -436,6 +443,11 @@ body.sky-d[data-game="elden-ring"] {
   --atmo: radial-gradient(ellipse 38% 55% at 50% 108%, rgba(240, 210, 140, .16), rgba(240, 210, 140, .05) 55%, transparent 75%);
 }
 body.sky-d[data-game="bloodborne"] { background: #06070d; --fog: #6c6f80; --fog-veil: #06070d; }
+body.sky-d[data-game="dark-souls-3"] {
+  background: radial-gradient(ellipse 120% 90% at 50% 40%, #1d1b1d 0%, #121114 55%, #0b0a0c 100%);
+  --fog: #7d7670; --fog-veil: #0e0d10;
+  --atmo: radial-gradient(ellipse 34% 40% at 50% 110%, rgba(232, 120, 60, .16), rgba(232, 120, 60, .05) 55%, transparent 75%);
+}
 /* sous les étoiles (z-index -1 : au-dessus du fond de la page, sous la carte) ; la ville reste en bas,
    la lune à droite, même quand l'écran rogne l'image */
 body.sky-d[data-game="bloodborne"]::after {

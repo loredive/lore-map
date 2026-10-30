@@ -19,7 +19,7 @@ import pytest
 sync_api = pytest.importorskip("playwright.sync_api")
 
 WEB = Path(__file__).resolve().parents[2] / "web"
-GAMES = ["bloodborne", "elden-ring"]
+GAMES = ["bloodborne", "dark-souls-3", "elden-ring"]
 DESKTOP = {"viewport": {"width": 1280, "height": 800}}
 PHONE = {"viewport": {"width": 390, "height": 844}, "is_mobile": True, "has_touch": True}
 
@@ -187,6 +187,16 @@ ADDRESSES = {
         ("tour", "#tour=paleblood/3", "tour", "Paleblood and the Moon"),
         ("old-french-entity", "#entite=Gehrman", "entity", "Gehrman"),
     ],
+    "dark-souls-3": [
+        ("text", "#Coiled%20Sword", "doc", "Coiled Sword"),
+        ("group", "#group=Keys%20and%20cells", "cluster", "Keys and cells"),
+        ("old-french-group", "#groupe=Keys%20and%20cells", "cluster", "Keys and cells"),
+        ("entity", "#entity=Aldrich", "entity", "Aldrich"),
+        ("path", "#path=Coiled%20Sword&Firelink%20Greatsword", "path", "Coiled Sword → Firelink Greatsword"),
+        ("dialogue", "#dialogue=Yuria%20of%20Londor", "dialogue", "Yuria of Londor"),
+        ("tour", "#tour=londor/3", "tour", "Londor and the Lord of Hollows"),
+        ("old-french-entity", "#entite=Aldrich", "entity", "Aldrich"),
+    ],
     "elden-ring": [
         ("text", "#Tarnished's%20Furled%20Finger", "doc", "Tarnished's Furled Finger"),
         ("group", "#group=Bell%20Bearings%20of%20the%20departed", "cluster", "Bell Bearings of the departed"),
@@ -199,9 +209,10 @@ ADDRESSES = {
         ("old-french-entity", "#entite=Marika", "entity", "Marika"),
     ],
 }
-TOURS = {"bloodborne": ("paleblood", "Paleblood and the Moon"), "elden-ring": ("story", "The story of the Lands Between")}
-ENTITIES = {"bloodborne": "Gehrman", "elden-ring": "Marika"}
-FIRST_TEXT = {"bloodborne": "Hunter's Mark", "elden-ring": "Tarnished's Furled Finger"}
+TOURS = {"bloodborne": ("paleblood", "Paleblood and the Moon"), "dark-souls-3": ("londor", "Londor and the Lord of Hollows"),
+         "elden-ring": ("story", "The story of the Lands Between")}
+ENTITIES = {"bloodborne": "Gehrman", "dark-souls-3": "Aldrich", "elden-ring": "Marika"}
+FIRST_TEXT = {"bloodborne": "Hunter's Mark", "dark-souls-3": "Coiled Sword", "elden-ring": "Tarnished's Furled Finger"}
 
 
 def shown(page):
@@ -427,8 +438,8 @@ def test_typing_a_search_is_one_step(browser, site, game):
 
 
 # ------------------------------------------------------------------ focus de la carte, chemin d'échos
-ENTITY = {"bloodborne": "Gehrman", "elden-ring": "Marika"}
-DIALOGUE = {"bloodborne": "Alfred, Hunter of Vilebloods", "elden-ring": "Ranni the Witch"}
+ENTITY = {"bloodborne": "Gehrman", "dark-souls-3": "Aldrich", "elden-ring": "Marika"}
+DIALOGUE = {"bloodborne": "Alfred, Hunter of Vilebloods", "dark-souls-3": "Yuria of Londor", "elden-ring": "Ranni the Witch"}
 
 
 def focus(page):
@@ -667,7 +678,7 @@ def test_both_triggers_redraw_any_page_in_place(browser, site, kind):
 # la déplacer dans son propre module. Les valeurs attendues sont calculées dans la page (toScreen, le
 # bord du panneau), pas recopiées.
 DEVICES = pytest.mark.parametrize("device", [DESKTOP, PHONE], ids=["desktop", "phone"])
-GROUPS = {"bloodborne": "Valtr and the League", "elden-ring": "Bell Bearings of the departed"}
+GROUPS = {"bloodborne": "Valtr and the League", "dark-souls-3": "Keys and cells", "elden-ring": "Bell Bearings of the departed"}
 
 
 def visible_area(page):
@@ -861,4 +872,25 @@ def test_click_during_intro_opens_the_star(browser, site, game):
     page.mouse.click(sx, sy)
     wait_shown(page, ("doc", first))
     assert not intro_active(page)
+    assert problems == []
+
+
+# ------------------------------------------------------------------ interlocuteurs incertains
+def test_an_uncertain_speaker_is_marked_with_its_reason(browser, site):
+    page, problems = open_page(browser, f"{site}?game=dark-souls-3#dialogue=Darkdiver%20Grandahl", DESKTOP)
+    wait_shown(page, ("dialogue", "Darkdiver Grandahl ?"))
+    mark = page.get_attribute("#panel h2 .unsure", "title")
+    assert mark == "Named from what the lines say; no source confirms it."
+    assert page.text_content("#panel .unsure-note").strip() == f"Uncertain speaker: {mark}"
+    page.click("#panel .pnum")
+    wait_shown(page, ("doc", "Darkdiver Grandahl — passage 1 ?"))
+    assert page.get_attribute("#panel h2 .unsure", "title") == mark
+    assert problems == []
+
+
+@pytest.mark.parametrize("game, speaker", [("dark-souls-3", "Yuria of Londor"), ("bloodborne", "Gehrman")])
+def test_a_confirmed_speaker_has_no_mark(browser, site, game, speaker):
+    page, problems = open_page(browser, f"{site}?game={game}#dialogue={quote(speaker)}", DESKTOP)
+    wait_shown(page, ("dialogue", speaker))
+    assert page.query_selector("#panel .unsure") is None and page.query_selector("#panel .unsure-note") is None
     assert problems == []

@@ -77,6 +77,7 @@ async function chooseGame() {
   S.hasImages = !!g.images;
   S.hasTours = !!g.tours;
   S.ui = g.ui || {};
+  S.uncertainSpeakers = g.uncertain_speakers || {};
   if (S.ui.tagline) { $(".tagline").textContent = S.ui.tagline; $(".brand h1").title = S.ui.tagline; }
   if (S.ui.aria) canvas.setAttribute("aria-label", S.ui.aria);
   if (S.ui.credit) $(".credit").textContent = S.ui.credit;

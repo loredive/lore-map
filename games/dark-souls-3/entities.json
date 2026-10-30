@@ -1,0 +1,704 @@
+[
+ {
+  "name": "Fire Keeper",
+  "kind": "personnage",
+  "aliases": [
+   "Gardienne du Feu",
+   "Gardiennes du Feu",
+   "Fire Keepers"
+  ]
+ },
+ {
+  "name": "Ludleth",
+  "kind": "personnage",
+  "aliases": [
+   "Ludleth of Courland",
+   "Ludleth de Courland"
+  ]
+ },
+ {
+  "name": "Gwyn",
+  "kind": "personnage",
+  "aliases": [
+   "Lord Gwyn"
+  ]
+ },
+ {
+  "name": "Gwyndolin",
+  "kind": "personnage",
+  "aliases": [
+   "Dark Sun Gwyndolin"
+  ]
+ },
+ {
+  "name": "Aldrich",
+  "kind": "personnage",
+  "aliases": [
+   "Aldrich, Saint of the Deep",
+   "Aldrich, Devourer of Gods"
+  ]
+ },
+ {
+  "name": "Sulyvahn",
+  "kind": "personnage",
+  "aliases": [
+   "Grand-maître Sulyvahn",
+   "Pontiff Sulyvahn"
+  ]
+ },
+ {
+  "name": "Prince Lothric",
+  "kind": "personnage",
+  "aliases": [
+   "Lothric, Younger Prince",
+   "Younger Prince"
+  ]
+ },
+ {
+  "name": "Lorian",
+  "kind": "personnage",
+  "aliases": [
+   "Prince Lorian"
+  ]
+ },
+ {
+  "name": "Oceiros",
+  "kind": "personnage",
+  "aliases": [
+   "Oceiros, the Consumed King",
+   "King Oceiros"
+  ]
+ },
+ {
+  "name": "Yhorm",
+  "kind": "personnage",
+  "aliases": [
+   "Yhorm the Giant",
+   "Yhorm le Géant"
+  ]
+ },
+ {
+  "name": "Wolnir",
+  "kind": "personnage",
+  "aliases": [
+   "Chef suprême Wolnir",
+   "High Lord Wolnir"
+  ]
+ },
+ {
+  "name": "Nameless King",
+  "kind": "personnage",
+  "aliases": [
+   "Roi sans nom"
+  ]
+ },
+ {
+  "name": "Friede",
+  "kind": "personnage",
+  "aliases": [
+   "Sister Friede",
+   "Sœur Friede",
+   "Elfriede"
+  ]
+ },
+ {
+  "name": "Gael",
+  "kind": "personnage",
+  "aliases": [
+   "Gael, Chev.-esclave",
+   "Slave Knight Gael"
+  ]
+ },
+ {
+  "name": "Ariandel",
+  "kind": "personnage",
+  "aliases": [
+   "Father Ariandel",
+   "Père Ariandel"
+  ]
+ },
+ {
+  "name": "Filianore",
+  "kind": "personnage",
+  "aliases": [
+   "Princess Filianore",
+   "Princesse Filianore"
+  ]
+ },
+ {
+  "name": "Shira",
+  "kind": "personnage",
+  "aliases": [
+   "Shira, Knight of Filianore"
+  ]
+ },
+ {
+  "name": "Yuria",
+  "kind": "personnage",
+  "aliases": [
+   "Yuria of Londor",
+   "Yuria de Londor"
+  ]
+ },
+ {
+  "name": "Yoel",
+  "kind": "personnage",
+  "aliases": [
+   "Yoel of Londor",
+   "Yoel de Londor"
+  ]
+ },
+ {
+  "name": "Anri",
+  "kind": "personnage",
+  "aliases": [
+   "Anri of Astora",
+   "Anri d'Astora"
+  ]
+ },
+ {
+  "name": "Horace",
+  "kind": "personnage",
+  "aliases": [
+   "Horace the Hushed"
+  ]
+ },
+ {
+  "name": "Siegward",
+  "kind": "personnage",
+  "aliases": [
+   "Siegward of Catarina",
+   "Siegward de Catarina"
+  ]
+ },
+ {
+  "name": "Patches",
+  "kind": "personnage",
+  "aliases": [
+   "Pat",
+   "Unbreakable Patches"
+  ]
+ },
+ {
+  "name": "Greirat",
+  "kind": "personnage",
+  "aliases": [
+   "Greirat of the Undead Settlement"
+  ]
+ },
+ {
+  "name": "Orbeck",
+  "kind": "personnage",
+  "aliases": [
+   "Orbeck of Vinheim",
+   "Orbeck de Vinheim"
+  ]
+ },
+ {
+  "name": "Cornyx",
+  "kind": "personnage",
+  "aliases": [
+   "Cornyx of the Great Swamp"
+  ]
+ },
+ {
+  "name": "Karla",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Irina",
+  "kind": "personnage",
+  "aliases": [
+   "Irina of Carim",
+   "Irina de Carim"
+  ]
+ },
+ {
+  "name": "Eygon",
+  "kind": "personnage",
+  "aliases": [
+   "Eygon of Carim"
+  ]
+ },
+ {
+  "name": "Sirris",
+  "kind": "personnage",
+  "aliases": [
+   "Sirris of the Sunless Realms"
+  ]
+ },
+ {
+  "name": "Hodrick",
+  "kind": "personnage",
+  "aliases": [
+   "Holy Knight Hodrick"
+  ]
+ },
+ {
+  "name": "Leonhard",
+  "kind": "personnage",
+  "aliases": [
+   "Ringfinger Leonhard"
+  ]
+ },
+ {
+  "name": "Rosaria",
+  "kind": "personnage",
+  "aliases": [
+   "Rosaria, Mother of Rebirth",
+   "Rosaria, Mère de la renaissance"
+  ]
+ },
+ {
+  "name": "Hawkwood",
+  "kind": "personnage",
+  "aliases": [
+   "Faucon-du-Breuil",
+   "Hawkwood the Deserter"
+  ]
+ },
+ {
+  "name": "Andre",
+  "kind": "personnage",
+  "aliases": [
+   "Blacksmith Andre"
+  ]
+ },
+ {
+  "name": "Lapp",
+  "kind": "personnage",
+  "aliases": [
+   "Amnesiac Lapp",
+   "Lapp l'Amnésique"
+  ]
+ },
+ {
+  "name": "Gertrude",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Logan",
+  "kind": "personnage",
+  "aliases": [
+   "Big Hat Logan"
+  ]
+ },
+ {
+  "name": "Seath",
+  "kind": "personnage",
+  "aliases": [
+   "Seath the Scaleless"
+  ]
+ },
+ {
+  "name": "Havel",
+  "kind": "personnage",
+  "aliases": [
+   "Havel the Rock"
+  ]
+ },
+ {
+  "name": "Artorias",
+  "kind": "personnage",
+  "aliases": [
+   "Knight Artorias",
+   "chevalier Artorias"
+  ]
+ },
+ {
+  "name": "Velka",
+  "kind": "personnage",
+  "aliases": [
+   "Velka, Goddess of Sin"
+  ]
+ },
+ {
+  "name": "Alva",
+  "kind": "personnage",
+  "aliases": [
+   "Alva, Seeker of the Spurned"
+  ]
+ },
+ {
+  "name": "Vilhelm",
+  "kind": "personnage",
+  "aliases": [
+   "Sir Vilhelm"
+  ]
+ },
+ {
+  "name": "Ocelotte",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Lothric",
+  "kind": "lieu",
+  "aliases": [
+   "Lothric Castle",
+   "Château de Lothric"
+  ]
+ },
+ {
+  "name": "Firelink Shrine",
+  "kind": "lieu",
+  "aliases": [
+   "Lige-feu",
+   "Sanctuaire de Lige-feu"
+  ]
+ },
+ {
+  "name": "Anor Londo",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Londor",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Irithyll",
+  "kind": "lieu",
+  "aliases": [
+   "Boreal Valley",
+   "Vallée boréale"
+  ]
+ },
+ {
+  "name": "Farron",
+  "kind": "lieu",
+  "aliases": [
+   "Farron Keep"
+  ]
+ },
+ {
+  "name": "Undead Settlement",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Cathedral of the Deep",
+  "kind": "lieu",
+  "aliases": [
+   "Cathédrale des Profondeurs"
+  ]
+ },
+ {
+  "name": "Profaned Capital",
+  "kind": "lieu",
+  "aliases": [
+   "Capitale profanée"
+  ]
+ },
+ {
+  "name": "Grand Archives",
+  "kind": "lieu",
+  "aliases": [
+   "Grandes archives"
+  ]
+ },
+ {
+  "name": "Catacombs of Carthus",
+  "kind": "lieu",
+  "aliases": [
+   "Carthus",
+   "Catacombes de Carthus"
+  ]
+ },
+ {
+  "name": "Great Swamp",
+  "kind": "lieu",
+  "aliases": [
+   "Grand marais"
+  ]
+ },
+ {
+  "name": "Izalith",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Vinheim",
+  "kind": "lieu",
+  "aliases": [
+   "Vinheim Dragon School",
+   "Dragon School"
+  ]
+ },
+ {
+  "name": "Carim",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Catarina",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "New Londo",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Oolacile",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Painted World of Ariandel",
+  "kind": "lieu",
+  "aliases": [
+   "Painted World",
+   "monde peint",
+   "Monde peint"
+  ]
+ },
+ {
+  "name": "Ringed City",
+  "kind": "lieu",
+  "aliases": [
+   "Cité enclavée"
+  ]
+ },
+ {
+  "name": "Kiln of the First Flame",
+  "kind": "lieu",
+  "aliases": [
+   "Kiln"
+  ]
+ },
+ {
+  "name": "Sunless Realms",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Lordran",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Archdragon Peak",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Lords of Cinder",
+  "kind": "faction",
+  "aliases": [
+   "Seigneurs des Cendres",
+   "Seigneur des Cendres",
+   "Lord of Cinder"
+  ],
+  "label": "Lords of Cinder"
+ },
+ {
+  "name": "Abyss Watchers",
+  "kind": "faction",
+  "aliases": [
+   "Légion des Mort-vivants",
+   "Veilleurs des Abysses",
+   "Undead Legion"
+  ]
+ },
+ {
+  "name": "Sable Church",
+  "kind": "faction",
+  "aliases": [
+   "Sable Church of Londor"
+  ]
+ },
+ {
+  "name": "Darkmoon",
+  "kind": "faction",
+  "aliases": [
+   "Lame de la Lune noire",
+   "Blades of the Darkmoon",
+   "Blade of the Darkmoon",
+   "Lune noire",
+   "Lames de la Lune noire"
+  ]
+ },
+ {
+  "name": "Way of White",
+  "kind": "faction",
+  "aliases": [
+   "Voie immaculée"
+  ]
+ },
+ {
+  "name": "Darkwraiths",
+  "kind": "faction",
+  "aliases": [
+   "Darkwraith"
+  ]
+ },
+ {
+  "name": "Pontiff's Knights",
+  "kind": "faction",
+  "aliases": [
+   "Chevaliers du Grand-maître",
+   "Chev. du Grand-maître",
+   "Pontiff Knight",
+   "Pontiff Knights"
+  ]
+ },
+ {
+  "name": "Crystal Sages",
+  "kind": "faction",
+  "aliases": [
+   "Sage de Cristal",
+   "Sages de Cristal",
+   "Crystal Sage"
+  ]
+ },
+ {
+  "name": "Sunlight warriors",
+  "kind": "faction",
+  "aliases": [
+   "Guerriers solaires",
+   "Guerrier solaire",
+   "Warriors of Sunlight",
+   "Warrior of Sunlight",
+   "Sunlight covenant"
+  ]
+ },
+ {
+  "name": "Mound-makers",
+  "kind": "faction",
+  "aliases": [
+   "Thanatophiles",
+   "Thanatophile",
+   "Mound-maker"
+  ]
+ },
+ {
+  "name": "Rosaria's Fingers",
+  "kind": "faction",
+  "aliases": [
+   "Phalanges de Rosaria",
+   "Fingers"
+  ]
+ },
+ {
+  "name": "Watchdogs of Farron",
+  "kind": "faction",
+  "aliases": [
+   "Guetteurs de Farron"
+  ]
+ },
+ {
+  "name": "Pygmies",
+  "kind": "faction",
+  "aliases": [
+   "pygmy",
+   "Pygmy",
+   "pygmée",
+   "pygmées"
+  ]
+ },
+ {
+  "name": "First Flame",
+  "kind": "notion",
+  "aliases": [
+   "Première Flamme"
+  ]
+ },
+ {
+  "name": "Abyss",
+  "kind": "notion",
+  "aliases": [
+   "abyss",
+   "Abysses",
+   "abysses"
+  ],
+  "broad": true
+ },
+ {
+  "name": "Hollow",
+  "kind": "notion",
+  "aliases": [
+   "Carcasses",
+   "Hollows",
+   "hollow",
+   "Carcasse",
+   "carcasse",
+   "Carcasses"
+  ],
+  "label": "Hollows",
+  "broad": true
+ },
+ {
+  "name": "Unkindled",
+  "kind": "notion",
+  "aliases": [
+   "Ashen One",
+   "Cendre",
+   "Cendres"
+  ],
+  "label": "Unkindled",
+  "broad": true
+ },
+ {
+  "name": "Age of Fire",
+  "kind": "notion",
+  "aliases": []
+ },
+ {
+  "name": "Darksign",
+  "kind": "notion",
+  "aliases": [
+   "Marque sombre"
+  ]
+ },
+ {
+  "name": "Dark Sigil",
+  "kind": "notion",
+  "aliases": []
+ },
+ {
+  "name": "Lord of Hollows",
+  "kind": "notion",
+  "aliases": [
+   "Seigneur des Carcasses"
+  ]
+ },
+ {
+  "name": "linking the fire",
+  "kind": "notion",
+  "aliases": [
+   "link the fire",
+   "linked the fire"
+  ],
+  "label": "Linking the fire"
+ },
+ {
+  "name": "Deep",
+  "kind": "notion",
+  "aliases": [
+   "deep",
+   "Profondeurs",
+   "profondeurs"
+  ],
+  "broad": true
+ },
+ {
+  "name": "Estus",
+  "kind": "notion",
+  "aliases": [
+   "Estus Flask",
+   "Fiole d'Estus"
+  ]
+ },
+ {
+  "name": "Titanite",
+  "kind": "notion",
+  "aliases": [
+   "titanite"
+  ]
+ }
+]

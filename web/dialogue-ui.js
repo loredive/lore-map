@@ -3,7 +3,7 @@
 // qui les relie.
 import { S, esc, portrait, textOf, textLang } from "./state.js";
 import { registerPage } from "./pages.js";
-import { linkText, bindEntityButtons, openInList } from "./links.js";
+import { linkText, bindEntityButtons, openInList, unsureMark } from "./links.js";
 
 // speaker et part d'un passage viennent de son nom (lore.js)
 export function buildDialogues() {
@@ -37,8 +37,9 @@ registerPage({
       html: `<article class="card">
     <div class="card-head${face ? " has-img" : ""}">${face}<div>
     <div class="cat">Dialogue</div>
-    <h2>${esc(speaker)}</h2>
+    <h2>${esc(speaker)}${unsureMark(speaker)}</h2>
     </div></div>
+    ${S.uncertainSpeakers[speaker] ? `<p class="unsure-note">Uncertain speaker: ${esc(S.uncertainSpeakers[speaker])}</p>` : ""}
     <p class="count">${list.length} passages, in the order the game speaks them. On the map, a thread links them:
       you can watch the dialogue move from one group to another.</p>
     <ol class="script">${list.map(i => {

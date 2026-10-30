@@ -32,3 +32,18 @@ def test_a_step_naming_no_text_stops_the_publication(tmp_path, monkeypatch):
     game = make_game(tmp_path, monkeypatch, ["Saw Cleaver", "Couperet-scie"])
     with pytest.raises(SystemExit, match="Couperet-scie"):
         games.publish_tours(game)
+
+
+def test_uncertain_speakers_reach_the_page(tmp_path, monkeypatch):
+    game = make_game(tmp_path, monkeypatch, ["Saw Cleaver"])
+    speakers = {"blocks": {}, "uncertain": {"Unknown NPC": "No source says who speaks these lines."}}
+    (game.dir / "speakers.json").write_text(json.dumps(speakers))
+    games.publish(game)
+    page = json.loads((game.data_dir / "game.json").read_text())
+    assert page["uncertain_speakers"] == {"Unknown NPC": "No source says who speaks these lines."}
+
+
+def test_a_game_without_uncertain_speakers_publishes_none(tmp_path, monkeypatch):
+    game = make_game(tmp_path, monkeypatch, ["Saw Cleaver"])
+    games.publish(game)
+    assert "uncertain_speakers" not in json.loads((game.data_dir / "game.json").read_text())
