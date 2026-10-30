@@ -12,6 +12,7 @@ import zlib
 
 SUBTITLES_SPEAKER = "Cutscenes"
 GENDER_OFFSET = 50                 # réplique adressée à une chasseuse : celle d'un chasseur + 50
+GENDER_WORDS = 3                   # au plus autant de mots changés entre une réplique et sa jumelle (him/her…)
 
 
 # ---------------------------------------------------------------- formats
@@ -95,7 +96,17 @@ def drop_repeated_runs(ids: list[int], tables: dict) -> list[int]:
             if not (repeat[k] and ((k > 0 and repeat[k - 1]) or (k + 1 < len(ids) and repeat[k + 1])))]
 
 
-def dialog(tables: dict, speakers: dict, new=lambda table, i: False) -> dict:
+def gender_twin(first: str | None, other: str) -> bool:
+    """La réplique +50 n'est que la variante de la première pour l'autre genre : même nombre de mots,
+    au plus GENDER_WORDS changés (« himself » / « herself »). Sinon, c'est une autre réplique."""
+    if first is None:
+        return False
+    a, b = first.split(), other.split()
+    return len(a) == len(b) and sum(x != y for x, y in zip(a, b)) <= GENDER_WORDS
+
+
+def dialog(tables: dict, speakers: dict, new=lambda table, i: False,
+           twin=lambda first, other: first is not None) -> dict:
     """Répliques regroupées par interlocuteur, au format du dump d'Elden Ring
     (« [id] texte<br/><br/>[id] texte », info_en, info_fr…), que dialog_docs de prepare.py découpe
     en passages. L'interlocuteur se lit sur les identifiants anglais, les mêmes dans chaque langue."""
@@ -104,7 +115,9 @@ def dialog(tables: dict, speakers: dict, new=lambda table, i: False) -> dict:
     for i in sorted(talk):
         # chaque réplique existe pour un chasseur (…00–…49) et pour une chasseuse (+50) : en
         # français, « le nouveau chasseur » / « la nouvelle chasseuse » ; on garde la première
-        if i % 100 >= GENDER_OFFSET and i - GENDER_OFFSET in talk:
+        # twin(première, +50) : par défaut (Bloodborne), toute réplique +50 dont la première existe ;
+        # gender_twin, plus stricte, ne retire que celles qui n'en diffèrent que par quelques mots
+        if i % 100 >= GENDER_OFFSET and twin(talk.get(i - GENDER_OFFSET), talk[i]):
             continue
         ids = by_speaker.setdefault(speaker_for(i, speakers) or speakers["unknown"], [])
         if not ids or talk[ids[-1]] != talk[i]:      # la même réplique enregistrée deux fois de suite
