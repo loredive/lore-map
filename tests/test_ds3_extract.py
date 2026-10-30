@@ -101,11 +101,12 @@ def test_each_block_takes_the_page_quoting_most_of_its_lines_and_sub_blocks_can_
     assert data["blocks"]["200"] == "Fire Keeper"                    # RENAME
     assert data["blocks"]["2900"] == "Pickle Pee, Pump-a-Rum Crow"
     assert data["blocks"]["7500"] == "Darkdiver Grandahl"            # MANUAL
-    assert data["blocks"]["0"] == "Oceiros, the Consumed King"
+    assert "0" not in data["blocks"]                        # bloc mêlé : pas de nom par défaut
     assert "5700" not in data["blocks"]                             # une seule voix : sans nom
-    # le bloc 0 est mêlé (3 voix contre 3) : son sous-bloc 19 garde son personnage ; le bloc 300 ne l'est
-    # pas (3 voix contre 2) : le sous-bloc 30018, qui parle de la Gardienne du feu, reste à Ludleth
-    assert data["sub_blocks"] == {"19": "Fire Keeper"}
+    # le bloc 0 est mêlé (3 voix contre 3) : chacun de ses sous-blocs a son personnage, et un sous-bloc
+    # sans voix restera sans nom ; le bloc 300 ne l'est pas (3 voix contre 2) : le sous-bloc 30018, qui
+    # parle de la Gardienne du feu, reste à Ludleth
+    assert data["sub_blocks"] == {"5": "Oceiros, the Consumed King", "19": "Fire Keeper"}
 
 
 def test_only_a_true_gendered_twin_is_dropped():

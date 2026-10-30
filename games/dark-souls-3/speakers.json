@@ -2,7 +2,6 @@
  "source": "darksouls.fandom.com, pages des personnages et boss de Dark Souls III, vote par réplique",
  "unknown": "Unknown NPC",
  "blocks": {
-  "0": "Lothric, Younger Prince",
   "200": "Fire Keeper",
   "300": "Ludleth of Courland",
   "400": "Yuria of Londor",
@@ -48,6 +47,8 @@
  },
  "sub_blocks": {
   "5": "Oceiros, the Consumed King",
+  "6": "Lothric, Younger Prince",
+  "7": "Lothric, Younger Prince",
   "16": "Unbreakable Patches",
   "19": "Emma, High Priestess",
   "24": "Emma, High Priestess",

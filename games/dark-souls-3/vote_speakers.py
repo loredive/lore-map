@@ -3,9 +3,10 @@ Qui parle dans 会話.fmg ? Les répliques sont rangées par blocs de 10 000 ide
 personnage (le bloc 0 en mêle plusieurs, par sous-blocs de 100), sans nom. Chaque réplique est
 cherchée dans les pages des personnages et des boss de Dark Souls III du wiki darksouls.fandom.com
 (leur texte source, par l'API du wiki) ; chaque bloc prend la page qui cite le plus de ses
-répliques. Dans un bloc mêlé (son gagnant n'a pas plus de la moitié des voix), un sous-bloc qui vote
-pour un autre personnage devient une exception ; ailleurs non, car une page cite souvent les
-répliques des autres qui parlent d'elle.
+répliques. Un bloc mêlé (son gagnant n'a pas plus de la moitié des voix) n'a pas de nom par défaut :
+chacun de ses sous-blocs prend la page qui cite le plus de ses répliques, et un sous-bloc qu'aucune ne
+cite reste sans nom. Ailleurs, pas d'exception : une page cite souvent les répliques des autres qui
+parlent d'elle.
 Quelques noms sont corrigés à la main (RENAME, MANUAL). Écrit speakers.json, relu à la main.
 
 Usage (une fois ; les pages sont téléchargées à part, ce sont des données, pas du code) :
@@ -79,15 +80,15 @@ def speakers(blocks: dict, subs: dict) -> dict:
     out, mixed = {}, set()
     for b, c in sorted(blocks.items()):
         title, score = c.most_common(1)[0]
-        if score >= MIN_VOTES:
-            out[str(b)] = name(title)
         if score <= MIXED * sum(c.values()):
             mixed.add(b)
+        elif score >= MIN_VOTES:
+            out[str(b)] = name(title)
     out.update(MANUAL)
     sub_blocks = {}
     for s, c in sorted(subs.items()):
         title, score = c.most_common(1)[0]
-        if s // 100 in mixed and score >= MIN_SUB_VOTES and name(title) != out.get(str(s // 100)):
+        if s // 100 in mixed and score >= MIN_SUB_VOTES:
             sub_blocks[str(s)] = name(title)
     return {"source": "darksouls.fandom.com, pages des personnages et boss de Dark Souls III, vote par réplique",
             "unknown": UNKNOWN, "blocks": out, "sub_blocks": sub_blocks}

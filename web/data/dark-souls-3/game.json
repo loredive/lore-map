@@ -1,0 +1,33 @@
+{
+ "id": "dark-souls-3",
+ "title": "Dark Souls III",
+ "colors": {
+  "Items": "#d9c48e",
+  "Weapons": "#cf8e66",
+  "Armor": "#9db8a3",
+  "Rings": "#c7a3d1",
+  "Spells": "#7fc0cc",
+  "Dialogue": "#a7b6d6"
+ },
+ "ui": {
+  "tagline": "Every star is a text from Dark Souls III. The more two texts talk about the same things, the closer they sit.",
+  "aria": "Map of Dark Souls III's texts: each star is a text, and texts close together talk about the same things. Arrow keys to move, plus and minus to zoom, Enter to open the targeted star.",
+  "credit": "Dark Souls III texts © FromSoftware / Bandai Namco. Non-commercial fan project.",
+  "alt_label": "French",
+  "alt_lang": "fr",
+  "search_examples": [
+   "who links the fire",
+   "Aldrich"
+  ],
+  "precise": {
+   "phrase": "Lords of Cinder",
+   "both": "Gael + Friede",
+   "exclude": "-Aldrich",
+   "category": "in:rings"
+  },
+  "entity_examples": "Aldrich or Lothric",
+  "empty_hint": "Aldrich, Londor",
+  "dlc_label": "Ashes of Ariandel & The Ringed City"
+ },
+ "tours": false
+}
