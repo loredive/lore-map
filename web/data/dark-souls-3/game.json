@@ -29,6 +29,7 @@
   "empty_hint": "Aldrich, Londor",
   "dlc_label": "Ariandel & Ringed City"
  },
+ "images": "game-files",
  "tours": true,
  "uncertain_speakers": {
   "Unknown NPC": "No source says who speaks these lines.",

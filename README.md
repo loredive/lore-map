@@ -24,7 +24,8 @@ The Elden Ring text comes from [EldenRingTextExplorer](https://github.com/EldenR
 Bloodborne has no public text dump: `games/bloodborne/extract.py` and `icons.py` read your own copy
 of the game, then `prepare.py --game bloodborne` builds the map. Dark Souls III works the same way
 from the Steam copy, once its `msg/` folder is unpacked with UXM: `games/dark-souls-3/extract.py`,
-then `prepare.py --game dark-souls-3`.
+then `prepare.py --game dark-souls-3`, then `games/dark-souls-3/icons.py` for its icons. These read the game's
+encrypted item tables with the key published by the modding community, and Paramdex for their layout.
 
 ## Tests
 

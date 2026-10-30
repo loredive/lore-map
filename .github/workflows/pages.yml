@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v10.3.3    # no moving major tag since v8
       # the tests don't need the embedding model, only these
-      - run: uv run --no-project --with pytest --with numpy --with scikit-learn --with pillow pytest
+      - run: uv run --no-project --with pytest --with numpy --with scikit-learn --with pillow --with cryptography pytest
       - run: node --test tests/*.test.mjs
       - run: uvx ruff@0.17.3 check .
       # the page in a real browser (tests/e2e), so a broken page is never deployed
@@ -64,6 +64,17 @@ jobs:
             mkdir -p web/img/bloodborne && unzip -q -o /tmp/img-bloodborne.zip -d web/img/bloodborne
           else
             echo "No icons release, Bloodborne is deployed without icons"
+          fi
+
+      # Dark Souls III icons also come from the game files, uploaded once to the same release
+      - name: Dark Souls III icons
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release download icons --pattern img-dark-souls-3.zip --dir /tmp; then
+            mkdir -p web/img/dark-souls-3 && unzip -q -o /tmp/img-dark-souls-3.zip -d web/img/dark-souls-3
+          else
+            echo "No Dark Souls III icons in the release, it is deployed without icons"
           fi
 
       - uses: actions/upload-pages-artifact@v5

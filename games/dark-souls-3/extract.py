@@ -10,10 +10,15 @@ prepare.py. Rien n'est écrit dans le dossier du jeu ; le JSON reste hors du dé
 Chaque table y est en trois parts : le jeu de base, <table>_dlc1 (Ashes of Ariandel) et
 <table>_dlc2 (The Ringed City). Un texte d'une part _dlc est marqué « dlc ». Les sorts sont aussi
 des objets : un objet dont la description est celle d'un sort n'est gardé qu'une fois, en sort.
+Les fichiers de texte gardent aussi des textes absents du jeu (anneaux, armures et sorts de Dark Souls 1,
+objets coupés) : seul un texte dont la ligne, dans les tables d'objets du jeu, a une icône est gardé
+(tout objet qu'on peut tenir en a une). Les tables sont dans Data0.bdt, à côté de msg/, chiffré
+(souls_formats.read_regulation) ; la disposition de leurs lignes vient de Paramdex (icons.py --download).
 Les interlocuteurs des dialogues viennent de speakers.json (blocs d'identifiants -> nom).
 
 Usage :
-    uv run python games/dark-souls-3/extract.py \\
+    uv run --with cryptography python games/dark-souls-3/icons.py --download /tmp/paramdex
+    uv run --with cryptography python games/dark-souls-3/extract.py --paramdex /tmp/paramdex \\
         --msg "/mnt/c/Games/Steam/steamapps/common/DARK SOULS III/Game/msg" --out ../dark-souls-3-text/ds3_text.json
 """
 import argparse
@@ -24,7 +29,19 @@ from pathlib import Path
 
 HERE = Path(__file__).parent
 sys.path.insert(0, str(HERE.parent.parent))      # souls_formats.py, à la racine du dépôt
-from souls_formats import dialog, gender_twin, read_bnd4, read_dcx, read_fmg, speaker_for, unwrap  # noqa: E402
+from souls_formats import (  # noqa: E402
+    DS3_LAYOUTS,
+    DS3_REGULATION_KEY,
+    dialog,
+    gender_twin,
+    icon_ids,
+    read_bnd4,
+    read_dcx,
+    read_fmg,
+    read_regulation,
+    speaker_for,
+    unwrap,
+)
 
 LANGS = {"en": "engus", "jp": "jpnjp", "fr": "frafr"}
 ARCHIVES = ("item_dlc2", "menu_dlc2")
@@ -75,9 +92,17 @@ def load_tables(msg: Path) -> tuple[dict[str, dict[str, dict[int, str]]], dict[s
 
 
 # ---------------------------------------------------------------- documents
-def build(tables: dict, dlc: dict[str, set[int]], speakers: dict) -> dict:
+def shown_items(game: Path, paramdex: Path) -> dict[str, set[int]]:
+    """{catégorie: identifiants des objets que le jeu montre}, ceux dont la ligne a une icône."""
+    params = read_regulation((game / "Data0.bdt").read_bytes(), DS3_REGULATION_KEY)
+    layouts = {t: (paramdex / f"{n}.xml").read_text(encoding="utf-8-sig") for t, n in DS3_LAYOUTS.items()}
+    return {cat: {i for i, n in ids.items() if n} for cat, ids in icon_ids(params, layouts).items()}
+
+
+def build(tables: dict, dlc: dict[str, set[int]], speakers: dict, shown: dict[str, set[int]] | None = None) -> dict:
     """Le JSON pour prepare.py, dans la forme du dump d'Elden Ring : {catégorie: {id: {name_en,
-    caption_en, …, dlc?}}, dialog: {…}}."""
+    caption_en, …, dlc?}}, dialog: {…}}. shown (shown_items) : un texte que le jeu ne montre jamais
+    reste dehors."""
     en = tables["en"]
     spells = {t for i, t in en[TABLES[SPELLS][1]].items() if i >= SPELL_FIRST_ID}
     out = {}
@@ -88,6 +113,8 @@ def build(tables: dict, dlc: dict[str, set[int]], speakers: dict) -> dict:
                 continue                  # sans nom : une variante ou un prototype
             if key == SPELLS and i < SPELL_FIRST_ID:
                 continue                  # un ancien sort, jamais en jeu
+            if shown is not None and i not in shown[key]:
+                continue                  # sans ligne ni icône dans les tables du jeu : jamais en jeu
             if en[lore][i].strip() == en[names][i].strip():
                 continue                  # la description n'est que le nom (« No Travel Gear / Head »)
             if key != SPELLS and en[lore][i] in spells:
@@ -106,11 +133,12 @@ def build(tables: dict, dlc: dict[str, set[int]], speakers: dict) -> dict:
 def main():
     p = argparse.ArgumentParser(description=__doc__.split("\n\n")[1])
     p.add_argument("--msg", type=Path, required=True, help="dossier Game/msg/ du jeu, ouvert par UXM")
+    p.add_argument("--paramdex", type=Path, required=True, help="dispositions écrites par icons.py --download")
     p.add_argument("--out", type=Path, required=True)
     a = p.parse_args()
     speakers = json.loads((HERE / "speakers.json").read_text(encoding="utf-8"))
     tables, dlc = load_tables(a.msg)
-    data = build(tables, dlc, speakers)
+    data = build(tables, dlc, speakers, shown_items(a.msg.parent, a.paramdex))
     a.out.parent.mkdir(parents=True, exist_ok=True)
     a.out.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
     for key, recs in data.items():

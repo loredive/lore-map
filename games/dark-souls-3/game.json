@@ -160,6 +160,7 @@
   "min_cluster": 12,
   "min_samples": 4,
   "max_cluster": 80,
+  "images": "game-files",
   "ui": {
     "tagline": "Every star is a text from Dark Souls III. The more two texts talk about the same things, the closer they sit.",
     "aria": "Map of Dark Souls III's texts: each star is a text, and texts close together talk about the same things. Arrow keys to move, plus and minus to zoom, Enter to open the targeted star.",
