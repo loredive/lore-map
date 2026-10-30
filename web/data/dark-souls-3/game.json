@@ -29,5 +29,9 @@
   "empty_hint": "Aldrich, Londor",
   "dlc_label": "Ariandel & Ringed City"
  },
- "tours": true
+ "tours": true,
+ "uncertain_speakers": {
+  "Unknown NPC": "No source says who speaks these lines.",
+  "Darkdiver Grandahl": "Named from what the lines say; no source confirms it."
+ }
 }

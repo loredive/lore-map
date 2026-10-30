@@ -55,5 +55,9 @@
   "26": "Siegward of Catarina",
   "27": "Fire Keeper",
   "31": "Fire Keeper"
+ },
+ "uncertain": {
+  "Unknown NPC": "No source says who speaks these lines.",
+  "Darkdiver Grandahl": "Named from what the lines say; no source confirms it."
  }
 }

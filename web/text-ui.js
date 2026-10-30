@@ -9,7 +9,7 @@ import { S, esc, colorOf, isHidden, docRow, clusterById, portrait, nameOf, textO
 import { setHover } from "./render.js";
 import { registerPage, openPage, describeEntry, reopen } from "./pages.js";
 import { startPath } from "./pathbar.js";
-import { entityChips, bindEntityButtons, linkText, dialogueButtons, bindDialogueButtons, dlcBadge, groupOf, snippet, mark } from "./links.js";
+import { entityChips, bindEntityButtons, linkText, dialogueButtons, bindDialogueButtons, dlcBadge, groupOf, snippet, mark, unsureMark } from "./links.js";
 import { tipAtStar } from "./tip.js";
 
 registerPage({
@@ -97,7 +97,7 @@ function card(d) {
   return `<article class="card">
     <div class="card-head${icon ? " has-img" : ""}">${icon}<div>
     <div class="cat"><span class="dot" style="--c:${colorOf(d.cat)}"></span>${esc(S.cats[d.cat])}${dlcBadge(d)}</div>
-    <h2>${esc(nameOf(d))}</h2>
+    <h2>${esc(nameOf(d))}${d.speaker ? unsureMark(d.speaker) : ""}</h2>
     ${groupLine(d)}
     ${o.name && o.name !== nameOf(d) ? `<p class="jpname" lang="${o.lang}">${esc(o.name)}</p>` : ""}
     ${d.jpName ? `<p class="jpname" lang="ja">${esc(d.jpName)}</p>` : ""}

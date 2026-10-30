@@ -67,6 +67,13 @@ export function speakersFor(e) {
   return [...S.dialogues.keys()].filter(sp => names.some(n => word(n).test(sp)));
 }
 
+// Un interlocuteur que les sources ne confirment pas (game.json : uncertain_speakers, écrit par
+// vote_speakers.py) : un « ? » à côté de son nom, la raison au survol, et dite aux lecteurs d'écran
+export function unsureMark(speaker) {
+  const why = S.uncertainSpeakers[speaker];
+  return why ? ` <span class="unsure" title="${esc(why)}" role="img" aria-label="Uncertain speaker: ${esc(why)}">?</span>` : "";
+}
+
 export function dialogueButtons(speakers, cls = "tdial") {
   return speakers.map(sp => `<button type="button" class="${cls}" data-sp="${esc(sp)}">Read the full dialogue of ${esc(sp)}
     (${S.dialogues.get(sp).length} passages)</button>`).join("");

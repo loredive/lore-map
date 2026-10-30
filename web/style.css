@@ -177,6 +177,12 @@ body {
 }
 
 .count { margin: 0 0 .6rem; color: var(--faint); font-size: .85rem; }
+/* interlocuteur incertain : un « ? » discret à côté du nom, la raison sous le titre du dialogue */
+.unsure {
+  display: inline-grid; place-items: center; width: 1.15em; height: 1.15em; margin-left: .3em; vertical-align: .15em;
+  border: 1px solid var(--rim-strong); border-radius: 50%; color: var(--faint); font: 600 .55em var(--body); cursor: help;
+}
+.unsure-note { margin: 0 0 .6rem; color: var(--faint); font-size: .85rem; font-style: italic; }
 .results { list-style: none; margin: 0; padding: 0; }
 .results button, .echoes button {
   display: block; width: 100%; padding: .55rem .5rem; border: 0; border-radius: 4px;

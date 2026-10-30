@@ -81,6 +81,9 @@ def publish(game: Game) -> None:
     game.data_dir.mkdir(parents=True, exist_ok=True)
     page = {k: game.cfg[k] for k in PAGE_KEYS if k in game.cfg}
     page["tours"] = (game.dir / "tours.json").exists()     # la page ne demande tours.json que s'il existe
+    speakers = game.dir / "speakers.json"                    # interlocuteurs incertains : marqués par la page
+    if speakers.exists() and (unsure := json.loads(speakers.read_text(encoding="utf-8")).get("uncertain")):
+        page["uncertain_speakers"] = unsure
     (game.data_dir / "game.json").write_text(json.dumps(page, ensure_ascii=False, indent=1), encoding="utf-8")
     publish_tours(game)
     ready = [g for g in list_games() if (WEB / "data" / g / "lore.json").exists()]

@@ -25,6 +25,7 @@ export const panel = $("#panel"), listColumn = $("#list-column"), tip = $("#tip"
 
 export const S = {
   game: DEFAULT_GAME, games: [], colors: {}, ui: {},   // jeu affiché, jeux disponibles, game.json
+  uncertainSpeakers: {}, // interlocuteur -> pourquoi son nom n'est pas sûr (game.json)
   docs: [], cats: [], clusters: [], meta: null,
   dpr: 1,
   hover: -1, selected: -1,

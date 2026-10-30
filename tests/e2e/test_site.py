@@ -873,3 +873,24 @@ def test_click_during_intro_opens_the_star(browser, site, game):
     wait_shown(page, ("doc", first))
     assert not intro_active(page)
     assert problems == []
+
+
+# ------------------------------------------------------------------ interlocuteurs incertains
+def test_an_uncertain_speaker_is_marked_with_its_reason(browser, site):
+    page, problems = open_page(browser, f"{site}?game=dark-souls-3#dialogue=Darkdiver%20Grandahl", DESKTOP)
+    wait_shown(page, ("dialogue", "Darkdiver Grandahl ?"))
+    mark = page.get_attribute("#panel h2 .unsure", "title")
+    assert mark == "Named from what the lines say; no source confirms it."
+    assert page.text_content("#panel .unsure-note").strip() == f"Uncertain speaker: {mark}"
+    page.click("#panel .pnum")
+    wait_shown(page, ("doc", "Darkdiver Grandahl — passage 1 ?"))
+    assert page.get_attribute("#panel h2 .unsure", "title") == mark
+    assert problems == []
+
+
+@pytest.mark.parametrize("game, speaker", [("dark-souls-3", "Yuria of Londor"), ("bloodborne", "Gehrman")])
+def test_a_confirmed_speaker_has_no_mark(browser, site, game, speaker):
+    page, problems = open_page(browser, f"{site}?game={game}#dialogue={quote(speaker)}", DESKTOP)
+    wait_shown(page, ("dialogue", speaker))
+    assert page.query_selector("#panel .unsure") is None and page.query_selector("#panel .unsure-note") is None
+    assert problems == []

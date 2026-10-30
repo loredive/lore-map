@@ -95,7 +95,7 @@ def test_each_block_takes_the_page_quoting_most_of_its_lines_and_sub_blocks_can_
             3001800: "Speak with the Fire Keeper, she awaiteth thee.", 3001801: "Speak with the Fire Keeper, she awaiteth thee.",
             29000000: "Me, me, pickle-pee, pump-a-rum.", 29000001: "Me, me, pickle-pee, pump-a-rum.",
             29000002: "Me, me, pickle-pee, pump-a-rum.", 57000000: "Ahh, you ignorant slaves."}
-    blocks, subs = vote.vote(talk, pages)
+    blocks, subs, _hits = vote.vote(talk, pages)
     assert blocks[200]["Fire Keeper (Dark Souls III)"] == 3.5      # une réplique sur deux pages : ½ voix chacune
     data = vote.speakers(blocks, subs)
     assert data["blocks"]["200"] == "Fire Keeper"                    # RENAME
@@ -121,3 +121,23 @@ def test_only_a_true_gendered_twin_is_dropped():
     assert "[200053]" not in info                          # « herself » au lieu de « himself » : la même réplique
     assert "[200055] To the old gods" in info              # +50, mais une autre réplique
     assert "[200057] Ahh, Unkindled One." in info and "dummyText" not in info
+
+
+def test_speakers_with_few_confirmed_lines_are_marked_uncertain():
+    pages = {"Yuria of Londor": "Link the fire, our Lord of Hollows. The Age of Fire was founded by the old gods.",
+             "Slave Knight Gael": "Ashen one, hearest thou my voice, still?"}
+    talk = {4000000: "Link the fire, our Lord of Hollows.", 4000001: "The Age of Fire was founded by the old gods.",
+            4000002: "Hmm...",                                        # trop court : ne compte pas
+            51000000: "Ashen one, hearest thou my voice, still?", 51000001: "A line no page quotes at all.",
+            51000002: "Another line no page quotes at all.",
+            75000000: "Fear not, the dark, my friend.", 27000500: "Another nana disappeared",
+            1000000: "It is called Lothric, where the lands converge."}
+    blocks, subs, hits = vote.vote(talk, pages)
+    data = {"unknown": "Unknown NPC", "sub_blocks": {},
+            "blocks": {"400": "Yuria of Londor", "5100": "Slave Knight Gael", "7500": "Darkdiver Grandahl", "100": "Narrator"}}
+    unsure = vote.uncertain(talk, data, hits)
+    assert "Yuria of Londor" not in unsure                           # 2 répliques sur 2
+    assert unsure["Slave Knight Gael"].startswith("The Dark Souls wiki confirms 1 of 3 lines")
+    assert unsure["Darkdiver Grandahl"] == "Named from what the lines say; no source confirms it."
+    assert unsure["Unknown NPC"] == "No source says who speaks these lines."
+    assert "Narrator" not in unsure                                  # SURE : ses répliques suffisent
