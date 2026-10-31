@@ -5,11 +5,17 @@ import struct
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
-
 from test_bloodborne_extract import make_dcx
 
-from souls_formats import (DS2_REGULATION_KEY, decrypt_ranges, path_hash, read_bhd5_ds2, read_bnd4,
-                           read_regulation_ds2, rsa_public_decrypt)
+from souls_formats import (
+    DS2_REGULATION_KEY,
+    decrypt_ranges,
+    path_hash,
+    read_bhd5_ds2,
+    read_bnd4,
+    read_regulation_ds2,
+    rsa_public_decrypt,
+)
 
 
 def rsa_encrypt_like_the_game(plain: bytes, key) -> tuple[bytes, bytes]:

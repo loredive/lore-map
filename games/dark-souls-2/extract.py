@@ -14,7 +14,8 @@ armures…). Les plages 892 (autre version de quelques armures) et 900 (brouillo
 format « Weapon type: … ») ne sont pas des objets du jeu. Les dialogues des trois DLC (Crown of the
 Sunken King, Old Iron King, Ivory King) viennent des cartes m50_35 à m50_37 : une réplique qui n'est que
 là est marquée DLC. Un objet est du DLC si son nom anglais est dans dlc.json (les pages des trois DLC sur
-le wiki darksouls.fandom.com : les archives ne séparent pas les objets du DLC). Les interlocuteurs viennent de speakers.json (blocs d'identifiants -> nom).
+le wiki darksouls.fandom.com : les archives ne séparent pas les objets du DLC). Les interlocuteurs viennent
+de speakers.json (blocs d'identifiants -> nom).
 Les fichiers de texte gardent aussi des objets coupés (anneaux « Illusory », robe de Rosabeth…) : seul un
 objet dont la ligne, dans ItemParam (Game/enc_regulation.bnd.dcx, chiffré), a une icône est gardé ; l'icône
 est le premier champ de la ligne (disposition ITEM_PARAM de Paramdex, DS2S).
