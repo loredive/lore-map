@@ -56,3 +56,17 @@ def test_junk_entries_are_dropped():
     assert ds2.clean(" no text ") == ""
     assert ds2.clean("none text") == ""
     assert ds2.clean("A murky, forgotten land. ") == "A murky, forgotten land."
+
+
+def test_an_item_without_an_icon_is_never_shown():
+    tables = {"en": lang_tables("A", "Ooh"), "fr": lang_tables("Une", "Oh")}
+    out = ds2.build(tables, set(), SPEAKERS, icons={1000000: 21, 21010100: 0})
+    assert set(out["weapon"]) == {"1000000"}
+    assert out["protector"] == {}                              # icône 0 : un objet coupé
+
+
+def test_an_item_named_in_the_dlc_list_is_marked_dlc():
+    tables = {"en": lang_tables("A", "Ooh"), "fr": lang_tables("Une", "Oh")}
+    out = ds2.build(tables, set(), SPEAKERS, dlc_items={"Pate's Helm"})
+    assert out["protector"]["21010100"]["dlc"] is True
+    assert "dlc" not in out["weapon"]["1000000"]

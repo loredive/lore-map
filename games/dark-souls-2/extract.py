@@ -13,7 +13,11 @@ Les catégories se lisent sur l'identifiant d'un objet (en millions : 1–6 arme
 armures…). Les plages 892 (autre version de quelques armures) et 900 (brouillon des textes d'armes, au
 format « Weapon type: … ») ne sont pas des objets du jeu. Les dialogues des trois DLC (Crown of the
 Sunken King, Old Iron King, Ivory King) viennent des cartes m50_35 à m50_37 : une réplique qui n'est que
-là est marquée DLC. Les interlocuteurs viennent de speakers.json (blocs d'identifiants -> nom).
+là est marquée DLC. Un objet est du DLC si son nom anglais est dans dlc.json (les pages des trois DLC sur
+le wiki darksouls.fandom.com : les archives ne séparent pas les objets du DLC). Les interlocuteurs viennent de speakers.json (blocs d'identifiants -> nom).
+Les fichiers de texte gardent aussi des objets coupés (anneaux « Illusory », robe de Rosabeth…) : seul un
+objet dont la ligne, dans ItemParam (Game/enc_regulation.bnd.dcx, chiffré), a une icône est gardé ; l'icône
+est le premier champ de la ligne (disposition ITEM_PARAM de Paramdex, DS2S).
 
 Usage :
     python games/dark-souls-2/extract.py \\
@@ -22,6 +26,7 @@ Usage :
 """
 import argparse
 import json
+import struct
 import sys
 from collections import Counter
 from pathlib import Path
@@ -31,9 +36,11 @@ sys.path.insert(0, str(HERE.parent.parent))      # souls_formats.py, à la racin
 from souls_formats import (  # noqa: E402
     decrypt_ranges,
     dialog,
+    param_rows,
     path_hash,
     read_bhd5_ds2,
     read_fmg,
+    read_regulation_ds2,
     rsa_public_decrypt,
     speaker_for,
 )
@@ -79,6 +86,12 @@ class Archive:
             return decrypt_ranges(f.read(size), key, ranges)
 
 
+def item_icons(game: Path) -> dict[int, int]:
+    """{identifiant d'objet: icône} lus dans ItemParam ; 0 ou moins : pas d'icône."""
+    item = read_regulation_ds2((game / "enc_regulation.bnd.dcx").read_bytes())["ItemParam.param"]
+    return {rid: struct.unpack_from("<i", item, at)[0] for rid, at in param_rows(item).items()}
+
+
 def clean(text: str) -> str:
     return "" if text.strip().lower() in JUNK else text.strip()
 
@@ -114,17 +127,23 @@ def load_tables(archive: Archive, maps: list[str]) -> tuple[dict, set[int]]:
 
 
 # ---------------------------------------------------------------- documents
-def build(tables: dict, dlc_lines: set[int], speakers: dict) -> dict:
+def build(tables: dict, dlc_lines: set[int], speakers: dict, icons: dict[int, int] | None = None,
+          dlc_items: set[str] = frozenset()) -> dict:
     """Le JSON pour prepare.py, dans la forme du dump d'Elden Ring : {catégorie: {id: {name_en,
-    caption_en, name_fr, caption_fr}}, dialog: {…}}."""
+    caption_en, name_fr, caption_fr}}, dialog: {…}}. icons (item_icons) : un objet sans icône, que le jeu
+    ne montre jamais, reste dehors."""
     en = tables["en"]
     out = {cat: {} for cat in CATEGORIES}
     for i, text in en["lore"].items():
         cat, name = category_of(i), en["names"].get(i, "")
         if cat is None or not name or text == name:
             continue                      # hors des plages du jeu, sans nom, ou rien que le nom
+        if icons is not None and icons.get(i, 0) <= 0:
+            continue                      # sans ligne ni icône dans ItemParam : jamais en jeu
         out[cat][str(i)] = {f"{f}_{lang}": tables[lang][t].get(i, "")
                             for lang in LANGS for f, t in (("name", "names"), ("caption", "lore"))}
+        if name in dlc_items:
+            out[cat][str(i)]["dlc"] = True
     # aucune réplique n'a de variante +50 pour l'autre genre (vérifié sur les fichiers du jeu)
     out["dialog"] = dialog(tables, speakers, lambda table, i: i in dlc_lines, twin=lambda first, other: False)
     return out
@@ -140,7 +159,8 @@ def main():
     archive = Archive(a.game)
     maps = talk_maps(a.dictionary.read_text(encoding="utf-8").splitlines())
     tables, dlc_lines = load_tables(archive, maps)
-    data = build(tables, dlc_lines, speakers)
+    dlc_items = {n for names in json.loads((HERE / "dlc.json").read_text(encoding="utf-8"))["crowns"].values() for n in names}
+    data = build(tables, dlc_lines, speakers, item_icons(a.game), dlc_items)
     a.out.parent.mkdir(parents=True, exist_ok=True)
     a.out.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
     for key, recs in data.items():

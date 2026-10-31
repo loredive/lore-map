@@ -6,7 +6,10 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
 
-from souls_formats import decrypt_ranges, path_hash, read_bhd5_ds2, rsa_public_decrypt
+from test_bloodborne_extract import make_dcx
+
+from souls_formats import (DS2_REGULATION_KEY, decrypt_ranges, path_hash, read_bhd5_ds2, read_bnd4,
+                           read_regulation_ds2, rsa_public_decrypt)
 
 
 def rsa_encrypt_like_the_game(plain: bytes, key) -> tuple[bytes, bytes]:
@@ -64,3 +67,34 @@ def test_only_the_listed_ranges_are_decrypted():
     data = enc.update(plain[:32]) + plain[32:]               # seuls les 32 premiers octets chiffrés
     assert decrypt_ranges(data, key, [(0, 32), (-1, -1)]) == plain
     assert decrypt_ranges(plain, None, []) == plain           # pas de clé : le fichier tel quel
+
+
+def make_bnd4_sjis(files):
+    """BND4 des paramètres de Dark Souls II : entrées de 0x18 octets sans identifiant, noms en Shift-JIS."""
+    names = [f"N:\\FRPG2\\data\\Param\\{n}".encode("shift_jis") + b"\0" for n in files]
+    names_at = 0x40 + 0x18 * len(files)
+    data_at = names_at + sum(map(len, names))
+    head = bytearray(0x40)
+    head[0:4] = b"BND4"
+    struct.pack_into("<i", head, 0x0C, len(files))
+    struct.pack_into("<q", head, 0x20, 0x18)
+    head[0x30] = 0                                           # noms en Shift-JIS
+    entries, at, name_at = bytearray(), data_at, names_at
+    for content, name in zip(files.values(), names):
+        entries += struct.pack("<B3xiqII", 0x40, -1, len(content), at, name_at)
+        at += len(content)
+        name_at += len(name)
+    return bytes(head + entries + b"".join(names) + b"".join(files.values()))
+
+
+def test_regulation_is_aes_ctr_from_byte_32_over_a_bnd4_with_shift_jis_names():
+    bnd = make_dcx(make_bnd4_sjis({"ItemParam.param": b"items", "アイテム.param": b"x"}))
+    head = bytes(range(32))                                  # les 11 premiers octets font le compteur
+    counter = b"\x80" + head[:11] + b"\0\0\0\x01"
+    enc = Cipher(algorithms.AES(DS2_REGULATION_KEY), modes.CTR(counter)).encryptor()
+    raw = head + enc.update(bnd) + enc.finalize()
+    assert read_regulation_ds2(raw) == {"ItemParam.param": b"items", "アイテム.param": b"x"}
+
+
+def test_bnd4_with_shift_jis_names_reads_like_the_others():
+    assert read_bnd4(make_bnd4_sjis({"a.param": b"12", "b.param": b""})) == {"a.param": b"12", "b.param": b""}
