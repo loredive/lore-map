@@ -47,3 +47,12 @@ def test_a_game_without_uncertain_speakers_publishes_none(tmp_path, monkeypatch)
     game = make_game(tmp_path, monkeypatch, ["Saw Cleaver"])
     games.publish(game)
     assert "uncertain_speakers" not in json.loads((game.data_dir / "game.json").read_text())
+
+
+def test_the_game_list_names_each_game_s_languages(tmp_path, monkeypatch):
+    game = make_game(tmp_path, monkeypatch, ["Saw Cleaver"])
+    cfg = {"id": "g", "title": "G", "categories": {}, "dialog_label": "", "alt_lang": "fr"}
+    (game.dir / "game.json").write_text(json.dumps(cfg))
+    games.publish(game)
+    listing = json.loads((tmp_path / "web" / "data" / "games.json").read_text())
+    assert listing == [{"id": "g", "title": "G", "langs": ["en", "fr"]}]

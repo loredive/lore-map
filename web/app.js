@@ -88,14 +88,18 @@ async function chooseGame() {
   }
 }
 
-// « Elden Ring · Bloodborne » sous le titre : un lien par jeu, le jeu affiché marqué
+// « Elden Ring · Bloodborne » sous le titre : un lien par jeu, le jeu affiché marqué ; ses langues au survol
+const LANG_NAMES = { en: "English", fr: "French", ja: "Japanese", de: "German", es: "Spanish", it: "Italian" };
 function buildGameSwitch() {
   const nav = document.createElement("nav");
   nav.className = "games";
   nav.setAttribute("aria-label", "Choose the game");
-  nav.innerHTML = S.games.map(g => g.id === S.game
-    ? `<a aria-current="page">${esc(g.title)}</a>`
-    : `<a href="?game=${encodeURIComponent(g.id)}">${esc(g.title)}</a>`).join('<span class="sep" aria-hidden="true">·</span>');
+  nav.innerHTML = S.games.map(g => {
+    const langs = g.langs || ["en"];
+    const title = `title="Texts in ${esc(langs.map(l => LANG_NAMES[l] || l).join(" and "))}${langs.length > 1 ? "" : " only"}"`;
+    return g.id === S.game ? `<a aria-current="page" ${title}>${esc(g.title)}</a>`
+      : `<a href="?game=${encodeURIComponent(g.id)}" ${title}>${esc(g.title)}</a>`;
+  }).join('<span class="sep" aria-hidden="true">·</span>');
   $(".drawer").prepend(nav);
 }
 
@@ -351,7 +355,15 @@ const NATIVE = { fr: "Français", ja: "日本語", de: "Deutsch", es: "Español"
 const langKey = () => `lore-map:lang:${S.game}`;
 function buildLangSwitch() {
   const box = $("#lang");
-  if (!S.ui.alt_lang || !S.docs.some(d => d.alt)) return;
+  if (!S.ui.alt_lang || !S.docs.some(d => d.alt)) {
+    // pas de seconde langue : le dire là où les autres jeux ont leur bouton (Elden Ring : anglais seulement)
+    if (S.games.some(g => g.langs?.length > 1)) {
+      box.innerHTML = `<span class="only" title="This game's texts are only available in English">English only</span>`;
+      box.removeAttribute("role");
+      box.hidden = false;
+    }
+    return;
+  }
   try { S.altLang = localStorage.getItem(langKey()) === "alt"; } catch { /* stockage bloqué */ }
   const label = NATIVE[S.ui.alt_lang] || S.ui.alt_label;
   box.innerHTML = `<button type="button" data-alt="0" lang="en">English</button><button type="button" data-alt="1" lang="${esc(S.ui.alt_lang)}">${esc(label)}</button>`;

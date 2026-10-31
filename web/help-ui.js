@@ -26,6 +26,9 @@ registerPage({
       <li><strong>Trace a path</strong> between two texts, from echo to echo, starting from any text.</li>
       <li><strong>By meaning / by category</strong>, in the top bar: texts placed by what they talk about, or sorted into columns by category.</li>
       <li><strong>Categories</strong>, in the top bar: click one to hide or show its texts.</li>
+      <li><strong>Languages</strong>: ${ui.alt_lang && S.docs.some(d => d.alt)
+        ? `the texts are in English and ${esc(ui.alt_label || ui.alt_lang)}; switch in the top bar.`
+        : `the texts of ${esc(S.games.find(g => g.id === S.game)?.title || "this game")} are in English only.`}</li>
       <li><strong>Back</strong> (or the browser's Back button) returns to the previous page; Escape closes.</li>
       <li>By touch: tapping a crowded spot zooms in, then lists the texts there.</li>
       <li>By keyboard: Tab to the map, arrow keys to move, + and − to zoom, Enter to open the targeted star.</li>

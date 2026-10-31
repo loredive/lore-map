@@ -88,7 +88,8 @@ def publish(game: Game) -> None:
     publish_tours(game)
     ready = [g for g in list_games() if (WEB / "data" / g / "lore.json").exists()]
     ready.sort(key=lambda g: g != FIRST)            # le premier jeu de la page d'abord, puis les autres
-    listing = [{"id": g, "title": load_game(g).title} for g in ready]
+    listing = [{"id": g.id, "title": g.title, "langs": [g.text_lang] + ([g.alt_lang] if g.alt_lang else [])}
+               for g in map(load_game, ready)]          # langs : les langues des textes, pour le sélecteur
     (WEB / "data" / "games.json").write_text(json.dumps(listing, ensure_ascii=False), encoding="utf-8")
 
 

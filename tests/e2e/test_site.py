@@ -592,6 +592,16 @@ def test_tracing_a_path_from_a_text(browser, site, game):
     assert problems == []
 
 
+def test_a_game_without_french_says_english_only(browser, site):
+    page, problems = open_page(browser, f"{site}?game=elden-ring", DESKTOP)
+    assert page.text_content("#lang").strip() == "English only"
+    assert page.get_attribute(".games a[aria-current]", "title") == "Texts in English only"
+    assert page.get_attribute(".games a[href='?game=bloodborne']", "title") == "Texts in English and French"
+    page.click("#help")
+    assert "in English only" in page.text_content("#panel")
+    assert problems == []
+
+
 @pytest.mark.parametrize("game", GAMES)
 def test_each_step_of_a_path_says_what_links_it(browser, site, game):
     _, address, view, title = ADDRESSES[game][4]

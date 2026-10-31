@@ -547,3 +547,4 @@ body.sky-d[data-game]::after {
 }
 @keyframes mode-pulse { 50% { opacity: .25; } }
 @media (prefers-reduced-motion: reduce) { #mode.loading::before { animation: none; } }
+.lang .only { padding: .2rem .7rem; color: var(--dim); font-size: .85rem; font-style: italic; }
