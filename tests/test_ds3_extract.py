@@ -2,8 +2,9 @@
 jeu (item_dlc2 et menu_dlc2 par langue ; chaque table en trois parts : jeu de base, _dlc1, _dlc2)."""
 from test_bloodborne_extract import make_bnd4, make_dcx, make_fmg
 
+from lore_map import speakers as vote
 from lore_map.sources.dark_souls_3 import extract as ds3
-from lore_map.sources.dark_souls_3 import vote_speakers as vote
+from lore_map.sources.dark_souls_3.speakers import RULES
 
 SPEAKERS = {"blocks": {"20": "Fire Keeper"}, "sub_blocks": {}, "unknown": "Unknown NPC"}
 
@@ -87,7 +88,7 @@ def test_each_block_takes_the_page_quoting_most_of_its_lines_and_sub_blocks_can_
             29000002: "Me, me, pickle-pee, pump-a-rum.", 57000000: "Ahh, you ignorant slaves."}
     blocks, subs, _hits = vote.vote(talk, pages)
     assert blocks[200]["Fire Keeper (Dark Souls III)"] == 3.5      # une réplique sur deux pages : ½ voix chacune
-    data = vote.speakers(blocks, subs)
+    data = vote.speakers(blocks, subs, RULES)
     assert data["blocks"]["200"] == "Fire Keeper"                    # RENAME
     assert data["blocks"]["2900"] == "Pickle Pee, Pump-a-Rum Crow"
     assert data["blocks"]["7500"] == "Darkdiver Grandahl"            # MANUAL
@@ -125,7 +126,7 @@ def test_speakers_with_few_confirmed_lines_are_marked_uncertain():
     blocks, subs, hits = vote.vote(talk, pages)
     data = {"unknown": "Unknown NPC", "sub_blocks": {},
             "blocks": {"400": "Yuria of Londor", "5100": "Slave Knight Gael", "7500": "Darkdiver Grandahl", "100": "Narrator"}}
-    unsure = vote.uncertain(talk, data, hits)
+    unsure = vote.uncertain(talk, data, hits, RULES)
     assert "Yuria of Londor" not in unsure                           # 2 répliques sur 2
     assert unsure["Slave Knight Gael"].startswith("The Dark Souls wiki confirms 1 of 3 lines")
     assert unsure["Darkdiver Grandahl"] == "Named from what the lines say; no source confirms it."
