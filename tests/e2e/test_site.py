@@ -51,10 +51,23 @@ def browser():
         b.close()
 
 
+# les contextes ouverts par open_page, fermés à la fin de chaque test : laissés ouverts, ils s'accumulent
+# dans le navigateur (un par test et par jeu) jusqu'à épuiser la mémoire de la machine de la CI
+_contexts = []
+
+
+@pytest.fixture(autouse=True)
+def close_contexts():
+    yield
+    while _contexts:
+        _contexts.pop().close()
+
+
 def open_page(browser, url, device, slow_data=False):
     """La page chargée, avec la liste de ce qui a mal tourné : erreurs JavaScript, ressources refusées par
     la politique de sécurité, requêtes en échec (sauf les icônes, absentes avant le déploiement)."""
     context = browser.new_context(**device)
+    _contexts.append(context)
     page = context.new_page()
     problems = []
     page.on("pageerror", lambda e: problems.append(f"page error: {e}"))
