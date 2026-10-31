@@ -77,6 +77,17 @@ jobs:
             echo "No Dark Souls III icons in the release, it is deployed without icons"
           fi
 
+      # Dark Souls II icons: one texture per item in the game files, uploaded once to the same release
+      - name: Dark Souls II icons
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release download icons --pattern img-dark-souls-2.zip --dir /tmp; then
+            mkdir -p web/img/dark-souls-2 && unzip -q -o /tmp/img-dark-souls-2.zip -d web/img/dark-souls-2
+          else
+            echo "No Dark Souls II icons in the release, it is deployed without icons"
+          fi
+
       # Dark Souls icons too: cut from the game's menu sheets, uploaded once to the same release
       - name: Dark Souls icons
         env:

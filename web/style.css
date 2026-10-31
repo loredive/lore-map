@@ -75,8 +75,8 @@ body {
 .menu-btn[aria-expanded="true"] { border-color: var(--grace); color: var(--grace); }
 .tools { order: 5; flex-basis: 100%; display: flex; align-items: center; justify-content: space-between; gap: 1.4rem; min-width: 0; }
 
-/* écran moyen : la première ligne se resserre pour tenir sur une ligne */
-@media (min-width: 761px) and (max-width: 1180px) {
+/* écran moyen : la première ligne se resserre pour tenir sur une ligne (cinq jeux dans le sélecteur) */
+@media (min-width: 761px) and (max-width: 1359px) {
   .topbar { gap: .5rem 1rem; }
   .seek { flex-basis: 180px; }
   .nav-btn { padding: .35rem .5rem; }
