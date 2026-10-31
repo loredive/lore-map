@@ -434,7 +434,8 @@ ol.script .text { margin: 0; white-space: pre-line; line-height: 1.6; }
 /* ---------- atmosphère (style d) : sous les étoiles, un calque fixe propre à chaque jeu ---------- */
 /* vignette et grain communs ; sous la barre du haut, un paysage par jeu (bg/<jeu>.webp) :
    Elden Ring : l'Arbre-Monde au-dessus des ruines ; Bloodborne : Yharnam sous la lune ;
-   Dark Souls : le lac de cendre et ses arbres-archons ; Dark Souls III : une terre de cendre sous l'éclipse */
+   Dark Souls : le lac de cendre et ses arbres-archons ;
+   Dark Souls II : une mer sombre entre des tours en ruine ; Dark Souls III : une terre de cendre sous l'éclipse */
 body.sky-d::before {
   content: ""; position: fixed; inset: 0; pointer-events: none;
   background:
@@ -452,6 +453,10 @@ body.sky-d[data-game="bloodborne"] {
 body.sky-d[data-game="dark-souls-1"] {
   background: #0a0d14; --fog: #7a7f8c; --fog-veil: #0b0e15;
   --bg: url("bg/dark-souls-1.webp"); --bg-at: 50% 100%; --bg-at-narrow: 12% 100%;
+}
+body.sky-d[data-game="dark-souls-2"] {
+  background: #070a12; --fog: #6f7b90; --fog-veil: #080b14;
+  --bg: url("bg/dark-souls-2.webp"); --bg-at: 50% 100%; --bg-at-narrow: 10% 100%;
 }
 body.sky-d[data-game="dark-souls-3"] {
   background: #0b0a0c; --fog: #7d7670; --fog-veil: #0e0d10;
