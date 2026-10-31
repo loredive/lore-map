@@ -541,3 +541,9 @@ body.sky-d[data-game]::after {
 @keyframes welcome-in { from { opacity: 0; transform: translateY(6px); } }
 @media (prefers-reduced-motion: reduce) { .welcome { animation: none; } }
 @media (max-width: 760px) { .welcome { left: 16px; bottom: 60px; } }
+#mode.loading::before {
+  content: ""; display: inline-block; width: .45rem; height: .45rem; margin-right: .45rem; border-radius: 50%;
+  background: var(--grace); vertical-align: .1rem; animation: mode-pulse 1.2s ease-in-out infinite;
+}
+@keyframes mode-pulse { 50% { opacity: .25; } }
+@media (prefers-reduced-motion: reduce) { #mode.loading::before { animation: none; } }
