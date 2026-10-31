@@ -98,6 +98,50 @@ def read_bhd5(b: bytes) -> dict[int, tuple[int, int]]:
     return out
 
 
+def rsa_public_decrypt(raw: bytes, pem: bytes) -> bytes:
+    """Index chiffré de Dark Souls II (GameDataEbl.bhd) : RSA « nu » avec la clé publique livrée à côté
+    (GameDataKeyCode.pem), par blocs de la taille de la clé ; chaque bloc rend un octet de moins."""
+    from cryptography.hazmat.primitives.serialization import load_pem_public_key
+    key = load_pem_public_key(pem).public_numbers()
+    k = (key.n.bit_length() + 7) // 8
+    return b"".join(pow(int.from_bytes(raw[i:i + k], "big"), key.e, key.n).to_bytes(k, "big")[1:]
+                    for i in range(0, len(raw), k))
+
+
+def read_bhd5_ds2(b: bytes) -> dict[int, tuple[int, int, bytes | None, list[tuple[int, int]]]]:
+    """Index BHD5 de Dark Souls II, déchiffré : {hash du chemin: (taille, position, clé AES ou None,
+    plages chiffrées)}. Entrées de 32 octets : hash, taille, position, SHA, clé AES (positions sur 64 bits)."""
+    if b[:4] != b"BHD5":
+        raise ValueError("BHD5 attendu")
+    buckets, at = struct.unpack_from("<ii", b, 0x10)
+    out = {}
+    for k in range(buckets):
+        count, entries_at = struct.unpack_from("<ii", b, at + 8 * k)
+        for j in range(count):
+            h, size, offset, _sha, aes_at = struct.unpack_from("<Iiqqq", b, entries_at + 32 * j)
+            key, ranges = None, []
+            if aes_at:
+                key = b[aes_at:aes_at + 16]
+                n, = struct.unpack_from("<i", b, aes_at + 16)
+                ranges = [struct.unpack_from("<qq", b, aes_at + 20 + 16 * r) for r in range(n)]
+            out[h] = (size, offset, key, ranges)
+    return out
+
+
+def decrypt_ranges(data: bytes, key: bytes | None, ranges: list[tuple[int, int]]) -> bytes:
+    """Un fichier d'une archive de Dark Souls II : seules les plages listées sont chiffrées (AES-128-ECB) ;
+    une plage (-1, -1) n'est pas chiffrée."""
+    if key is None:
+        return data
+    from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+    out = bytearray(data)
+    dec = Cipher(algorithms.AES(key), modes.ECB()).decryptor()
+    for start, end in ranges:
+        if start != -1 and end > start:
+            out[start:end] = dec.update(data[start:end])
+    return bytes(out)
+
+
 def read_fmg(b: bytes) -> dict[int, str]:
     """FMG v2, ou v1 (Dark Souls : positions sur 32 bits) : {identifiant: texte} ; les entrées vides sont omises."""
     v1 = b[2] == 1
