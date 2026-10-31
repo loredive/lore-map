@@ -592,6 +592,27 @@ def test_tracing_a_path_from_a_text(browser, site, game):
     assert problems == []
 
 
+def test_a_game_without_french_says_english_only(browser, site):
+    page, problems = open_page(browser, f"{site}?game=elden-ring", DESKTOP)
+    assert page.text_content("#lang").strip() == "English only"
+    assert page.get_attribute(".games a[aria-current]", "title") == "Texts in English only"
+    assert page.get_attribute(".games a[href='?game=bloodborne']", "title") == "Texts in English and French"
+    page.click("#help")
+    assert "in English only" in page.text_content("#panel")
+    assert problems == []
+
+
+@pytest.mark.parametrize("game", GAMES)
+def test_each_step_of_a_path_says_what_links_it(browser, site, game):
+    _, address, view, title = ADDRESSES[game][4]
+    page, problems = open_page(browser, f"{site}?game={game}{address}", DESKTOP)
+    steps = page.locator("#panel .results.path > li").count()
+    whys = page.locator("#panel .results.path .why").all_inner_texts()
+    assert len(whys) == steps - 1
+    assert all("echo" in w for w in whys)
+    assert problems == []
+
+
 # ------------------------------------------------------------------ réaffichage sur place
 # Changer de langue ou masquer une catégorie réaffiche la page ouverte telle quelle : ni caméra qui
 # bouge, ni focus clavier déplacé, ni entrée d'historique, ni défilement perdu.
@@ -892,6 +913,28 @@ def test_intro_plays_on_a_plain_load(browser, site, game):
     assert intro_active(page)                          # open_page attend 500 ms, l'ouverture en dure 7000
     page.mouse.click(100, 400)
     assert not intro_active(page)
+    assert problems == []
+
+
+@pytest.mark.parametrize("device", [DESKTOP, PHONE], ids=["desktop", "phone"])
+def test_first_visit_welcome_shows_once(browser, site, device):
+    page, problems = open_page(browser, f"{site}?game=bloodborne", device)
+    assert page.is_visible("#welcome")
+    page.click("#welcome .close")
+    assert page.is_hidden("#welcome")
+    page.reload()
+    page.wait_for_function("() => document.querySelector('#status').textContent === ''", timeout=20000)
+    assert page.is_hidden("#welcome")
+    assert problems == []
+
+
+def test_first_visit_welcome_leads_to_the_tours_and_closes_on_a_page(browser, site):
+    page, problems = open_page(browser, f"{site}?game=bloodborne", DESKTOP)
+    page.click("#welcome [data-go=tours]")
+    wait_shown(page, ("tours", "Guided tours"))
+    assert page.is_hidden("#welcome")
+    page, _ = open_page(browser, f"{site}?game=elden-ring{ADDRESSES['elden-ring'][0][1]}", DESKTOP)
+    assert page.is_hidden("#welcome")                     # un lien vers une page : pas d'accueil
     assert problems == []
 
 

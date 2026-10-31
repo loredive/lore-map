@@ -164,19 +164,41 @@ function showRefined(ranked, q) {
   if (found) announce(`${found} texts found`);       // comme la première liste
 }
 
-export async function embedQuery(q) {
-  try {
-    if (!S.extractor) {
-      S.semanticState = "loading";
-      mode.textContent = "Loading the meaning-search model (only once, ~120 MB)…";
+// Le modèle du sens, chargé une seule fois même si plusieurs recherches l'attendent. Pendant le
+// téléchargement, la ligne sous la recherche en donne l'avancement (les fichiers du modèle réunis) ;
+// le pourcentage est caché aux lecteurs d'écran, qui n'entendent que le début et la fin.
+let modelLoad = null;
+const BIG_FILE = 1e6;   // octets : seuls les gros fichiers du modèle comptent dans le pourcentage
+function loadModel() {
+  return modelLoad ||= (async () => {
+    S.semanticState = "loading";
+    mode.classList.add("loading");
+    mode.innerHTML = `Loading meaning search (only once, ~120 MB)<span class="pct" aria-hidden="true"></span>. Keyword results meanwhile.`;
+    const pct = mode.querySelector(".pct"), files = new Map();
+    const progress = e => {
+      if (e.status !== "progress" || !(e.total > BIG_FILE)) return;   // les petits fichiers d'abord : « 100 % » trompeur
+      files.set(e.file, [e.loaded, e.total]);
+      let loaded = 0, total = 0;
+      for (const [l, t] of files.values()) { loaded += l; total += t; }
+      pct.textContent = `: ${Math.floor(100 * loaded / total)}%`;
+    };
+    try {
       const [{ pipeline }, buf] = await Promise.all([
         import(TRANSFORMERS_URL),
         fetch(dataPath("emb.bin")).then(r => r.arrayBuffer()),
       ]);
       S.emb = new Int8Array(buf);
-      S.extractor = await pipeline("feature-extraction", S.meta.model);
+      S.extractor = await pipeline("feature-extraction", S.meta.model, { progress_callback: progress });
       S.semanticState = "ready";
+    } finally {
+      mode.classList.remove("loading");
     }
+  })();
+}
+
+export async function embedQuery(q) {
+  try {
+    if (!S.extractor) await loadModel();
     const out = await S.extractor(S.meta.queryPrefix + q, { pooling: "mean", normalize: true });
     return out.data;
   } catch (err) {
