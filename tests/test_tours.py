@@ -2,8 +2,8 @@ import json
 
 import pytest
 
-import games
-from lore_format import write_lore
+from lore_map import games
+from lore_map.lore_format import write_lore
 
 
 def make_game(tmp_path, monkeypatch, steps):

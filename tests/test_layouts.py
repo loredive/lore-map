@@ -1,6 +1,6 @@
 import numpy as np
 
-from layouts import cohesion
+from lore_map.layouts import cohesion
 
 
 def test_cohesion_is_high_for_a_compact_group_and_low_for_a_scattered_one():

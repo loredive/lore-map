@@ -1,6 +1,6 @@
 // Évaluation de la recherche de la page : pour chaque requête de queries.json, rang du premier
 // texte attendu par mots-clés, par sens et après fusion, puis taux de réussite et MRR par lot.
-// Usage : node eval/search_eval.mjs [jeu]   (après uv run python eval/embed_queries.py ; jeu : elden-ring)
+// Usage : node eval/search_eval.mjs [jeu]   (après uv run python -m eval.embed_queries ; jeu : elden-ring)
 // Les requêtes sont dans games/<jeu>/eval/, les textes dans web/data/<jeu>/.
 // Aussi lancée par node --test (tests/search_eval.test.mjs).
 import { readFileSync } from "node:fs";

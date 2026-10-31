@@ -22,15 +22,13 @@ from pathlib import Path
 
 HERE = Path(__file__).parent
 sys.path.insert(0, str(HERE.parent.parent))      # souls_formats.py, à la racine du dépôt
-from souls_formats import (  # noqa: E402,F401  (read_* : aussi importés par icons.py et les tests)
+from lore_map.formats.archives import read_bnd4, read_dcx  # noqa: E402,F401  (read_* : aussi importés par icons.py et les tests)
+from lore_map.formats.dialog import (  # noqa: E402,F401  (read_* : aussi importés par icons.py et les tests)
     dialog,
     drop_repeated_runs,
-    read_bnd4,
-    read_dcx,
-    read_fmg,
     speaker_for,
-    unwrap,
 )
+from lore_map.formats.fmg import read_fmg, unwrap  # noqa: E402,F401  (read_* : aussi importés par icons.py et les tests)
 
 LANGS = {"en": "engus", "jp": "jpnjp", "fr": "frafr"}
 PLACEHOLDERS = {"", "*"}

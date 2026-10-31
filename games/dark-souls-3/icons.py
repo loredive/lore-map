@@ -28,7 +28,8 @@ from PIL import Image
 HERE = Path(__file__).parent
 ROOT = HERE.parent.parent
 sys.path.insert(0, str(ROOT))                    # souls_formats.py, à la racine du dépôt
-from souls_formats import DS3_ITEMS, DS3_LAYOUTS, DS3_REGULATION_KEY, icon_ids, read_dcx, read_regulation  # noqa: E402
+from lore_map.formats.archives import read_dcx  # noqa: E402
+from lore_map.formats.params import DS3_ITEMS, DS3_LAYOUTS, DS3_REGULATION_KEY, icon_ids, read_regulation  # noqa: E402
 
 DATA, IMG = ROOT / "web" / "data" / "dark-souls-3", ROOT / "web" / "img" / "dark-souls-3"
 LANG = json.loads((HERE / "game.json").read_text(encoding="utf-8"))["text_lang"]   # langue des noms sur la carte

@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from lore_format import read_lore, write_lore
+from lore_map.lore_format import read_lore, write_lore
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
 

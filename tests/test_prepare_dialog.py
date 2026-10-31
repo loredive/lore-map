@@ -1,7 +1,7 @@
 """Découpe des dialogues en passages (prepare.dialog_docs)."""
 from types import SimpleNamespace
 
-from prepare import dialog_docs
+from lore_map.prepare import dialog_docs
 
 GAME = SimpleNamespace(speaker_names={}, text_lang="en", alt_lang=None, junk=(), min_chars=1,
                        dialog_label="Dialogue")

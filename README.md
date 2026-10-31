@@ -16,8 +16,8 @@ The generated data is in `web/data/`. Icons are not versioned, and the page work
 
 ```bash
 uv sync
-uv run python prepare.py --source ../EldenRingTextExplorer/elden_ring_text.json
-uv run python images.py              # Elden Ring icons, from the Elden Ring Fan API
+uv run python -m lore_map.prepare --source ../EldenRingTextExplorer/elden_ring_text.json
+uv run python -m lore_map.images     # Elden Ring icons, from the Elden Ring Fan API
 ```
 
 The Elden Ring text comes from [EldenRingTextExplorer](https://github.com/EldenRingExplorer/EldenRingTextExplorer).

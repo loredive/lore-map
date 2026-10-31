@@ -4,7 +4,7 @@ Textes de Dark Souls III : extraits des archives de messages du jeu (copie Steam
 Les archives du PC sont chiffrées : le joueur les ouvre une fois avec UXM Selective Unpacker
 (« Unpack », sans « Patch »), qui écrit Game/msg/<langue>/ à côté du jeu. On y lit
 item_dlc2.msgbnd.dcx et menu_dlc2.msgbnd.dcx (le jeu entier, DLC compris ; même format que
-Bloodborne, souls_formats.py) en anglais, japonais et français, et on écrit le JSON que lit
+Bloodborne, lore_map/formats/) en anglais, japonais et français, et on écrit le JSON que lit
 prepare.py. Rien n'est écrit dans le dossier du jeu ; le JSON reste hors du dépôt.
 
 Chaque table y est en trois parts : le jeu de base, <table>_dlc1 (Ashes of Ariandel) et
@@ -13,7 +13,7 @@ des objets : un objet dont la description est celle d'un sort n'est gardé qu'un
 Les fichiers de texte gardent aussi des textes absents du jeu (anneaux, armures et sorts de Dark Souls 1,
 objets coupés) : seul un texte dont la ligne, dans les tables d'objets du jeu, a une icône est gardé
 (tout objet qu'on peut tenir en a une). Les tables sont dans Data0.bdt, à côté de msg/, chiffré
-(souls_formats.read_regulation) ; la disposition de leurs lignes vient de Paramdex (icons.py --download).
+(formats.params.read_regulation) ; la disposition de leurs lignes vient de Paramdex (icons.py --download).
 Les interlocuteurs des dialogues viennent de speakers.json (blocs d'identifiants -> nom).
 
 Usage :
@@ -29,19 +29,10 @@ from pathlib import Path
 
 HERE = Path(__file__).parent
 sys.path.insert(0, str(HERE.parent.parent))      # souls_formats.py, à la racine du dépôt
-from souls_formats import (  # noqa: E402
-    DS3_LAYOUTS,
-    DS3_REGULATION_KEY,
-    dialog,
-    gender_twin,
-    icon_ids,
-    read_bnd4,
-    read_dcx,
-    read_fmg,
-    read_regulation,
-    speaker_for,
-    unwrap,
-)
+from lore_map.formats.archives import read_bnd4, read_dcx  # noqa: E402
+from lore_map.formats.dialog import dialog, gender_twin, speaker_for  # noqa: E402
+from lore_map.formats.fmg import read_fmg, unwrap  # noqa: E402
+from lore_map.formats.params import DS3_LAYOUTS, DS3_REGULATION_KEY, icon_ids, read_regulation  # noqa: E402
 
 LANGS = {"en": "engus", "jp": "jpnjp", "fr": "frafr"}
 ARCHIVES = ("item_dlc2", "menu_dlc2")

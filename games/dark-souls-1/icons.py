@@ -28,7 +28,8 @@ from pathlib import Path
 HERE = Path(__file__).parent
 ROOT = HERE.parent.parent
 sys.path.insert(0, str(ROOT))                    # souls_formats.py, à la racine du dépôt
-from souls_formats import DS1_ITEMS, DS1_LAYOUTS, icon_ids, param_rows_32, read_bnd3, read_dcx  # noqa: E402
+from lore_map.formats.archives import read_bnd3, read_dcx  # noqa: E402
+from lore_map.formats.params import DS1_ITEMS, DS1_LAYOUTS, icon_ids, param_rows_32  # noqa: E402
 
 DATA, IMG = ROOT / "web" / "data" / "dark-souls-1", ROOT / "web" / "img" / "dark-souls-1"
 LANG = json.loads((HERE / "game.json").read_text(encoding="utf-8"))["text_lang"]   # langue des noms sur la carte

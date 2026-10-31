@@ -29,7 +29,7 @@ from pathlib import Path
 
 HERE = Path(__file__).parent
 sys.path.insert(0, str(HERE.parent.parent))      # souls_formats.py, à la racine du dépôt
-from souls_formats import speaker_for  # noqa: E402
+from lore_map.formats.dialog import speaker_for  # noqa: E402
 
 API = "https://darksouls.fandom.com/api.php?"
 CATEGORIES = ("Dark_Souls_II:_Characters", "Dark_Souls_II:_Merchants", "Dark_Souls_II:_Bosses")

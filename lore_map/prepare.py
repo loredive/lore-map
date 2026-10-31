@@ -11,7 +11,7 @@ les données vont dans web/data/<id>/.
 Usage (chez toi) :
     uv sync
     git clone https://github.com/EldenRingExplorer/EldenRingTextExplorer
-    uv run python prepare.py --source EldenRingTextExplorer/elden_ring_text.json   # --game elden-ring
+    uv run python -m lore_map.prepare --source EldenRingTextExplorer/elden_ring_text.json   # --game elden-ring
 
 Options utiles :
     --embedder tfidf      sans réseau ni GPU (pas de recherche sémantique dans la page)
@@ -24,11 +24,11 @@ from pathlib import Path
 
 import numpy as np
 
-import layouts
-from entities import KINDS, candidate_names, load_entities, rank_mentions, related_entities
-from games import DEFAULT, list_games, load_game, publish
-from labels import load_titles, match_titles, save_titles
-from lore_format import write_lore
+from lore_map import layouts
+from lore_map.entities import KINDS, candidate_names, load_entities, rank_mentions, related_entities
+from lore_map.games import DEFAULT, list_games, load_game, publish
+from lore_map.labels import load_titles, match_titles, save_titles
+from lore_map.lore_format import write_lore
 
 MODEL_NAME = "intfloat/multilingual-e5-small"      # mêmes poids que Xenova/multilingual-e5-small (navigateur)
 BROWSER_MODEL = "Xenova/multilingual-e5-small"

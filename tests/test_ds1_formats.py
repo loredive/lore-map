@@ -4,7 +4,9 @@ import struct
 
 from test_bloodborne_extract import make_dcx
 
-from souls_formats import icon_ids, param_rows_32, path_hash, read_bhd5, read_bnd3, read_dcx, read_fmg
+from lore_map.formats.archives import path_hash, read_bhd5, read_bnd3, read_dcx
+from lore_map.formats.fmg import read_fmg
+from lore_map.formats.params import icon_ids, param_rows_32
 
 
 def make_fmg1(entries):

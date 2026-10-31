@@ -2,7 +2,7 @@
 Textes de Dark Souls (Prepare to Die Edition) : lus dans les archives du jeu (copie Steam du joueur).
 
 Les archives DATA/dvdbnd<n>.bdt ne sont pas chiffrées : leur index dvdbnd<n>.bhd5 liste chaque
-fichier par le hash de son chemin (souls_formats.read_bhd5), et on y lit /msg/<LANGUE>/item.msgbnd.dcx
+fichier par le hash de son chemin (formats.archives.read_bhd5), et on y lit /msg/<LANGUE>/item.msgbnd.dcx
 et menu.msgbnd.dcx (DCX -> BND3 -> FMG v1) en anglais, japonais et français, sans rien décompresser
 sur le disque. On écrit le JSON que lit prepare.py ; rien n'est écrit dans le dossier du jeu, et le JSON
 reste hors du dépôt.
@@ -32,21 +32,10 @@ from pathlib import Path
 
 HERE = Path(__file__).parent
 sys.path.insert(0, str(HERE.parent.parent))      # souls_formats.py, à la racine du dépôt
-from souls_formats import (  # noqa: E402
-    DS1_ITEMS,
-    DS1_LAYOUTS,
-    dialog,
-    gender_twin,
-    icon_ids,
-    param_rows_32,
-    path_hash,
-    read_bhd5,
-    read_bnd3,
-    read_dcx,
-    read_fmg,
-    speaker_for,
-    unwrap,
-)
+from lore_map.formats.archives import path_hash, read_bhd5, read_bnd3, read_dcx  # noqa: E402
+from lore_map.formats.dialog import dialog, gender_twin, speaker_for  # noqa: E402
+from lore_map.formats.fmg import read_fmg, unwrap  # noqa: E402
+from lore_map.formats.params import DS1_ITEMS, DS1_LAYOUTS, icon_ids, param_rows_32  # noqa: E402
 
 LANGS = {"en": "ENGLISH", "jp": "JAPANESE", "fr": "FRENCH"}
 ARCHIVES = ("item", "menu")
