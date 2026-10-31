@@ -520,3 +520,24 @@ body.sky-d[data-game]::after {
   margin: .1rem 0 .1rem 1.8rem; color: var(--faint); font-size: .85rem; line-height: 1.35; font-style: italic;
 }
 .results.path .why span { color: var(--grace); font-style: normal; }
+.welcome {
+  position: fixed; z-index: 3; left: 28px; bottom: 64px; width: min(340px, calc(100vw - 32px));
+  padding: .6rem 2rem .6rem .9rem; background: rgba(13, 18, 32, .94); border: 1px solid var(--rim-strong);
+  border-radius: 6px; color: var(--parch); font-size: .92rem; line-height: 1.4;
+  animation: welcome-in .6s ease 1.2s both;
+}
+.welcome[hidden] { display: none; }
+.welcome p { margin: 0 0 .3rem; }
+.welcome p:last-of-type { margin: 0; }
+.welcome [data-go] {
+  padding: 0; border: 0; background: none; cursor: pointer; color: var(--grace);
+  font: inherit; text-decoration: underline; text-underline-offset: 3px;
+}
+.welcome .close {
+  position: absolute; top: .2rem; right: .3rem; width: 28px; height: 28px; padding: 0;
+  border: 0; background: none; cursor: pointer; color: var(--faint); font-size: 1.2rem;
+}
+.welcome .close:hover, .welcome .close:focus-visible { color: var(--grace); }
+@keyframes welcome-in { from { opacity: 0; transform: translateY(6px); } }
+@media (prefers-reduced-motion: reduce) { .welcome { animation: none; } }
+@media (max-width: 760px) { .welcome { left: 16px; bottom: 60px; } }

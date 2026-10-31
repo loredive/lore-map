@@ -2,6 +2,7 @@
 import { S, $, canvas, panel, listColumn, tip, status, input, mode, esc, colorOf, announce, dataPath, DEFAULT_GAME, nameOf, groupName, resetContext, focusPanel, reducedMotion } from "./state.js";
 import { buildGrid, buildSprites, computeHulls, resize, draw, nearest, setHover, starsNear, startIntro, skipIntro } from "./render.js";
 import { introMode } from "./intro.js";
+import { showWelcome } from "./welcome.js";
 import { camera, toWorld, panBy, zoomAt, canZoom, flyTo, viewCenter, frameFrom } from "./camera.js";
 import { buildViewSwitch } from "./views.js";
 import { decodeLore } from "./lore.js";
@@ -429,4 +430,5 @@ if (await load()) {
   const intro = introMode({ opened, reducedMotion });
   if (intro === "full") startIntro();
   else if (intro === "fade") canvas.classList.add("fade-in");
+  if (!opened) showWelcome();                    // première visite : par où commencer
 }
