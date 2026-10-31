@@ -4,11 +4,10 @@ Embeddings des requêtes d'évaluation (games/<id>/eval/queries.json), avec le m
 La page utilise la version quantifiée (q8) des mêmes poids dans le navigateur : les scores
 diffèrent un peu, le classement presque pas.
 
-Usage : uv run python eval/embed_queries.py [--game elden-ring]
+Usage : uv run python -m eval.embed_queries [--game elden-ring]
 """
 import argparse
 import json
-import sys
 from pathlib import Path
 
 from sentence_transformers import SentenceTransformer
@@ -17,9 +16,8 @@ HERE = Path(__file__).parent
 
 
 def main():
-    sys.path.insert(0, str(HERE.parent))
-    from games import DEFAULT, load_game
-    from prepare import MODEL_NAME  # le même modèle que pour les textes
+    from lore_map.games import DEFAULT, load_game
+    from lore_map.prepare import MODEL_NAME  # le même modèle que pour les textes
 
     p = argparse.ArgumentParser()
     p.add_argument("--game", default=DEFAULT)

@@ -11,8 +11,8 @@ web/data/dark-souls-1/images.json ({nom du texte: n}). Rien n'est écrit dans le
 les dialogues n'ont pas d'icône.
 
 Usage (après extract.py et prepare.py) :
-    python games/dark-souls-1/icons.py --download ../dark-souls-1-text/paramdex
-    uv run --with pillow python games/dark-souls-1/icons.py --paramdex ../dark-souls-1-text/paramdex \\
+    python -m lore_map.sources.dark_souls_1.icons --download ../dark-souls-1-text/paramdex
+    uv run --with pillow python -m lore_map.sources.dark_souls_1.icons --paramdex ../dark-souls-1-text/paramdex \\
         --data "/mnt/c/Games/Steam/steamapps/common/Dark Souls Prepare to Die Edition/DATA" \\
         --text ../dark-souls-1-text/ds1_text.json
 """
@@ -20,15 +20,16 @@ import argparse
 import io
 import json
 import struct
-import sys
 import urllib.request
 from collections import Counter
 from pathlib import Path
 
-HERE = Path(__file__).parent
-ROOT = HERE.parent.parent
-sys.path.insert(0, str(ROOT))                    # souls_formats.py, à la racine du dépôt
-from souls_formats import DS1_ITEMS, DS1_LAYOUTS, icon_ids, param_rows_32, read_bnd3, read_dcx  # noqa: E402
+from lore_map.formats.archives import read_bnd3, read_dcx
+from lore_map.formats.params import DS1_ITEMS, DS1_LAYOUTS, icon_ids, param_rows_32
+from lore_map.formats.textures import read_tpf
+from lore_map.games import GAMES, ROOT
+
+HERE = GAMES / "dark-souls-1"                 # les données du jeu : game.json, speakers.json…
 
 DATA, IMG = ROOT / "web" / "data" / "dark-souls-1", ROOT / "web" / "img" / "dark-souls-1"
 LANG = json.loads((HERE / "game.json").read_text(encoding="utf-8"))["text_lang"]   # langue des noms sur la carte
@@ -36,19 +37,6 @@ QUALITY = 80
 PARAMDEX = "https://raw.githubusercontent.com/soulsmods/Paramdex/master/DS1/Defs/"
 SHEETS = ("/menu/menu_0.tpf.dcx", "/menu/menu_4.tpf.dcx")    # les planches d'icônes en pleine taille
 ICON = "EquIcon_"
-
-
-# ---------------------------------------------------------------- formats
-def read_tpf(d: bytes) -> dict[str, bytes]:
-    """TPF du PC (Dark Souls) : {nom de la texture: fichier DDS}."""
-    if d[:4] != b"TPF\0":
-        raise ValueError("TPF attendu")
-    count, = struct.unpack_from("<i", d, 8)
-    out = {}
-    for k in range(count):
-        offset, size, _fmt, _type, _mips, _flags, name_at, _ = struct.unpack_from("<IiBBBBII", d, 0x10 + 20 * k)
-        out[d[name_at:d.index(b"\0", name_at)].decode("shift_jis")] = d[offset:offset + size]
-    return out
 
 
 def drb_sprites(d: bytes, prefix: str = ICON) -> dict[str, tuple[str, tuple[int, int, int, int]]]:
@@ -111,8 +99,9 @@ def main():
     if a.download:
         download(a.download)
         return
-    from extract import Archives  # ici : --download n'a besoin ni du jeu ni de Pillow
     from PIL import Image
+
+    from lore_map.sources.dark_souls_1.extract import Archives  # ici : --download n'a besoin ni du jeu ni de Pillow
     archives = Archives(a.data)
     layouts = {t: (a.paramdex / f"{n}.xml").read_text(encoding="utf-8-sig") for t, n in DS1_LAYOUTS.items()}
     params = read_bnd3(read_dcx(archives.read("/param/GameParam/GameParam.parambnd.dcx")))

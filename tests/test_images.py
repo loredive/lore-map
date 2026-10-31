@@ -1,4 +1,4 @@
-from images import match, norm
+from lore_map.images import match, norm
 
 
 def index(*names):

@@ -3,11 +3,10 @@ Compare les projections t-SNE et UMAP de prepare.py sur plusieurs graines : part
 voisins gardés sur la carte, structure globale, et groupes HDBSCAN obtenus (nombre, bruit,
 accord avec les vrais voisins, contiguïté sur la carte). C'est ce qui a fait choisir t-SNE.
 
-Usage : uv run python eval/projection_seeds.py [--seeds 5]
+Usage : uv run python -m eval.projection_seeds [--seeds 5]
 """
 import argparse
 import json
-import sys
 from pathlib import Path
 
 import numpy as np
@@ -32,13 +31,12 @@ def measure(emb, xy, true, pairs):
 
 
 def main():
-    sys.path.insert(0, str(HERE.parent))
     import umap
     from sklearn.manifold import TSNE
     from sklearn.neighbors import NearestNeighbors
 
-    from games import DEFAULT, load_game
-    from prepare import dialog_docs, embed, item_docs
+    from lore_map.games import DEFAULT, load_game
+    from lore_map.prepare import dialog_docs, embed, item_docs
 
     p = argparse.ArgumentParser()
     p.add_argument("--source", default=str(HERE.parent.parent / "EldenRingTextExplorer" / "elden_ring_text.json"))

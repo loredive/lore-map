@@ -2,7 +2,7 @@
 Textes de Dark Souls II (Scholar of the First Sin) : lus dans les archives du jeu (copie Steam du joueur).
 
 L'index Game/GameDataEbl.bhd est chiffré en RSA avec la clé publique livrée à côté (GameDataKeyCode.pem) ;
-déchiffré, c'est un index BHD5 (souls_formats.read_bhd5_ds2) qui liste chaque fichier de GameDataEbl.bdt
+déchiffré, c'est un index BHD5 (formats.archives.read_bhd5_ds2) qui liste chaque fichier de GameDataEbl.bdt
 par le hash de son chemin. Les textes y sont des FMG v1 isolés, en clair : /menu/text/<langue>/itemname.fmg
 (noms) et detailedexplanation.fmg (descriptions), les dialogues dans talk/m<carte>.fmg (un fichier par
 carte, un même personnage parfois dans plusieurs) et le prologue dans prologue.fmg. La copie occidentale
@@ -21,33 +21,26 @@ objet dont la ligne, dans ItemParam (Game/enc_regulation.bnd.dcx, chiffré), a u
 est le premier champ de la ligne (disposition ITEM_PARAM de Paramdex, DS2S).
 
 Usage :
-    python games/dark-souls-2/extract.py \\
+    python -m lore_map.sources.dark_souls_2.extract \\
         --game "/mnt/c/Games/Steam/steamapps/common/Dark Souls II Scholar of the First Sin/Game" \\
         --dictionary ../dark-souls-2-text/uxm/ScholarDictionary.txt --out ../dark-souls-2-text/ds2_text.json
 """
 import argparse
 import json
 import struct
-import sys
 from collections import Counter
 from pathlib import Path
 
-HERE = Path(__file__).parent
-sys.path.insert(0, str(HERE.parent.parent))      # souls_formats.py, à la racine du dépôt
-from souls_formats import (  # noqa: E402
-    decrypt_ranges,
-    dialog,
-    param_rows,
-    path_hash,
-    read_bhd5_ds2,
-    read_fmg,
-    read_regulation_ds2,
-    rsa_public_decrypt,
-    speaker_for,
-)
+from lore_map.formats.archives import decrypt_ranges, path_hash, read_bhd5_ds2, rsa_public_decrypt
+from lore_map.formats.dialog import dialog, speaker_for
+from lore_map.formats.fmg import read_fmg
+from lore_map.formats.params import param_rows, read_regulation_ds2
+from lore_map.games import GAMES
+
+HERE = GAMES / "dark-souls-2"                 # les données du jeu : game.json, speakers.json…
 
 LANGS = {"en": "english", "fr": "french"}
-TALK = "会話"                      # noms des tables attendus par souls_formats.dialog
+TALK = "会話"                      # noms des tables attendus par formats.dialog.dialog
 SUBTITLES = "ムービー字幕"
 DLC_MAPS = ("m50_35", "m50_36", "m50_37")      # Sunken King, Old Iron King, Ivory King
 JUNK = {"no text", "none text", "(no line)", "(n/a)", "(deleted)"}     # en minuscules

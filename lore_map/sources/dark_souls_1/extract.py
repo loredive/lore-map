@@ -2,7 +2,7 @@
 Textes de Dark Souls (Prepare to Die Edition) : lus dans les archives du jeu (copie Steam du joueur).
 
 Les archives DATA/dvdbnd<n>.bdt ne sont pas chiffrées : leur index dvdbnd<n>.bhd5 liste chaque
-fichier par le hash de son chemin (souls_formats.read_bhd5), et on y lit /msg/<LANGUE>/item.msgbnd.dcx
+fichier par le hash de son chemin (formats.archives.read_bhd5), et on y lit /msg/<LANGUE>/item.msgbnd.dcx
 et menu.msgbnd.dcx (DCX -> BND3 -> FMG v1) en anglais, japonais et français, sans rien décompresser
 sur le disque. On écrit le JSON que lit prepare.py ; rien n'est écrit dans le dossier du jeu, et le JSON
 reste hors du dépôt.
@@ -18,35 +18,24 @@ est gardé ; la disposition de ces lignes vient de Paramdex (icons.py --download
 Les interlocuteurs des dialogues viennent de speakers.json (blocs d'identifiants -> nom).
 
 Usage :
-    python games/dark-souls-1/icons.py --download ../dark-souls-1-text/paramdex
-    python games/dark-souls-1/extract.py --paramdex ../dark-souls-1-text/paramdex \\
+    python -m lore_map.sources.dark_souls_1.icons --download ../dark-souls-1-text/paramdex
+    python -m lore_map.sources.dark_souls_1.extract --paramdex ../dark-souls-1-text/paramdex \\
         --data "/mnt/c/Games/Steam/steamapps/common/Dark Souls Prepare to Die Edition/DATA" \\
         --out ../dark-souls-1-text/ds1_text.json
 """
 import argparse
 import json
 import re
-import sys
 from collections import Counter
 from pathlib import Path
 
-HERE = Path(__file__).parent
-sys.path.insert(0, str(HERE.parent.parent))      # souls_formats.py, à la racine du dépôt
-from souls_formats import (  # noqa: E402
-    DS1_ITEMS,
-    DS1_LAYOUTS,
-    dialog,
-    gender_twin,
-    icon_ids,
-    param_rows_32,
-    path_hash,
-    read_bhd5,
-    read_bnd3,
-    read_dcx,
-    read_fmg,
-    speaker_for,
-    unwrap,
-)
+from lore_map.formats.archives import path_hash, read_bhd5, read_bnd3, read_dcx
+from lore_map.formats.dialog import dialog, gender_twin, speaker_for
+from lore_map.formats.fmg import read_fmg, unwrap
+from lore_map.formats.params import DS1_ITEMS, DS1_LAYOUTS, icon_ids, param_rows_32
+from lore_map.games import GAMES
+
+HERE = GAMES / "dark-souls-1"                 # les données du jeu : game.json, speakers.json…
 
 LANGS = {"en": "ENGLISH", "jp": "JAPANESE", "fr": "FRENCH"}
 ARCHIVES = ("item", "menu")

@@ -1,7 +1,7 @@
 {
   "id": "dark-souls-3",
   "title": "Dark Souls III",
-  "source": "message archives of the player's Steam copy (Game/msg/engus, frafr, jpnjp, unpacked by UXM), read by games/dark-souls-3/extract.py",
+  "source": "message archives of the player's Steam copy (Game/msg/engus, frafr, jpnjp, unpacked by UXM), read by lore_map/sources/dark_souls_3/extract.py",
   "text_lang": "en",
   "alt_lang": "fr",
   "min_chars": 15,

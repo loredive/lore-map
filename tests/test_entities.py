@@ -1,4 +1,4 @@
-from entities import find_mentions
+from lore_map.entities import find_mentions
 
 
 def doc(name, text=""):
@@ -42,7 +42,7 @@ def test_excluded_phrases_do_not_count_as_mentions():
 
 
 def test_texts_naming_the_entity_often_in_their_body_rank_first():
-    from entities import rank_mentions
+    from lore_map.entities import rank_mentions
     docs = [doc("Godwyn's Helm", "A helm."),                              # titre seulement
             doc("Note", "Godwyn fell. Godwyn the Golden was mourned."),  # deux fois dans le texte
             doc("Rumour", "They say Godwyn died first.")]                # une fois
@@ -51,7 +51,7 @@ def test_texts_naming_the_entity_often_in_their_body_rank_first():
 
 
 def test_body_only_entities_ignore_mentions_in_titles():
-    from entities import rank_mentions
+    from lore_map.entities import rank_mentions
     erdtree = {"name": "Erdtree", "kind": "notion", "aliases": [], "body_only": True}
     docs = [doc("Erdtree Greatshield", "A golden shield."), doc("Lore", "The Erdtree burns.")]
     assert [i for i, _ in rank_mentions([erdtree], docs)["Erdtree"]] == [1]
@@ -59,7 +59,7 @@ def test_body_only_entities_ignore_mentions_in_titles():
 
 
 def test_related_entities_favour_specific_co_mentions_and_skip_broad_ones():
-    from entities import related_entities
+    from lore_map.entities import related_entities
     found = {"Godwyn": [1, 2, 3, 4], "Fia": [1, 2, 3, 9], "Erdtree": [1, 2, 3, 4, 5, 6, 7, 8],
              "Ranni": [3, 10, 11, 12]}
     entities = [ent("Godwyn"), ent("Fia"), ent("Ranni"),

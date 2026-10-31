@@ -10,9 +10,9 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
-from lore_format import read_lore
+from lore_map.lore_format import read_lore
 
-ROOT = Path(__file__).parent
+ROOT = Path(__file__).parent.parent                 # la racine du dépôt (ce fichier est dans lore_map/)
 GAMES = ROOT / "games"
 WEB = ROOT / "web"
 DEFAULT = "elden-ring"                  # jeu des scripts sans --game

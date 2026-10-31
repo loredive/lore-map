@@ -53,7 +53,7 @@ jobs:
           restore-keys: elden-ring-icons-
       - name: Elden Ring icons
         continue-on-error: true    # if the API is down, the page still works without icons
-        run: uv run --no-project --with pillow python images.py --game elden-ring
+        run: uv run --no-project --with pillow python -m lore_map.images --game elden-ring
 
       # Bloodborne icons come from the game files, so they are uploaded once to the "icons" release
       - name: Bloodborne icons

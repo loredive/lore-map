@@ -1,4 +1,4 @@
-from labels import match_titles
+from lore_map.labels import match_titles
 
 
 def entry(title, members):

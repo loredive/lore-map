@@ -4,9 +4,8 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-import layouts
-import prepare
-from lore_format import read_lore, write_lore
+from lore_map import layouts, prepare
+from lore_map.lore_format import read_lore, write_lore
 
 DATA = Path(__file__).resolve().parent.parent / "web" / "data"
 

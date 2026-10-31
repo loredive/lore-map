@@ -8,8 +8,8 @@ web/data/<jeu>/images.json ({nom du texte: fichier}). Indépendant de prepare.py
 Seuls les jeux dont game.json dit "images": "fanapi" ont une source d'images (Elden Ring).
 
 Usage :
-    uv run python images.py              # réponses de l'API gardées dans .cache/fanapi/
-    uv run python images.py --refresh    # les redemander
+    uv run python -m lore_map.images     # réponses de l'API gardées dans .cache/fanapi/
+    uv run python -m lore_map.images --refresh    # les redemander
 """
 import argparse
 import io
@@ -22,10 +22,10 @@ from pathlib import Path
 
 from PIL import Image
 
-from games import DEFAULT, list_games, load_game
-from lore_format import read_lore
+from lore_map.games import DEFAULT, list_games, load_game
+from lore_map.lore_format import read_lore
 
-ROOT = Path(__file__).parent
+ROOT = Path(__file__).parent.parent                 # la racine du dépôt (ce fichier est dans lore_map/)
 CACHE = ROOT / ".cache" / "fanapi"
 API = "https://eldenring.fanapis.com/api"
 ITEM_ENDPOINTS = ["items", "weapons", "armors", "talismans", "ashes", "spirits",

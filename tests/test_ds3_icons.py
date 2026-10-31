@@ -1,4 +1,4 @@
-"""Paramètres de Dark Souls III (souls_formats) : disposition des lignes (XML de Paramdex), paramètres
+"""Paramètres de Dark Souls III (lore_map.formats.params) : disposition des lignes (XML de Paramdex), paramètres
 chiffrés du PC, numéros d'icône par objet, sur de petits fichiers fabriqués ici."""
 import struct
 
@@ -6,7 +6,7 @@ from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from test_bloodborne_extract import make_bnd4, make_dcx
 
-from souls_formats import icon_ids, layout_offsets, read_regulation
+from lore_map.formats.params import icon_ids, layout_offsets, read_regulation
 
 LAYOUT = """<?xml version="1.0" encoding="utf-8"?>
 <PARAMDEF XmlVersion="1"><Fields>

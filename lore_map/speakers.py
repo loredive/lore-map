@@ -1,61 +1,55 @@
 """
-Qui parle dans les dialogues de Dark Souls II (talk/m<carte>.fmg) ? Les répliques sont rangées par
-blocs de 10 000 identifiants, un par personnage, sans nom. Chaque réplique est cherchée dans les pages
-des personnages, marchands et boss de Dark Souls II du wiki darksouls.fandom.com (leur texte source, par
-l'API du wiki) ; chaque bloc prend la page qui cite le plus de ses répliques. Un bloc mêlé (son gagnant
-n'a pas plus de la moitié des voix) n'a pas de nom par défaut : chacun de ses sous-blocs prend la page
-qui cite le plus de ses répliques, et un sous-bloc qu'aucune ne cite reste sans nom.
+Qui parle dans les dialogues d'un jeu Souls ? Les répliques sont rangées par blocs de 10 000
+identifiants, un par personnage, sans nom. Chaque réplique est cherchée dans les pages des personnages
+(et des marchands, des boss…) du jeu sur le wiki darksouls.fandom.com (leur texte source, par l'API du
+wiki) ; chaque bloc prend la page qui cite le plus de ses répliques. Un bloc mêlé (son gagnant n'a pas
+plus de la moitié des voix) n'a pas de nom par défaut : chacun de ses sous-blocs de 100 prend la page qui
+cite le plus de ses répliques, et un sous-bloc qu'aucune ne cite reste sans nom. Ailleurs, pas
+d'exception : une page cite souvent les répliques des autres qui parlent d'elle.
 
 Un nom dont le wiki ne confirme pas au moins la moitié des répliques (CONFIRMED), un nom donné à la
 main, et les répliques sans nom sont marqués incertains (« uncertain » : la raison, montrée par la page),
-sauf les noms de SURE, que leurs répliques suffisent à reconnaître.
-Quelques noms sont corrigés à la main (RENAME, MANUAL). Écrit speakers.json, relu à la main.
+sauf les noms sûrs (Rules.sure), que leurs répliques suffisent à reconnaître.
 
-Usage (une fois ; les pages sont téléchargées à part, ce sont des données, pas du code) :
-    python games/dark-souls-2/vote_speakers.py --download ../dark-souls-2-text/wiki_pages.json
-    python games/dark-souls-2/vote_speakers.py --wiki ../dark-souls-2-text/wiki_pages.json \\
-        --game "/mnt/c/Games/Steam/steamapps/common/Dark Souls II Scholar of the First Sin/Game" \\
-        --dictionary ../dark-souls-2-text/uxm/ScholarDictionary.txt
+Ce qui change d'un jeu à l'autre (catégories du wiki, noms corrigés ou donnés à la main, lecture des
+dialogues) est dans lore_map/sources/<jeu>/speakers.py, qui appelle main(). Écrit games/<id>/speakers.json,
+relu à la main.
 """
 import argparse
 import json
 import re
-import sys
 import time
 import urllib.parse
 import urllib.request
 from collections import Counter, defaultdict
+from collections.abc import Callable
+from dataclasses import dataclass, field
 from pathlib import Path
 
-HERE = Path(__file__).parent
-sys.path.insert(0, str(HERE.parent.parent))      # souls_formats.py, à la racine du dépôt
-from souls_formats import speaker_for  # noqa: E402
+from lore_map.formats.dialog import speaker_for
+from lore_map.games import GAMES
 
 API = "https://darksouls.fandom.com/api.php?"
-CATEGORIES = ("Dark_Souls_II:_Characters", "Dark_Souls_II:_Merchants", "Dark_Souls_II:_Bosses")
 MIN_CHARS = 15                    # plus court (« Hmm... »), une réplique ne dit pas qui parle
 MIN_VOTES = 3                     # en dessous, un bloc reste sans nom
 MIN_SUB_VOTES = 2                 # un sous-bloc ne contredit son bloc qu'avec au moins ce score
 MIXED = 0.5                       # part des voix du gagnant d'un bloc mêlé, au plus
 CONFIRMED = 0.5                   # en dessous de cette part de répliques confirmées, un nom est incertain
 UNKNOWN = "Unknown NPC"
-# titres de pages -> nom affiché
-RENAME = {"Rat King (character)": "Rat King"}
-# blocs qu'aucune page ne cite (ou mal), nommés d'après leurs répliques
-MANUAL = {
-    "6270": "Nashandra",                         # fin du jeu : « Brave Undead, you have proven yourself to me. »
-    "7050": "Old Ladies",                        # Things Betwixt : « Heh heh heh... What seems to be the ruckus? »
-    "7051": "Old Ladies",
-    "7052": "Old Ladies",
-    "7590": "Elana, the Squalid Queen",          # le DLC, Shulva : « You...forever you shall rot... »
-    "7602": "Milfanito",                         # « Ah...Ahh... » chanté, à côté des blocs 7600 et 7601
-}
-MANUAL_SUB = {}
 
-# noms certains sans confirmation du wiki : leurs répliques ne laissent pas de doute
-SURE = {
-    "Old Ladies",                     # les trois vieilles de Things Betwixt, seules à y parler
-}
+
+@dataclass(frozen=True)
+class Rules:
+    """Ce qui est propre à un jeu dans le vote."""
+    game: str                     # identifiant du jeu (games/<id>/speakers.json)
+    title: str                    # nom du jeu, dans la source de speakers.json (« Dark Souls II »)
+    wiki: str                     # nom du wiki dans les raisons d'incertitude (« The Dark Souls wiki confirms… »)
+    pages: str                    # quelles pages, dans la source (« personnages, marchands et boss »)
+    categories: tuple[str, ...]   # catégories du wiki dont les pages sont téléchargées
+    rename: dict[str, str] = field(default_factory=dict)       # titre de page -> nom affiché
+    manual: dict[str, str] = field(default_factory=dict)       # blocs qu'aucune page ne cite (ou mal)
+    manual_sub: dict[str, str] = field(default_factory=dict)   # sous-blocs nommés à la main ; leur bloc n'a plus de nom
+    sure: frozenset[str] = frozenset()                         # noms certains sans confirmation du wiki
 
 
 def norm(text: str) -> str:
@@ -85,10 +79,10 @@ def vote(talk: dict[int, str], pages: dict[str, str]) -> tuple[dict, dict, dict]
     return blocks, subs, hits
 
 
-def speakers(blocks: dict, subs: dict) -> dict:
+def speakers(blocks: dict, subs: dict, rules: Rules) -> dict:
     """speakers.json : le gagnant de chaque bloc, et les sous-blocs qui en votent un autre."""
     def name(title):
-        return RENAME.get(title, title)
+        return rules.rename.get(title, title)
     out, mixed = {}, set()
     for b, c in sorted(blocks.items()):
         title, score = c.most_common(1)[0]
@@ -96,47 +90,47 @@ def speakers(blocks: dict, subs: dict) -> dict:
             mixed.add(b)
         elif score >= MIN_VOTES:
             out[str(b)] = name(title)
-    out.update(MANUAL)
-    for s in MANUAL_SUB:
+    out.update(rules.manual)
+    for s in rules.manual_sub:
         out.pop(str(int(s) // 100), None)                # le bloc mêlé n'a plus de nom à lui
-    sub_blocks = dict(MANUAL_SUB)
+    sub_blocks = dict(rules.manual_sub)
     for s, c in sorted(subs.items()):
         title, score = c.most_common(1)[0]
         if s // 100 in mixed and score >= MIN_SUB_VOTES:
             sub_blocks[str(s)] = name(title)
-    return {"source": "darksouls.fandom.com, pages des personnages, marchands et boss de Dark Souls II, vote par réplique",
+    return {"source": f"darksouls.fandom.com, pages des {rules.pages} de {rules.title}, vote par réplique",
             "unknown": UNKNOWN, "blocks": out, "sub_blocks": sub_blocks}
 
 
-def uncertain(talk: dict[int, str], data: dict, hits: dict[int, list[str]]) -> dict[str, str]:
+def uncertain(talk: dict[int, str], data: dict, hits: dict[int, list[str]], rules: Rules) -> dict[str, str]:
     """{nom: raison} des interlocuteurs incertains, d'après les répliques cherchées (hits) : celles que
     le wiki cite sous ce nom sont confirmées."""
     total, confirmed = Counter(), Counter()
     for i in hits:
         who = speaker_for(i, data) or data["unknown"]
         total[who] += 1
-        confirmed[who] += any(RENAME.get(t, t) == who for t in hits[i])
+        confirmed[who] += any(rules.rename.get(t, t) == who for t in hits[i])
     out = {}
     for who, n in total.items():
-        if who in SURE:
+        if who in rules.sure:
             continue
         if who == data["unknown"]:
             out[who] = "No source says who speaks these lines."
-        elif who in {*MANUAL.values(), *MANUAL_SUB.values()} and not confirmed[who]:
+        elif who in {*rules.manual.values(), *rules.manual_sub.values()} and not confirmed[who]:
             out[who] = "Named from what the lines say; no source confirms it."
         elif confirmed[who] < CONFIRMED * n:
-            out[who] = (f"The Dark Souls II wiki confirms {confirmed[who]} of {n} lines; "
+            out[who] = (f"The {rules.wiki} wiki confirms {confirmed[who]} of {n} lines; "
                         "the others are attributed by where they sit in the game files.")
     return out
 
 
-def download(out: Path) -> None:
-    """Le texte source des pages des catégories CATEGORIES, une requête par seconde."""
+def download(out: Path, categories: tuple[str, ...]) -> None:
+    """Le texte source des pages de ces catégories du wiki, une requête par seconde."""
     def get(url):
         req = urllib.request.Request(url, headers={"User-Agent": "lore-map (fan project)"})
         return json.load(urllib.request.urlopen(req, timeout=30))
     titles = set()
-    for cat in CATEGORIES:
+    for cat in categories:
         q = get(API + f"action=query&list=categorymembers&cmtitle=Category:{cat}&cmlimit=500&format=json")
         titles |= {m["title"] for m in q["query"]["categorymembers"] if m["ns"] == 0}
         time.sleep(1)
@@ -149,24 +143,24 @@ def download(out: Path) -> None:
     print(f"{len(pages)} pages écrites dans {out}")
 
 
-def main():
-    p = argparse.ArgumentParser(description=__doc__.split("\n\n")[1])
+def main(rules: Rules, description: str, add_args: Callable[[argparse.ArgumentParser], None],
+         load_talk: Callable[[argparse.Namespace], dict[int, str]]) -> None:
+    """La ligne de commande d'un jeu : --download, ou --wiki et les arguments du jeu (add_args), avec
+    lesquels load_talk lit ses répliques anglaises."""
+    p = argparse.ArgumentParser(description=description)
     p.add_argument("--download", type=Path, help="télécharge les pages du wiki dans ce fichier, puis s'arrête")
     p.add_argument("--wiki", type=Path, help="pages téléchargées par --download")
-    p.add_argument("--game", type=Path, help="dossier Game/ du jeu (GameDataEbl.bhd, .bdt, .pem)")
-    p.add_argument("--dictionary", type=Path, help="ScholarDictionary.txt d'UXM (chemins des fichiers)")
+    add_args(p)
     a = p.parse_args()
     if a.download:
-        download(a.download)
+        download(a.download, rules.categories)
         return
-    from extract import Archive, load_tables, talk_maps  # ici : les tests chargent ce fichier sans le jeu
-    maps = talk_maps(a.dictionary.read_text(encoding="utf-8").splitlines())
-    tables, _dlc = load_tables(Archive(a.game), maps)
-    talk = tables["en"]["会話"]
+    talk = load_talk(a)
     blocks, subs, hits = vote(talk, json.loads(a.wiki.read_text(encoding="utf-8")))
-    data = speakers(blocks, subs)
-    data["uncertain"] = uncertain(talk, data, hits)
-    (HERE / "speakers.json").write_text(json.dumps(data, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    data = speakers(blocks, subs, rules)
+    data["uncertain"] = uncertain(talk, data, hits, rules)
+    (GAMES / rules.game / "speakers.json").write_text(json.dumps(data, ensure_ascii=False, indent=1) + "\n",
+                                                      encoding="utf-8")
     lines = Counter(i // 10000 for i in talk)
     for b in sorted(lines):
         c = blocks.get(b, Counter())
@@ -174,7 +168,3 @@ def main():
               + "; ".join(f"{t} {v:.0f}" for t, v in c.most_common(2)))
     print("exceptions :", data["sub_blocks"])
     print("incertains :", json.dumps(data["uncertain"], ensure_ascii=False, indent=1))
-
-
-if __name__ == "__main__":
-    main()

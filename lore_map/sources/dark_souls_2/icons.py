@@ -9,38 +9,26 @@ web/data/dark-souls-2/images.json ({nom du texte: n}). Rien n'est écrit dans le
 dialogues n'ont pas d'icône.
 
 Usage (après extract.py et prepare.py) :
-    uv run --with pillow python games/dark-souls-2/icons.py \\
+    uv run --with pillow python -m lore_map.sources.dark_souls_2.icons \\
         --game "/mnt/c/Games/Steam/steamapps/common/Dark Souls II Scholar of the First Sin/Game" \\
         --text ../dark-souls-2-text/ds2_text.json
 """
 import argparse
 import io
 import json
-import struct
-import sys
 from collections import Counter
 from pathlib import Path
 
-HERE = Path(__file__).parent
-ROOT = HERE.parent.parent
-sys.path.insert(0, str(ROOT))                    # souls_formats.py, à la racine du dépôt
+from lore_map.formats.textures import read_tpf
+from lore_map.games import GAMES, ROOT
+
+HERE = GAMES / "dark-souls-2"                 # les données du jeu : game.json, speakers.json…
+
 
 DATA, IMG = ROOT / "web" / "data" / "dark-souls-2", ROOT / "web" / "img" / "dark-souls-2"
 LANG = json.loads((HERE / "game.json").read_text(encoding="utf-8"))["text_lang"]   # langue des noms sur la carte
 QUALITY = 80
 SIZE = 160                                       # côté du carré, en pixels
-
-
-def read_tpf(d: bytes) -> dict[str, bytes]:
-    """TPF du PC (Dark Souls II, comme Dark Souls) : {nom de la texture: fichier DDS}."""
-    if d[:4] != b"TPF\0":
-        raise ValueError("TPF attendu")
-    count, = struct.unpack_from("<i", d, 8)
-    out = {}
-    for k in range(count):
-        offset, size, _fmt, _type, _mips, _flags, name_at, _ = struct.unpack_from("<IiBBBBII", d, 0x10 + 20 * k)
-        out[d[name_at:d.index(b"\0", name_at)].decode("shift_jis")] = d[offset:offset + size]
-    return out
 
 
 def square(im, size: int = SIZE):
@@ -61,8 +49,9 @@ def main():
     p.add_argument("--game", type=Path, required=True, help="dossier Game/ du jeu (GameDataEbl.bhd, .bdt, .pem)")
     p.add_argument("--text", type=Path, required=True, help="JSON écrit par extract.py")
     a = p.parse_args()
-    from extract import CATEGORIES, Archive, item_icons  # ici : les tests chargent ce fichier sans le jeu
     from PIL import Image
+
+    from lore_map.sources.dark_souls_2.extract import CATEGORIES, Archive, item_icons  # ici : les tests chargent ce fichier sans le jeu
     archive, icons = Archive(a.game), item_icons(a.game)
     text = json.loads(a.text.read_text(encoding="utf-8"))
     lore = json.loads((DATA / "lore.json").read_text(encoding="utf-8"))

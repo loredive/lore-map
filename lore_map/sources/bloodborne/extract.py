@@ -11,26 +11,23 @@ Avec --base (msg/ du jeu de base, sans la mise à jour), les textes absents du j
 marqués « dlc » : ajoutés avec The Old Hunters (le DLC et la mise à jour gratuite parue avec lui).
 
 Usage :
-    uv run python games/bloodborne/extract.py --msg "/mnt/c/PS4Games/CUSA00207-UPDATE/dvdroot_ps4/msg" \\
+    uv run python -m lore_map.sources.bloodborne.extract --msg "/mnt/c/PS4Games/CUSA00207-UPDATE/dvdroot_ps4/msg" \\
         --base "/mnt/c/PS4Games/CUSA00207/dvdroot_ps4/msg" --out ../bloodborne-text/bloodborne_text.json
 """
 import argparse
 import json
-import sys
 from collections import Counter
 from pathlib import Path
 
-HERE = Path(__file__).parent
-sys.path.insert(0, str(HERE.parent.parent))      # souls_formats.py, à la racine du dépôt
-from souls_formats import (  # noqa: E402,F401  (read_* : aussi importés par icons.py et les tests)
+from lore_map.formats.archives import read_bnd4, read_dcx
+from lore_map.formats.dialog import (
     dialog,
-    drop_repeated_runs,
-    read_bnd4,
-    read_dcx,
-    read_fmg,
     speaker_for,
-    unwrap,
 )
+from lore_map.formats.fmg import read_fmg, unwrap
+from lore_map.games import GAMES
+
+HERE = GAMES / "bloodborne"                 # les données du jeu : game.json, speakers.json…
 
 LANGS = {"en": "engus", "jp": "jpnjp", "fr": "frafr"}
 PLACEHOLDERS = {"", "*"}
