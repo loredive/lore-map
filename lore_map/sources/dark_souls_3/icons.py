@@ -17,7 +17,6 @@ Usage (après extract.py et prepare.py ; dossier Game/ ouvert par UXM) :
 import argparse
 import io
 import json
-import struct
 import urllib.request
 from collections import Counter
 from pathlib import Path
@@ -26,6 +25,7 @@ from PIL import Image
 
 from lore_map.formats.archives import read_dcx
 from lore_map.formats.params import DS3_ITEMS, DS3_LAYOUTS, DS3_REGULATION_KEY, icon_ids, read_regulation
+from lore_map.formats.textures import read_tpf
 from lore_map.games import GAMES, ROOT
 
 HERE = GAMES / "dark-souls-3"                 # les données du jeu : game.json, speakers.json…
@@ -38,11 +38,8 @@ PARAMDEX = "https://raw.githubusercontent.com/soulsmods/Paramdex/master/DS3/Defs
 # ---------------------------------------------------------------- textures
 def read_tpf_image(raw: bytes) -> Image.Image:
     """Première texture d'un TPF PC : un fichier DDS complet."""
-    d = read_dcx(raw)
-    if d[:4] != b"TPF\0":
-        raise ValueError("TPF attendu")
-    offset, size = struct.unpack_from("<Ii", d, 0x10)
-    im = Image.open(io.BytesIO(d[offset:offset + size]))
+    dds = next(iter(read_tpf(read_dcx(raw)).values()))
+    im = Image.open(io.BytesIO(dds))
     im.load()
     return im
 

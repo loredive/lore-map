@@ -16,10 +16,10 @@ Usage (après extract.py et prepare.py) :
 import argparse
 import io
 import json
-import struct
 from collections import Counter
 from pathlib import Path
 
+from lore_map.formats.textures import read_tpf
 from lore_map.games import GAMES, ROOT
 
 HERE = GAMES / "dark-souls-2"                 # les données du jeu : game.json, speakers.json…
@@ -29,18 +29,6 @@ DATA, IMG = ROOT / "web" / "data" / "dark-souls-2", ROOT / "web" / "img" / "dark
 LANG = json.loads((HERE / "game.json").read_text(encoding="utf-8"))["text_lang"]   # langue des noms sur la carte
 QUALITY = 80
 SIZE = 160                                       # côté du carré, en pixels
-
-
-def read_tpf(d: bytes) -> dict[str, bytes]:
-    """TPF du PC (Dark Souls II, comme Dark Souls) : {nom de la texture: fichier DDS}."""
-    if d[:4] != b"TPF\0":
-        raise ValueError("TPF attendu")
-    count, = struct.unpack_from("<i", d, 8)
-    out = {}
-    for k in range(count):
-        offset, size, _fmt, _type, _mips, _flags, name_at, _ = struct.unpack_from("<IiBBBBII", d, 0x10 + 20 * k)
-        out[d[name_at:d.index(b"\0", name_at)].decode("shift_jis")] = d[offset:offset + size]
-    return out
 
 
 def square(im, size: int = SIZE):

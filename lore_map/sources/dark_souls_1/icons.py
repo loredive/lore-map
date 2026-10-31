@@ -26,6 +26,7 @@ from pathlib import Path
 
 from lore_map.formats.archives import read_bnd3, read_dcx
 from lore_map.formats.params import DS1_ITEMS, DS1_LAYOUTS, icon_ids, param_rows_32
+from lore_map.formats.textures import read_tpf
 from lore_map.games import GAMES, ROOT
 
 HERE = GAMES / "dark-souls-1"                 # les données du jeu : game.json, speakers.json…
@@ -36,19 +37,6 @@ QUALITY = 80
 PARAMDEX = "https://raw.githubusercontent.com/soulsmods/Paramdex/master/DS1/Defs/"
 SHEETS = ("/menu/menu_0.tpf.dcx", "/menu/menu_4.tpf.dcx")    # les planches d'icônes en pleine taille
 ICON = "EquIcon_"
-
-
-# ---------------------------------------------------------------- formats
-def read_tpf(d: bytes) -> dict[str, bytes]:
-    """TPF du PC (Dark Souls) : {nom de la texture: fichier DDS}."""
-    if d[:4] != b"TPF\0":
-        raise ValueError("TPF attendu")
-    count, = struct.unpack_from("<i", d, 8)
-    out = {}
-    for k in range(count):
-        offset, size, _fmt, _type, _mips, _flags, name_at, _ = struct.unpack_from("<IiBBBBII", d, 0x10 + 20 * k)
-        out[d[name_at:d.index(b"\0", name_at)].decode("shift_jis")] = d[offset:offset + size]
-    return out
 
 
 def drb_sprites(d: bytes, prefix: str = ICON) -> dict[str, tuple[str, tuple[int, int, int, int]]]:
