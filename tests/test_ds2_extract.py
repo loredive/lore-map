@@ -71,3 +71,17 @@ def test_an_item_named_in_the_dlc_list_is_marked_dlc():
     out = ds2.build(tables, set(), SPEAKERS, dlc_items={"Pate's Helm"})
     assert out["protector"]["21010100"]["dlc"] is True
     assert "dlc" not in out["weapon"]["1000000"]
+
+
+def test_an_icon_is_cropped_to_what_shows_and_centred_in_a_square():
+    from PIL import Image
+    _icons_path = Path(__file__).parent.parent / "games" / "dark-souls-2" / "icons.py"
+    spec = importlib.util.spec_from_file_location("ds2_icons", _icons_path)
+    icons = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(icons)
+    im = Image.new("RGBA", (128, 256))
+    im.paste((200, 50, 50, 255), (40, 100, 60, 180))          # 20 × 80 visibles
+    out = icons.square(im, size=160)
+    assert out.size == (80, 80)                                # pas agrandie
+    assert out.getchannel("A").getbbox() == (30, 0, 50, 80)    # centrée
+    assert icons.square(Image.new("RGBA", (128, 256)), size=64).size == (64, 64)
