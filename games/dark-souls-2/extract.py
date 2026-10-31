@@ -49,7 +49,7 @@ LANGS = {"en": "english", "fr": "french"}
 TALK = "会話"                      # noms des tables attendus par souls_formats.dialog
 SUBTITLES = "ムービー字幕"
 DLC_MAPS = ("m50_35", "m50_36", "m50_37")      # Sunken King, Old Iron King, Ivory King
-JUNK = {"no text", "none text"}
+JUNK = {"no text", "none text", "(no line)", "(n/a)", "(deleted)"}     # en minuscules
 
 # catégorie -> plages d'identifiants, en millions
 CATEGORIES = {

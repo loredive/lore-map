@@ -1,0 +1,646 @@
+[
+ {
+  "name": "Vendrick",
+  "kind": "personnage",
+  "aliases": [
+   "King Vendrick",
+   "Roi Vendrick",
+   "roi Vendrick"
+  ]
+ },
+ {
+  "name": "Nashandra",
+  "kind": "personnage",
+  "aliases": [
+   "Queen Nashandra",
+   "Reine Nashandra",
+   "reine Nashandra"
+  ]
+ },
+ {
+  "name": "Aldia",
+  "kind": "personnage",
+  "aliases": [
+   "Lord Aldia",
+   "Aldia, Scholar of the First Sin",
+   "Seigneur Aldia"
+  ]
+ },
+ {
+  "name": "Old Iron King",
+  "kind": "personnage",
+  "aliases": [
+   "Iron King",
+   "Vieux Roi de Fer",
+   "vieux Roi de Fer",
+   "Roi de Fer"
+  ]
+ },
+ {
+  "name": "Ivory King",
+  "kind": "personnage",
+  "aliases": [
+   "Roi d'ivoire"
+  ]
+ },
+ {
+  "name": "Lost Sinner",
+  "kind": "personnage",
+  "aliases": [
+   "Pécheresse oubliée",
+   "Pécheresse"
+  ]
+ },
+ {
+  "name": "Sir Alonne",
+  "kind": "personnage",
+  "aliases": [
+   "Alonne",
+   "Sire Alonne",
+   "sire Alonne"
+  ]
+ },
+ {
+  "name": "Velstadt",
+  "kind": "personnage",
+  "aliases": [
+   "Velstadt, the Royal Aegis"
+  ]
+ },
+ {
+  "name": "Sir Yorgh",
+  "kind": "personnage",
+  "aliases": [
+   "Yorgh",
+   "sire Yorgh",
+   "Sire Yorgh"
+  ]
+ },
+ {
+  "name": "Elana",
+  "kind": "personnage",
+  "aliases": [
+   "Elana, the Squalid Queen",
+   "Elana, Squalid Queen",
+   "Reine Sordide"
+  ]
+ },
+ {
+  "name": "Sinh",
+  "kind": "personnage",
+  "aliases": [
+   "Sinh, the Slumbering Dragon",
+   "Dragon endormi"
+  ]
+ },
+ {
+  "name": "Raime",
+  "kind": "personnage",
+  "aliases": [
+   "Fume Knight"
+  ]
+ },
+ {
+  "name": "Alsanna",
+  "kind": "personnage",
+  "aliases": [
+   "Alsanna, Silent Oracle"
+  ]
+ },
+ {
+  "name": "Mytha",
+  "kind": "personnage",
+  "aliases": [
+   "Mytha, the Baneful Queen",
+   "Reine funeste"
+  ]
+ },
+ {
+  "name": "Freja",
+  "kind": "personnage",
+  "aliases": [
+   "Duke's Dear Freja"
+  ]
+ },
+ {
+  "name": "Vengarl",
+  "kind": "personnage",
+  "aliases": [
+   "Vengarl of Forossa"
+  ]
+ },
+ {
+  "name": "Lucatiel",
+  "kind": "personnage",
+  "aliases": [
+   "Lucatiel of Mirrah"
+  ]
+ },
+ {
+  "name": "Creighton",
+  "kind": "personnage",
+  "aliases": [
+   "Creighton the Wanderer"
+  ]
+ },
+ {
+  "name": "Pate",
+  "kind": "personnage",
+  "aliases": [
+   "Mild-Mannered Pate",
+   "Pat"
+  ]
+ },
+ {
+  "name": "Targray",
+  "kind": "personnage",
+  "aliases": [
+   "Blue Sentinel Targray"
+  ]
+ },
+ {
+  "name": "Benhart",
+  "kind": "personnage",
+  "aliases": [
+   "Benhart of Jugo"
+  ]
+ },
+ {
+  "name": "Straid",
+  "kind": "personnage",
+  "aliases": [
+   "Straid of Olaphis"
+  ]
+ },
+ {
+  "name": "Navlaan",
+  "kind": "personnage",
+  "aliases": [
+   "Royal Sorcerer Navlaan"
+  ]
+ },
+ {
+  "name": "Licia",
+  "kind": "personnage",
+  "aliases": [
+   "Licia of Lindeldt"
+  ]
+ },
+ {
+  "name": "Rosabeth",
+  "kind": "personnage",
+  "aliases": [
+   "Rosabeth of Melfia"
+  ]
+ },
+ {
+  "name": "Felkin",
+  "kind": "personnage",
+  "aliases": [
+   "Felkin the Outcast"
+  ]
+ },
+ {
+  "name": "Grandahl",
+  "kind": "personnage",
+  "aliases": [
+   "Darkdiver Grandahl"
+  ]
+ },
+ {
+  "name": "Agdayne",
+  "kind": "personnage",
+  "aliases": [
+   "Grave Warden Agdayne"
+  ]
+ },
+ {
+  "name": "Zullie",
+  "kind": "personnage",
+  "aliases": [
+   "Zullie the Witch"
+  ]
+ },
+ {
+  "name": "Alva",
+  "kind": "personnage",
+  "aliases": [
+   "Alva the Wayfarer"
+  ]
+ },
+ {
+  "name": "Saint Serreta",
+  "kind": "personnage",
+  "aliases": [
+   "Serreta",
+   "sainte Serreta"
+  ]
+ },
+ {
+  "name": "Syan",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Llewellyn",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Olenford",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Ornifex",
+  "kind": "personnage",
+  "aliases": [
+   "Weaponsmith Ornifex"
+  ]
+ },
+ {
+  "name": "Drummond",
+  "kind": "personnage",
+  "aliases": [
+   "Captain Drummond"
+  ]
+ },
+ {
+  "name": "Wellager",
+  "kind": "personnage",
+  "aliases": [
+   "Chancellor Wellager"
+  ]
+ },
+ {
+  "name": "Emerald Herald",
+  "kind": "personnage",
+  "aliases": []
+ },
+ {
+  "name": "Shalquoir",
+  "kind": "personnage",
+  "aliases": [
+   "Sweet Shalquoir"
+  ]
+ },
+ {
+  "name": "Ancient Dragon",
+  "kind": "personnage",
+  "aliases": [
+   "Dragon ancien"
+  ]
+ },
+ {
+  "name": "Drangleic",
+  "kind": "lieu",
+  "aliases": [],
+  "broad": true
+ },
+ {
+  "name": "Drangleic Castle",
+  "kind": "lieu",
+  "aliases": [
+   "Drangleic castle",
+   "château de Drangleic",
+   "Château de Drangleic"
+  ]
+ },
+ {
+  "name": "Majula",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Eleum Loyce",
+  "kind": "lieu",
+  "aliases": [
+   "Loyce"
+  ]
+ },
+ {
+  "name": "Brume Tower",
+  "kind": "lieu",
+  "aliases": [
+   "Tour de brume"
+  ]
+ },
+ {
+  "name": "Iron Keep",
+  "kind": "lieu",
+  "aliases": [
+   "Forteresse de Fer"
+  ]
+ },
+ {
+  "name": "Shulva",
+  "kind": "lieu",
+  "aliases": [
+   "Sanctum City",
+   "Cité-Sanctuaire"
+  ]
+ },
+ {
+  "name": "Undead Crypt",
+  "kind": "lieu",
+  "aliases": [
+   "Crypte des Mort-vivants",
+   "Crypte des Morts-vivants"
+  ]
+ },
+ {
+  "name": "Undead Purgatory",
+  "kind": "lieu",
+  "aliases": [
+   "Purgatoire des Mort-vivants"
+  ]
+ },
+ {
+  "name": "Dark Chasm",
+  "kind": "lieu",
+  "aliases": [
+   "Dark Chasm of Old",
+   "Gouffre obscur"
+  ]
+ },
+ {
+  "name": "The Gutter",
+  "kind": "lieu",
+  "aliases": [
+   "Gutter",
+   "Dépotoir"
+  ]
+ },
+ {
+  "name": "Harvest Valley",
+  "kind": "lieu",
+  "aliases": [
+   "Vallée des Récoltes"
+  ]
+ },
+ {
+  "name": "Forest of Fallen Giants",
+  "kind": "lieu",
+  "aliases": [
+   "Forest of the Giants",
+   "Forest of Giants",
+   "Forêt des Géants défunts",
+   "Forêt des Géants"
+  ]
+ },
+ {
+  "name": "King's Passage",
+  "kind": "lieu",
+  "aliases": [
+   "Passage du Roi"
+  ]
+ },
+ {
+  "name": "Shrine of Amana",
+  "kind": "lieu",
+  "aliases": [
+   "Amana"
+  ]
+ },
+ {
+  "name": "Lost Bastille",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Forossa",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Mirrah",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Melfia",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Lindelt",
+  "kind": "lieu",
+  "aliases": [
+   "Lindelt Monastery",
+   "Monastère de Lindelt",
+   "Lindeldt"
+  ]
+ },
+ {
+  "name": "Volgen",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Olaphis",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Heide",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Tseldora",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Jugo",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Lanafir",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Venn",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Alken",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Leydia",
+  "kind": "lieu",
+  "aliases": []
+ },
+ {
+  "name": "Giants",
+  "kind": "faction",
+  "aliases": [
+   "Giant Lord",
+   "Géants",
+   "Seigneur géant"
+  ]
+ },
+ {
+  "name": "Gyrm",
+  "kind": "faction",
+  "aliases": []
+ },
+ {
+  "name": "Knights of Loyce",
+  "kind": "faction",
+  "aliases": [
+   "Chevaliers de Loyce",
+   "Chevalier de Loyce"
+  ]
+ },
+ {
+  "name": "Alonne Knights",
+  "kind": "faction",
+  "aliases": []
+ },
+ {
+  "name": "Drakeblood Knights",
+  "kind": "faction",
+  "aliases": [
+   "Drakeblood Knight",
+   "Chevaliers de Drakesang"
+  ]
+ },
+ {
+  "name": "Primal Knights",
+  "kind": "faction",
+  "aliases": [
+   "Prime-chevaliers"
+  ]
+ },
+ {
+  "name": "Blue Sentinels",
+  "kind": "faction",
+  "aliases": [
+   "Sentinelles bleues",
+   "Knights of the Blue",
+   "Way of Blue"
+  ]
+ },
+ {
+  "name": "Pilgrims of Dark",
+  "kind": "faction",
+  "aliases": [
+   "Pèlerins des Ténèbres"
+  ]
+ },
+ {
+  "name": "Lion Clan",
+  "kind": "faction",
+  "aliases": [
+   "Lion Knights",
+   "Clan du Lion"
+  ]
+ },
+ {
+  "name": "Dragonriders",
+  "kind": "faction",
+  "aliases": [
+   "Dragonrider",
+   "Monte-Dragon"
+  ]
+ },
+ {
+  "name": "Ironclad Soldiers",
+  "kind": "faction",
+  "aliases": []
+ },
+ {
+  "name": "Forlorn",
+  "kind": "faction",
+  "aliases": [
+   "Esseulés"
+  ]
+ },
+ {
+  "name": "Melfian Magic Academy",
+  "kind": "faction",
+  "aliases": [
+   "Académie de magie de Melfia"
+  ]
+ },
+ {
+  "name": "Brotherhood of Blood",
+  "kind": "faction",
+  "aliases": [
+   "Confrérie du Sang"
+  ]
+ },
+ {
+  "name": "Bell Keepers",
+  "kind": "faction",
+  "aliases": [
+   "Bell Keeper"
+  ]
+ },
+ {
+  "name": "Undead",
+  "kind": "notion",
+  "aliases": [
+   "Mort-vivant",
+   "Mort-vivants",
+   "Morts-vivants"
+  ],
+  "broad": true
+ },
+ {
+  "name": "Hollow",
+  "kind": "notion",
+  "aliases": [
+   "Hollows",
+   "Hollowed",
+   "Carcasse",
+   "Carcasses"
+  ],
+  "broad": true,
+  "label": "Hollows"
+ },
+ {
+  "name": "Dark",
+  "kind": "notion",
+  "aliases": [
+   "Ténèbres"
+  ],
+  "broad": true
+ },
+ {
+  "name": "Chaos",
+  "kind": "notion",
+  "aliases": [
+   "ancien Chaos",
+   "Old Chaos"
+  ],
+  "broad": true
+ },
+ {
+  "name": "First Sin",
+  "kind": "notion",
+  "aliases": [
+   "Péché originel"
+  ]
+ },
+ {
+  "name": "Old Ones",
+  "kind": "notion",
+  "aliases": [
+   "Anciens"
+  ]
+ },
+ {
+  "name": "Abyss",
+  "kind": "notion",
+  "aliases": [
+   "Abysses"
+  ]
+ }
+]

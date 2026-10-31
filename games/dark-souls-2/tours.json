@@ -1,0 +1,218 @@
+[
+ {
+  "id": "story",
+  "title": "The curse of Drangleic",
+  "intro": "Start here: the curse of the Undead, the fallen kingdom of Drangleic, and the throne the bearer of the curse is sent to find. The other tours tell each part in depth.",
+  "steps": [
+   {
+    "text": "Cutscenes — passage 1",
+    "note": "The opening: \"You will lose everything. Once branded.\" The cursed become \"A thing that feeds on souls. A Hollow.\" And far to the north, \"a great king built a great kingdom. I believe they called it Drangleic.\""
+   },
+   {
+    "text": "Cutscenes — passage 2",
+    "note": "Why the cursed come: \"one day, you will stand before its decrepit gate. Without really knowing why... Like a moth drawn to a flame.\""
+   },
+   {
+    "text": "Old Ladies — passage 1",
+    "note": "The three old women of Things Betwixt spell out the curse: \"Your flesh will decay, your mind will fade. But you won't ever die. You'll go Hollow.\""
+   },
+   {
+    "text": "Lucatiel of Mirrah — passage 4",
+    "note": "A fellow Undead's hope: \"a Hollow can never be human again. One can skirt this wicked fate only with the help of the souls found here.\""
+   },
+   {
+    "text": "Emerald Herald — passage 2",
+    "note": "The Emerald Herald gives the bearer of the curse a goal: \"Go on, and see the King... King Vendrick.\" And a way: \"seek misery. For misery will lead you to greater, stronger souls.\""
+   },
+   {
+    "text": "Crestfallen Saulden — passage 2",
+    "note": "\"What we call the curse is traceable to the soul.\" And: \"There are four beings in this land with giant souls.\""
+   },
+   {
+    "text": "King's Ring",
+    "note": "The king's own struggle: \"Vendrick, King of Drangleic, used a powerful soul to keep the curse at bay. In the end, he sought the flame that began it all.\""
+   },
+   {
+    "text": "Giant Lord Soul",
+    "note": "How Drangleic fell: \"Vendrick crossed the seas, took prisoner the Giants, and brought them back to his castle, clapped in irons.\" After that, his face \"could be seen to grow darker with each passing day.\""
+   },
+   {
+    "text": "Nashandra — passage 2",
+    "note": "The queen at the castle: \"I am Nashandra, Queen of Drangleic.\" Of Vendrick she says: \"in the end, he never took the true throne.\""
+   },
+   {
+    "text": "Vendrick — passage 3",
+    "note": "Vendrick, hollowed in the crypt: \"With fire, they say, a true king can harness the curse. A lie.\" And: \"I subdued the Giants, and claimed their strength. So that I might step closer to fire...\""
+   },
+   {
+    "text": "Vendrick — passage 4",
+    "note": "Who the queen really is: the Abyss left fragments, \"Each fragment, thirsting for power, spread Dark\"; \"My dear Shandra... was one such fragment...\""
+   },
+   {
+    "text": "Emerald Herald — passage 12",
+    "note": "The Herald's own origin: \"I was born of dragons, contrived by men.\" And a warning: Nashandra \"covets the First Flame, and the Great Soul. Put Nashandra to rest.\""
+   },
+   {
+    "text": "Aldia, Scholar of the First Sin — passage 6",
+    "note": "Before the throne, Aldia asks the real question: \"What do you want, truly? Light? Dark? Or something else entirely...\""
+   },
+   {
+    "text": "Emerald Herald — passage 1",
+    "note": "The end: \"Once the fire is linked, souls will flourish anew, and all of this will play out again. It is your choice...to embrace, or renounce this... Great Sovereign, take your throne.\""
+   }
+  ]
+ },
+ {
+  "id": "great-souls",
+  "title": "The four great souls",
+  "intro": "The Emerald Herald sends the bearer of the curse after four beings with immense souls. Who they were, and what their souls say.",
+  "steps": [
+   {
+    "text": "Crestfallen Saulden — passage 2",
+    "note": "The warning: \"There are four beings in this land with giant souls... Each has a powerful soul, and a terrible curse.\""
+   },
+   {
+    "text": "Emerald Herald — passage 3",
+    "note": "The quest: \"Seek those whose names are unutterable, the four endowed with immense souls. Their souls will serve as beacons.\""
+   },
+   {
+    "text": "Soul of the Lost Sinner",
+    "note": "The first, held at Sinner's Rise: \"The Lost Sinner eternally punishes herself for the sins of her past.\""
+   },
+   {
+    "text": "Old Iron King Soul",
+    "note": "The second: the Old Iron King, \"who succumbed to the flames that swallowed his castle\", his soul \"possessed by the things that lurk below.\""
+   },
+   {
+    "text": "Smelter Demon Soul",
+    "note": "What killed him: \"The Old Iron King's life was taken by a mass of iron that had been given a soul. Was this metal goliath there from the beginning, or was it a product of the king's conceit?\""
+   },
+   {
+    "text": "Soul of the Rotten",
+    "note": "The third, deep in the Gutter: \"The Rotten embraces all, in his sanctuary for all things unwanted or tossed away.\""
+   },
+   {
+    "text": "Soul of the Duke's Dear Freja",
+    "note": "The fourth: the Writhing Ruin, which \"first took possession of a solitary insect, but grew its power, feasting on the wealth of twisted souls found in the land.\""
+   },
+   {
+    "text": "Emerald Herald — passage 7",
+    "note": "\"You have acquired the soul of an Old One.\" And the lesson of the quest: \"The soul and the curse are one and the same.\""
+   },
+   {
+    "text": "Emerald Herald — passage 8",
+    "note": "With the old souls gathered: \"Bearer of the curse, make your way to the castle. There, you will find the throne.\""
+   }
+  ]
+ },
+ {
+  "id": "lost-crowns",
+  "title": "The Lost Crowns",
+  "intro": "The three DLC: Vendrick sends the bearer of the curse after the crowns of three forgotten kings, the Sunken King, the Old Iron King and the Ivory King.",
+  "steps": [
+   {
+    "text": "Vendrick — passage 1",
+    "note": "The call: \"Do you intend to link the fire? Then you must first take the throne. Prove your worth. Find the ancient crowns.\""
+   },
+   {
+    "text": "Vendrick — passage 2",
+    "note": "Why the crowns: \"The crowns hold the strength of lords from times long past.\""
+   },
+   {
+    "text": "Crown of the Sunken King",
+    "note": "The first king \"erected the Eternal Sanctum below the earth to worship the great dragon, but the towering bulwark crumbled with the city shortly after the dragon's awakening.\""
+   },
+   {
+    "text": "Drakeblood Armor",
+    "note": "The besiegers: the Drakeblood Knights, \"who worshipped the blood of dragons, were led by Sir Yorgh in a siege of the Eternal Sanctum.\""
+   },
+   {
+    "text": "Soul of Sinh, the Slumbering Dragon",
+    "note": "The fall of Shulva: \"Sir Yorgh disturbed it with a single great strike, and the dragon could bear its store of poison no longer. The rain of death toppled the city.\""
+   },
+   {
+    "text": "Soul of Elana, Squalid Queen",
+    "note": "Who waits beside the dragon: \"This child of Dark accompanies the dragon, slowly amassing souls in anticipation of the coming day of vengeance.\""
+   },
+   {
+    "text": "Crown of the Old Iron King",
+    "note": "The second king \"sunk below the scorching iron, met the one whose name must never be repeated, and became Ichorous Earth.\""
+   },
+   {
+    "text": "Alonne's Armor",
+    "note": "His knight: Sir Alonne \"chose to serve a little-known and unestablished lord, and helped him become the Old Iron King.\""
+   },
+   {
+    "text": "Soul of the Fume Knight",
+    "note": "Brume Tower's guardian: \"Raime was a distinguished knight who became infatuated with the Bride of Ash, and settled in this land of smoke and fog.\""
+   },
+   {
+    "text": "Soul of Nadalia, Bride of Ash",
+    "note": "The Bride herself: \"When Nadalia came to this land, the king she sought was no longer there.\""
+   },
+   {
+    "text": "Crown of the Ivory King",
+    "note": "The third king \"built a great cathedral to appease the raging flame\", then \"left without a word, leaving everything to Alsanna.\""
+   },
+   {
+    "text": "Ivory King Armor",
+    "note": "His task: Eleum Loyce \"was a vast rampart built to contain the ancient Chaos. The Ivory King placed his throne upon the very mouth of Chaos.\""
+   },
+   {
+    "text": "Alsanna, Silent Oracle — passage 6",
+    "note": "Alsanna keeps watch alone: \"The knights of Eleum Loyce were swallowed by the Chaos... I pray for their deliverance...\""
+   },
+   {
+    "text": "Aldia, Scholar of the First Sin — passage 6",
+    "note": "Aldia sums up the three kings: \"Many monarchs have come and gone. One drowned in poison, another succumbed to flame. Still another slumbers in a realm of ice.\""
+   }
+  ]
+ },
+ {
+  "id": "aldia",
+  "title": "Aldia and the First Sin",
+  "intro": "Vendrick's elder brother, his experiments to escape fate, and his questions about light, Dark and the lie of fire.",
+  "steps": [
+   {
+    "text": "Aldia Key",
+    "note": "The brothers: \"King Vendrick condemned his own elder brother to the mansion. They both sought the truth, but through different means.\""
+   },
+   {
+    "text": "Aldia Hammer",
+    "note": "Aldia's past: \"Lord Aldia was the King's elder brother and helped found Drangleic, but he later lost interest in the land's fortunes.\" His acolytes' hammers \"dissect the bodies of the victims of their experimentation.\""
+   },
+   {
+    "text": "Dragon Acolyte Mask",
+    "note": "His acolytes: \"Several of the greatest minds converged in Aldia to weave strange new rituals, but rumors suggest that during the course of their work their thoughts were not their own.\""
+   },
+   {
+    "text": "Hood of the Forlorn",
+    "note": "What the experiments made: \"Born of Aldia's obsession with the First Sin, the Forlorn lost both their corporeal form and a world to call their own.\""
+   },
+   {
+    "text": "Emerald Herald — passage 12",
+    "note": "Another of them: \"I was born of dragons, contrived by men. By ones who would cozen fate herself... But they failed.\""
+   },
+   {
+    "text": "Aldia, Scholar of the First Sin — passage 2",
+    "note": "Aldia's choice for the bearer of the curse: \"there are but two paths. Inherit the order of this world, or destroy it.\""
+   },
+   {
+    "text": "Aldia, Scholar of the First Sin — passage 3",
+    "note": "The roots of the world: \"Once, the Lord of Light banished Dark, and all that stemmed from humanity.\""
+   },
+   {
+    "text": "Aldia, Scholar of the First Sin — passage 4",
+    "note": "\"Men are props on the stage of life, and no matter how tender, how exquisite... A lie will remain a lie.\""
+   },
+   {
+    "text": "Ancient Dragon — passage 1",
+    "note": "The dragon in the Aerie: \"For the curse of life, is the curse of want.\""
+   },
+   {
+    "text": "Aldia, Scholar of the First Sin — passage 6",
+    "note": "His failure, and his question: \"I sought to shed the yoke of fate, but failed... What do you want, truly? Light? Dark? Or something else entirely...\""
+   }
+  ]
+ }
+]

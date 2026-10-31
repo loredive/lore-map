@@ -55,6 +55,7 @@ def test_build_keeps_game_items_in_both_languages_and_marks_dlc_lines():
 def test_junk_entries_are_dropped():
     assert ds2.clean(" no text ") == ""
     assert ds2.clean("none text") == ""
+    assert ds2.clean("(no line)") == "" and ds2.clean("(N/A)") == "" and ds2.clean("(deleted)") == ""
     assert ds2.clean("A murky, forgotten land. ") == "A murky, forgotten land."
 
 
