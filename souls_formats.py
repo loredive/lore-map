@@ -14,6 +14,10 @@ import zlib
 # clé AES des paramètres de Dark Souls III sur PC (Data0.bdt), publiée par SoulsFormats (SFUtil) et les
 # éditeurs de paramètres de la communauté
 DS3_REGULATION_KEY = b"ds3#jn/8_7(rsY9pg55GFN7VFL#+3n/)"
+# clé AES des paramètres de Dark Souls II: Scholar of the First Sin (enc_regulation.bnd.dcx), publiée par
+# SoulsFormats (SFUtil.DecryptDS2Regulation)
+DS2_REGULATION_KEY = bytes([0x40, 0x17, 0x81, 0x30, 0xDF, 0x0A, 0x94, 0x54,
+                            0x33, 0x09, 0xE1, 0x71, 0xEC, 0xBF, 0x25, 0x4C])
 # Dark Souls III : table de paramètres -> fichier de disposition de Paramdex
 DS3_LAYOUTS = {"EquipParamGoods": "EQUIP_PARAM_GOODS_ST", "EquipParamWeapon": "EQUIP_PARAM_WEAPON_ST",
                "EquipParamProtector": "EQUIP_PARAM_PROTECTOR_ST", "EquipParamAccessory": "EQUIP_PARAM_ACCESSORY_ST"}
@@ -49,17 +53,24 @@ def read_dcx(raw: bytes) -> bytes:
 
 
 def read_bnd4(data: bytes) -> dict[str, bytes]:
-    """BND4 (petit-boutiste, noms UTF-16) : {nom de fichier sans chemin: contenu}."""
+    """BND4 (petit-boutiste) : {nom de fichier sans chemin: contenu}. Noms en UTF-16, ou en Shift-JIS
+    si l'octet 0x30 est nul ; entrées de 0x24 octets (taille, position, identifiant, nom), ou de 0x18
+    sans identifiant (paramètres de Dark Souls II)."""
     if data[:4] != b"BND4":
         raise ValueError("BND4 attendu")
     count, = struct.unpack_from("<i", data, 0x0C)
     entry_size, = struct.unpack_from("<q", data, 0x20)
+    unicode = data[0x30] != 0
     files = {}
     for k in range(count):
         o = 0x40 + k * entry_size
         size, = struct.unpack_from("<q", data, o + 8)
-        offset, _id, name_at = struct.unpack_from("<Iii", data, o + 24)
-        files[_utf16(data, name_at).split("\\")[-1]] = data[offset:offset + size]
+        if entry_size == 0x18:
+            offset, name_at = struct.unpack_from("<II", data, o + 16)
+        else:
+            offset, _id, name_at = struct.unpack_from("<Iii", data, o + 24)
+        name = _utf16(data, name_at) if unicode else data[name_at:data.index(b"\0", name_at)].decode("shift_jis")
+        files[name.split("\\")[-1]] = data[offset:offset + size]
     return files
 
 
@@ -96,6 +107,50 @@ def read_bhd5(b: bytes) -> dict[int, tuple[int, int]]:
             h, size, offset, _ = struct.unpack_from("<IIII", b, entries_at + 16 * j)
             out[h] = (size, offset)
     return out
+
+
+def rsa_public_decrypt(raw: bytes, pem: bytes) -> bytes:
+    """Index chiffré de Dark Souls II (GameDataEbl.bhd) : RSA « nu » avec la clé publique livrée à côté
+    (GameDataKeyCode.pem), par blocs de la taille de la clé ; chaque bloc rend un octet de moins."""
+    from cryptography.hazmat.primitives.serialization import load_pem_public_key
+    key = load_pem_public_key(pem).public_numbers()
+    k = (key.n.bit_length() + 7) // 8
+    return b"".join(pow(int.from_bytes(raw[i:i + k], "big"), key.e, key.n).to_bytes(k, "big")[1:]
+                    for i in range(0, len(raw), k))
+
+
+def read_bhd5_ds2(b: bytes) -> dict[int, tuple[int, int, bytes | None, list[tuple[int, int]]]]:
+    """Index BHD5 de Dark Souls II, déchiffré : {hash du chemin: (taille, position, clé AES ou None,
+    plages chiffrées)}. Entrées de 32 octets : hash, taille, position, SHA, clé AES (positions sur 64 bits)."""
+    if b[:4] != b"BHD5":
+        raise ValueError("BHD5 attendu")
+    buckets, at = struct.unpack_from("<ii", b, 0x10)
+    out = {}
+    for k in range(buckets):
+        count, entries_at = struct.unpack_from("<ii", b, at + 8 * k)
+        for j in range(count):
+            h, size, offset, _sha, aes_at = struct.unpack_from("<Iiqqq", b, entries_at + 32 * j)
+            key, ranges = None, []
+            if aes_at:
+                key = b[aes_at:aes_at + 16]
+                n, = struct.unpack_from("<i", b, aes_at + 16)
+                ranges = [struct.unpack_from("<qq", b, aes_at + 20 + 16 * r) for r in range(n)]
+            out[h] = (size, offset, key, ranges)
+    return out
+
+
+def decrypt_ranges(data: bytes, key: bytes | None, ranges: list[tuple[int, int]]) -> bytes:
+    """Un fichier d'une archive de Dark Souls II : seules les plages listées sont chiffrées (AES-128-ECB) ;
+    une plage (-1, -1) n'est pas chiffrée."""
+    if key is None:
+        return data
+    from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+    out = bytearray(data)
+    dec = Cipher(algorithms.AES(key), modes.ECB()).decryptor()
+    for start, end in ranges:
+        if start != -1 and end > start:
+            out[start:end] = dec.update(data[start:end])
+    return bytes(out)
 
 
 def read_fmg(b: bytes) -> dict[int, str]:
@@ -154,6 +209,14 @@ def read_regulation(raw: bytes, key: bytes) -> dict[str, bytes]:
     from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
     dec = Cipher(algorithms.AES(key), modes.CBC(raw[:16])).decryptor()
     return read_bnd4(read_dcx(dec.update(raw[16:]) + dec.finalize()))
+
+
+def read_regulation_ds2(raw: bytes, key: bytes = DS2_REGULATION_KEY) -> dict[str, bytes]:
+    """Paramètres chiffrés de Dark Souls II (enc_regulation.bnd.dcx) : AES-128-CTR à partir de l'octet 32,
+    compteur initial 0x80, les 11 premiers octets du fichier, puis 1 ; dessous, un DCX (BND4 de .param)."""
+    from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+    dec = Cipher(algorithms.AES(key), modes.CTR(b"\x80" + raw[:11] + b"\0\0\0\x01")).decryptor()
+    return read_bnd4(read_dcx(dec.update(raw[32:]) + dec.finalize()))
 
 
 def layout_offsets(xml: str) -> tuple[dict[str, int], int]:

@@ -1,0 +1,36 @@
+{
+ "id": "dark-souls-2",
+ "title": "Dark Souls II",
+ "colors": {
+  "Items": "#d9c48e",
+  "Weapons": "#cf8e66",
+  "Shields": "#b9a27e",
+  "Armor": "#9db8a3",
+  "Rings": "#c7a3d1",
+  "Spells": "#7fc0cc",
+  "Keys": "#e3dcc0",
+  "Dialogue": "#a7b6d6"
+ },
+ "ui": {
+  "tagline": "Every star is a text from Dark Souls II. The more two texts talk about the same things, the closer they sit.",
+  "aria": "Map of Dark Souls II's texts: each star is a text, and texts close together talk about the same things. Arrow keys to move, plus and minus to zoom, Enter to open the targeted star.",
+  "credit": "Dark Souls II texts © FromSoftware / Bandai Namco. Non-commercial fan project.",
+  "alt_label": "French",
+  "alt_lang": "fr",
+  "search_examples": [
+   "the curse of the Undead",
+   "Vendrick"
+  ],
+  "precise": {
+   "phrase": "Old Iron King",
+   "both": "Vendrick + giants",
+   "exclude": "-Aldia",
+   "category": "in:rings"
+  },
+  "entity_examples": "Vendrick or Drangleic",
+  "empty_hint": "Vendrick, Drangleic",
+  "dlc_label": "The Lost Crowns"
+ },
+ "images": "game-files",
+ "tours": true
+}
