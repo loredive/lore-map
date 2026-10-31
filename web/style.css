@@ -516,3 +516,7 @@ body.sky-d[data-game]::after {
 .tour-steps button:hover, .tour-steps button[aria-current] { color: var(--parch); }
 .tour-steps .step { flex: none; width: 1.4rem; height: 1.4rem; border: 1px solid var(--rim); border-radius: 50%; text-align: center; line-height: 1.3rem; font-size: .78rem; }
 .tour-steps button[aria-current] .step { border-color: var(--grace); color: var(--grace); }
+.results.path .why {
+  margin: .1rem 0 .1rem 1.8rem; color: var(--faint); font-size: .85rem; line-height: 1.35; font-style: italic;
+}
+.results.path .why span { color: var(--grace); font-style: normal; }
