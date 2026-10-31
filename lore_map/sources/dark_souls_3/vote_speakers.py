@@ -14,23 +14,23 @@ sauf les noms de SURE, que leurs répliques suffisent à reconnaître.
 Quelques noms sont corrigés à la main (RENAME, MANUAL). Écrit speakers.json, relu à la main.
 
 Usage (une fois ; les pages sont téléchargées à part, ce sont des données, pas du code) :
-    uv run python games/dark-souls-3/vote_speakers.py --download /tmp/wiki/ds3_pages.json
-    uv run python games/dark-souls-3/vote_speakers.py --wiki /tmp/wiki/ds3_pages.json \\
+    uv run python -m lore_map.sources.dark_souls_3.vote_speakers --download /tmp/wiki/ds3_pages.json
+    uv run python -m lore_map.sources.dark_souls_3.vote_speakers --wiki /tmp/wiki/ds3_pages.json \\
         --msg "/mnt/c/Games/Steam/steamapps/common/DARK SOULS III/Game/msg"
 """
 import argparse
 import json
 import re
-import sys
 import time
 import urllib.parse
 import urllib.request
 from collections import Counter, defaultdict
 from pathlib import Path
 
-HERE = Path(__file__).parent
-sys.path.insert(0, str(HERE.parent.parent))      # souls_formats.py, à la racine du dépôt
-from lore_map.formats.dialog import speaker_for  # noqa: E402
+from lore_map.formats.dialog import speaker_for
+from lore_map.games import GAMES
+
+HERE = GAMES / "dark-souls-3"                 # les données du jeu : game.json, speakers.json…
 
 API = "https://darksouls.fandom.com/api.php?"
 CATEGORIES = ("Dark_Souls_III:_Characters", "Dark_Souls_III:_Bosses")
@@ -159,7 +159,7 @@ def main():
     if a.download:
         download(a.download)
         return
-    from extract import load_tables  # ici : les tests chargent ce fichier sans le dossier du jeu
+    from lore_map.sources.dark_souls_3.extract import load_tables  # ici : les tests chargent ce fichier sans le dossier du jeu
     tables, _dlc = load_tables(a.msg)
     talk = {i: t for i, t in tables["en"]["会話"].items() if t != "(dummyText)"}
     blocks, subs, hits = vote(talk, json.loads(a.wiki.read_text(encoding="utf-8")))

@@ -21,23 +21,23 @@ objet dont la ligne, dans ItemParam (Game/enc_regulation.bnd.dcx, chiffré), a u
 est le premier champ de la ligne (disposition ITEM_PARAM de Paramdex, DS2S).
 
 Usage :
-    python games/dark-souls-2/extract.py \\
+    python -m lore_map.sources.dark_souls_2.extract \\
         --game "/mnt/c/Games/Steam/steamapps/common/Dark Souls II Scholar of the First Sin/Game" \\
         --dictionary ../dark-souls-2-text/uxm/ScholarDictionary.txt --out ../dark-souls-2-text/ds2_text.json
 """
 import argparse
 import json
 import struct
-import sys
 from collections import Counter
 from pathlib import Path
 
-HERE = Path(__file__).parent
-sys.path.insert(0, str(HERE.parent.parent))      # souls_formats.py, à la racine du dépôt
-from lore_map.formats.archives import decrypt_ranges, path_hash, read_bhd5_ds2, rsa_public_decrypt  # noqa: E402
-from lore_map.formats.dialog import dialog, speaker_for  # noqa: E402
-from lore_map.formats.fmg import read_fmg  # noqa: E402
-from lore_map.formats.params import param_rows, read_regulation_ds2  # noqa: E402
+from lore_map.formats.archives import decrypt_ranges, path_hash, read_bhd5_ds2, rsa_public_decrypt
+from lore_map.formats.dialog import dialog, speaker_for
+from lore_map.formats.fmg import read_fmg
+from lore_map.formats.params import param_rows, read_regulation_ds2
+from lore_map.games import GAMES
+
+HERE = GAMES / "dark-souls-2"                 # les données du jeu : game.json, speakers.json…
 
 LANGS = {"en": "english", "fr": "french"}
 TALK = "会話"                      # noms des tables attendus par formats.dialog.dialog

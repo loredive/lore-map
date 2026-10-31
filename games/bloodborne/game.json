@@ -1,7 +1,7 @@
 {
   "id": "bloodborne",
   "title": "Bloodborne",
-  "source": "message archives of the player's PS4 copy (msg/engus, frafr, jpnjp), read by games/bloodborne/extract.py",
+  "source": "message archives of the player's PS4 copy (msg/engus, frafr, jpnjp), read by lore_map/sources/bloodborne/extract.py",
   "text_lang": "en",
   "alt_lang": "fr",
   "min_chars": 15,

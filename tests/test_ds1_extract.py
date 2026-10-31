@@ -1,12 +1,5 @@
 """Textes de Dark Souls (Prepare to Die Edition) : les règles de l'extracteur, sur de petites tables."""
-import importlib.util
-from pathlib import Path
-
-# extract.py existe dans chaque dossier de jeu : celui-ci est chargé sous un nom à lui
-_path = Path(__file__).parent.parent / "games" / "dark-souls-1" / "extract.py"
-_spec = importlib.util.spec_from_file_location("ds1_extract", _path)
-ds1 = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(ds1)
+from lore_map.sources.dark_souls_1 import extract as ds1
 
 SPEAKERS = {"blocks": {"1000": "Oscar of Astora"}, "sub_blocks": {}, "unknown": "Unknown NPC"}
 

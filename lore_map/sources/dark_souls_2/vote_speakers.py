@@ -1,12 +1,10 @@
 """
-Qui parle dans 会話.fmg ? Les répliques sont rangées par blocs de 10 000 identifiants, un par
-personnage (le bloc 0 en mêle plusieurs, par sous-blocs de 100), sans nom. Chaque réplique est
-cherchée dans les pages des personnages, marchands et boss de Dark Souls du wiki darksouls.fandom.com
-(leur texte source, par l'API du wiki) ; chaque bloc prend la page qui cite le plus de ses
-répliques. Un bloc mêlé (son gagnant n'a pas plus de la moitié des voix) n'a pas de nom par défaut :
-chacun de ses sous-blocs prend la page qui cite le plus de ses répliques, et un sous-bloc qu'aucune ne
-cite reste sans nom. Ailleurs, pas d'exception : une page cite souvent les répliques des autres qui
-parlent d'elle.
+Qui parle dans les dialogues de Dark Souls II (talk/m<carte>.fmg) ? Les répliques sont rangées par
+blocs de 10 000 identifiants, un par personnage, sans nom. Chaque réplique est cherchée dans les pages
+des personnages, marchands et boss de Dark Souls II du wiki darksouls.fandom.com (leur texte source, par
+l'API du wiki) ; chaque bloc prend la page qui cite le plus de ses répliques. Un bloc mêlé (son gagnant
+n'a pas plus de la moitié des voix) n'a pas de nom par défaut : chacun de ses sous-blocs prend la page
+qui cite le plus de ses répliques, et un sous-bloc qu'aucune ne cite reste sans nom.
 
 Un nom dont le wiki ne confirme pas au moins la moitié des répliques (CONFIRMED), un nom donné à la
 main, et les répliques sans nom sont marqués incertains (« uncertain » : la raison, montrée par la page),
@@ -14,26 +12,27 @@ sauf les noms de SURE, que leurs répliques suffisent à reconnaître.
 Quelques noms sont corrigés à la main (RENAME, MANUAL). Écrit speakers.json, relu à la main.
 
 Usage (une fois ; les pages sont téléchargées à part, ce sont des données, pas du code) :
-    python games/dark-souls-1/vote_speakers.py --download /tmp/wiki/ds1_pages.json
-    python games/dark-souls-1/vote_speakers.py --wiki /tmp/wiki/ds1_pages.json \\
-        --data "/mnt/c/Games/Steam/steamapps/common/Dark Souls Prepare to Die Edition/DATA"
+    python -m lore_map.sources.dark_souls_2.vote_speakers --download ../dark-souls-2-text/wiki_pages.json
+    python -m lore_map.sources.dark_souls_2.vote_speakers --wiki ../dark-souls-2-text/wiki_pages.json \\
+        --game "/mnt/c/Games/Steam/steamapps/common/Dark Souls II Scholar of the First Sin/Game" \\
+        --dictionary ../dark-souls-2-text/uxm/ScholarDictionary.txt
 """
 import argparse
 import json
 import re
-import sys
 import time
 import urllib.parse
 import urllib.request
 from collections import Counter, defaultdict
 from pathlib import Path
 
-HERE = Path(__file__).parent
-sys.path.insert(0, str(HERE.parent.parent))      # souls_formats.py, à la racine du dépôt
-from lore_map.formats.dialog import speaker_for  # noqa: E402
+from lore_map.formats.dialog import speaker_for
+from lore_map.games import GAMES
+
+HERE = GAMES / "dark-souls-2"                 # les données du jeu : game.json, speakers.json…
 
 API = "https://darksouls.fandom.com/api.php?"
-CATEGORIES = ("Dark_Souls:_Characters", "Dark_Souls:_Merchants", "Dark_Souls:_Bosses")
+CATEGORIES = ("Dark_Souls_II:_Characters", "Dark_Souls_II:_Merchants", "Dark_Souls_II:_Bosses")
 MIN_CHARS = 15                    # plus court (« Hmm... »), une réplique ne dit pas qui parle
 MIN_VOTES = 3                     # en dessous, un bloc reste sans nom
 MIN_SUB_VOTES = 2                 # un sous-bloc ne contredit son bloc qu'avec au moins ce score
@@ -41,20 +40,21 @@ MIXED = 0.5                       # part des voix du gagnant d'un bloc mêlé, a
 CONFIRMED = 0.5                   # en dessous de cette part de répliques confirmées, un nom est incertain
 UNKNOWN = "Unknown NPC"
 # titres de pages -> nom affiché
-RENAME = {}
+RENAME = {"Rat King (character)": "Rat King"}
 # blocs qu'aucune page ne cite (ou mal), nommés d'après leurs répliques
 MANUAL = {
-    "3802": "Siegmeyer of Catarina",                     # « Mmm...mmm... », dans les blocs de Siegmeyer
-    "5500": "Snuggly the Crow",                          # « Give me, warm. Give me, soft. »
-    "5600": "Dusk of Oolacile",                          # le DLC : « Long ago, in my homeland of Oolacile… »
+    "6270": "Nashandra",                         # fin du jeu : « Brave Undead, you have proven yourself to me. »
+    "7050": "Old Ladies",                        # Things Betwixt : « Heh heh heh... What seems to be the ruckus? »
+    "7051": "Old Ladies",
+    "7052": "Old Ladies",
+    "7590": "Elana, the Squalid Queen",          # le DLC, Shulva : « You...forever you shall rot... »
+    "7602": "Milfanito",                         # « Ah...Ahh... » chanté, à côté des blocs 7600 et 7601
 }
-# le bloc 0 mêle le récit d'ouverture et Gwyndolin au tombeau de Gwyn : nommé par sous-bloc
-MANUAL_SUB = {"10": "Narrator", "20": "Narrator", "30": "Dark Sun Gwyndolin", "40": "Dark Sun Gwyndolin"}
+MANUAL_SUB = {}
 
 # noms certains sans confirmation du wiki : leurs répliques ne laissent pas de doute
 SURE = {
-    "Narrator",                       # le récit d'ouverture (« The Darksign brands the Undead. »)
-    "Snuggly the Crow",               # ses répliques sont celles du troc au nid
+    "Old Ladies",                     # les trois vieilles de Things Betwixt, seules à y parler
 }
 
 
@@ -104,7 +104,7 @@ def speakers(blocks: dict, subs: dict) -> dict:
         title, score = c.most_common(1)[0]
         if s // 100 in mixed and score >= MIN_SUB_VOTES:
             sub_blocks[str(s)] = name(title)
-    return {"source": "darksouls.fandom.com, pages des personnages, marchands et boss de Dark Souls, vote par réplique",
+    return {"source": "darksouls.fandom.com, pages des personnages, marchands et boss de Dark Souls II, vote par réplique",
             "unknown": UNKNOWN, "blocks": out, "sub_blocks": sub_blocks}
 
 
@@ -125,7 +125,7 @@ def uncertain(talk: dict[int, str], data: dict, hits: dict[int, list[str]]) -> d
         elif who in {*MANUAL.values(), *MANUAL_SUB.values()} and not confirmed[who]:
             out[who] = "Named from what the lines say; no source confirms it."
         elif confirmed[who] < CONFIRMED * n:
-            out[who] = (f"The Dark Souls wiki confirms {confirmed[who]} of {n} lines; "
+            out[who] = (f"The Dark Souls II wiki confirms {confirmed[who]} of {n} lines; "
                         "the others are attributed by where they sit in the game files.")
     return out
 
@@ -153,13 +153,15 @@ def main():
     p = argparse.ArgumentParser(description=__doc__.split("\n\n")[1])
     p.add_argument("--download", type=Path, help="télécharge les pages du wiki dans ce fichier, puis s'arrête")
     p.add_argument("--wiki", type=Path, help="pages téléchargées par --download")
-    p.add_argument("--data", type=Path, help="dossier DATA/ du jeu (dvdbnd*.bhd5 et .bdt)")
+    p.add_argument("--game", type=Path, help="dossier Game/ du jeu (GameDataEbl.bhd, .bdt, .pem)")
+    p.add_argument("--dictionary", type=Path, help="ScholarDictionary.txt d'UXM (chemins des fichiers)")
     a = p.parse_args()
     if a.download:
         download(a.download)
         return
-    from extract import Archives, load_tables  # ici : les tests chargent ce fichier sans le dossier du jeu
-    tables, _dlc = load_tables(Archives(a.data))
+    from lore_map.sources.dark_souls_2.extract import Archive, load_tables, talk_maps  # ici : les tests chargent ce fichier sans le jeu
+    maps = talk_maps(a.dictionary.read_text(encoding="utf-8").splitlines())
+    tables, _dlc = load_tables(Archive(a.game), maps)
     talk = tables["en"]["会話"]
     blocks, subs, hits = vote(talk, json.loads(a.wiki.read_text(encoding="utf-8")))
     data = speakers(blocks, subs)

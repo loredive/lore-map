@@ -1,15 +1,9 @@
 """Textes de Dark Souls III, sur de petites archives fabriquées dans la même disposition que celles du
 jeu (item_dlc2 et menu_dlc2 par langue ; chaque table en trois parts : jeu de base, _dlc1, _dlc2)."""
-import importlib.util
-from pathlib import Path
-
 from test_bloodborne_extract import make_bnd4, make_dcx, make_fmg
 
-# extract.py existe dans chaque dossier de jeu : celui-ci est chargé sous un nom à lui
-_path = Path(__file__).parent.parent / "games" / "dark-souls-3" / "extract.py"
-_spec = importlib.util.spec_from_file_location("ds3_extract", _path)
-ds3 = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(ds3)
+from lore_map.sources.dark_souls_3 import extract as ds3
+from lore_map.sources.dark_souls_3 import vote_speakers as vote
 
 SPEAKERS = {"blocks": {"20": "Fire Keeper"}, "sub_blocks": {}, "unknown": "Unknown NPC"}
 
@@ -72,10 +66,6 @@ def test_load_tables_reads_the_dlc2_archives_of_each_language(tmp_path):
     assert dlc["武器名"] == {12} and dlc["会話"] == {200001}
 
 
-_vpath = Path(__file__).parent.parent / "games" / "dark-souls-3" / "vote_speakers.py"
-_vspec = importlib.util.spec_from_file_location("ds3_vote", _vpath)
-vote = importlib.util.module_from_spec(_vspec)
-_vspec.loader.exec_module(vote)
 
 
 def test_each_block_takes_the_page_quoting_most_of_its_lines_and_sub_blocks_can_differ():

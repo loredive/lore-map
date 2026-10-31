@@ -21,16 +21,23 @@ uv run python -m lore_map.images     # Elden Ring icons, from the Elden Ring Fan
 ```
 
 The Elden Ring text comes from [EldenRingTextExplorer](https://github.com/EldenRingExplorer/EldenRingTextExplorer).
-Bloodborne has no public text dump: `games/bloodborne/extract.py` and `icons.py` read your own copy
-of the game, then `prepare.py --game bloodborne` builds the map. Dark Souls III works the same way
-from the Steam copy, once its `msg/` folder is unpacked with UXM: `games/dark-souls-3/extract.py`,
-then `prepare.py --game dark-souls-3`, then `games/dark-souls-3/icons.py` for its icons. These read the game's
-encrypted item tables with the key published by the modding community, and Paramdex for their layout.
-Dark Souls (Prepare to Die Edition) needs no unpacking: `games/dark-souls-1/extract.py` and `icons.py` read
-the Steam copy's archives in place, then `prepare.py --game dark-souls-1` builds the map.
-Dark Souls II (Scholar of the First Sin) is read in place too: `games/dark-souls-2/extract.py` decrypts
-the archive index with the key shipped beside it and takes file names from UXM's dictionary, then
-`prepare.py --game dark-souls-2`, then `games/dark-souls-2/icons.py`.
+The other games have no public text dump: each one's `extract` and `icons` read your own copy of the
+game, then `prepare --game <id>` builds the map. For example:
+
+```bash
+uv run python -m lore_map.sources.dark_souls_2.extract --game <…/Game> --dictionary <…> --out ../ds2_text.json
+uv run python -m lore_map.prepare --game dark-souls-2 --source ../ds2_text.json
+uv run python -m lore_map.sources.dark_souls_2.icons --game <…/Game> --text ../ds2_text.json
+```
+
+Bloodborne reads a PS4 dump. Dark Souls III needs its `msg/` folder unpacked with UXM first. Dark Souls
+and Dark Souls II are read in place from the Steam copy. The Souls games' item tables are encrypted and
+read with the keys published by the modding community, with Paramdex for their layout. Each script's
+docstring has its exact arguments.
+
+The code is in `lore_map/`: the pipeline (`prepare`, `entities`, `labels`, `layouts`…), the game file
+formats in `formats/`, and one package per game in `sources/`. `games/<id>/` holds each game's hand-edited
+data: settings, group titles, tours, characters and places, speakers.
 
 ## Tests
 

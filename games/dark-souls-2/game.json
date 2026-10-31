@@ -1,7 +1,7 @@
 {
   "id": "dark-souls-2",
   "title": "Dark Souls II",
-  "source": "message archives of the player's Steam copy of Dark Souls II: Scholar of the First Sin (Game/GameDataEbl.bdt, read in place), read by games/dark-souls-2/extract.py",
+  "source": "message archives of the player's Steam copy of Dark Souls II: Scholar of the First Sin (Game/GameDataEbl.bdt, read in place), read by lore_map/sources/dark_souls_2/extract.py",
   "text_lang": "en",
   "alt_lang": "fr",
   "min_chars": 15,

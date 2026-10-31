@@ -8,7 +8,7 @@ en WebP dans web/img/bloodborne/ et écrit web/data/bloodborne/images.json ({nom
 Rien n'est écrit dans le dossier du jeu. Pas d'icônes pour les gemmes, runes, notes et dialogues.
 
 Usage (après extract.py et prepare.py) :
-    uv run python games/bloodborne/icons.py --dump /mnt/c/PS4Games/CUSA00207-UPDATE/dvdroot_ps4 \\
+    uv run python -m lore_map.sources.bloodborne.icons --dump /mnt/c/PS4Games/CUSA00207-UPDATE/dvdroot_ps4 \\
         --base /mnt/c/PS4Games/CUSA00207/dvdroot_ps4 --text ../bloodborne-text/bloodborne_text.json
 """
 import argparse
@@ -18,10 +18,12 @@ import struct
 from collections import Counter
 from pathlib import Path
 
-from extract import HERE, read_bnd4, read_dcx
 from PIL import Image
 
-ROOT = HERE.parent.parent
+from lore_map.formats.archives import read_bnd4, read_dcx
+from lore_map.games import ROOT
+from lore_map.sources.bloodborne.extract import HERE
+
 DATA, IMG = ROOT / "web" / "data" / "bloodborne", ROOT / "web" / "img" / "bloodborne"
 LANG = json.loads((HERE / "game.json").read_text(encoding="utf-8"))["text_lang"]   # langue des noms sur la carte
 SIZE = 192                 # px : affichée à 96 px, nette sur un écran à haute densité

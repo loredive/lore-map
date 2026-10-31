@@ -1,12 +1,12 @@
 """Lecture des archives de messages de Bloodborne, sur de petits fichiers fabriqués ici
 dans la même disposition que ceux du jeu (DCX DFLT -> BND4 -> FMG v2)."""
 import struct
-import sys
 import zlib
-from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent.parent / "games" / "bloodborne"))
-from extract import build, drop_repeated_runs, note_title, read_bnd4, read_dcx, read_fmg, speaker_for, unwrap  # noqa: E402
+from lore_map.formats.archives import read_bnd4, read_dcx
+from lore_map.formats.dialog import drop_repeated_runs, speaker_for
+from lore_map.formats.fmg import read_fmg, unwrap
+from lore_map.sources.bloodborne.extract import build, note_title
 
 
 def make_fmg(entries):

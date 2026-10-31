@@ -10,26 +10,25 @@ web/data/dark-souls-3/images.json ({nom du texte: n}). Rien n'est écrit dans le
 Les sorts sont des objets (EquipParamGoods) ; les dialogues n'ont pas d'icône.
 
 Usage (après extract.py et prepare.py ; dossier Game/ ouvert par UXM) :
-    uv run --with cryptography python games/dark-souls-3/icons.py --download /tmp/paramdex
-    uv run --with cryptography python games/dark-souls-3/icons.py --paramdex /tmp/paramdex \\
+    uv run --with cryptography python -m lore_map.sources.dark_souls_3.icons --download /tmp/paramdex
+    uv run --with cryptography python -m lore_map.sources.dark_souls_3.icons --paramdex /tmp/paramdex \\
         --game "/mnt/c/Games/Steam/steamapps/common/DARK SOULS III/Game" --text ../dark-souls-3-text/ds3_text.json
 """
 import argparse
 import io
 import json
 import struct
-import sys
 import urllib.request
 from collections import Counter
 from pathlib import Path
 
 from PIL import Image
 
-HERE = Path(__file__).parent
-ROOT = HERE.parent.parent
-sys.path.insert(0, str(ROOT))                    # souls_formats.py, à la racine du dépôt
-from lore_map.formats.archives import read_dcx  # noqa: E402
-from lore_map.formats.params import DS3_ITEMS, DS3_LAYOUTS, DS3_REGULATION_KEY, icon_ids, read_regulation  # noqa: E402
+from lore_map.formats.archives import read_dcx
+from lore_map.formats.params import DS3_ITEMS, DS3_LAYOUTS, DS3_REGULATION_KEY, icon_ids, read_regulation
+from lore_map.games import GAMES, ROOT
+
+HERE = GAMES / "dark-souls-3"                 # les données du jeu : game.json, speakers.json…
 
 DATA, IMG = ROOT / "web" / "data" / "dark-souls-3", ROOT / "web" / "img" / "dark-souls-3"
 LANG = json.loads((HERE / "game.json").read_text(encoding="utf-8"))["text_lang"]   # langue des noms sur la carte

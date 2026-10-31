@@ -6,7 +6,7 @@ chaque bloc prend le personnage qui y a le plus de répliques. Écrit speakers.j
 
 Usage (une fois ; la page est téléchargée à part, c'est une donnée, pas du code) :
     curl -L http://www.bloodborne-wiki.com/2017/12/dialogue-reference.html -o /tmp/wiki/dialogue.html
-    uv run python games/bloodborne/vote_speakers.py --wiki /tmp/wiki/dialogue.html --msg <…/msg>
+    uv run python -m lore_map.sources.bloodborne.vote_speakers --wiki /tmp/wiki/dialogue.html --msg <…/msg>
 """
 import argparse
 import html
@@ -15,7 +15,9 @@ import re
 from collections import Counter, defaultdict
 from pathlib import Path
 
-from extract import HERE, LANGS, read_bnd4, read_dcx, read_fmg
+from lore_map.formats.archives import read_bnd4, read_dcx
+from lore_map.formats.fmg import read_fmg
+from lore_map.sources.bloodborne.extract import HERE, LANGS
 
 MIN_CHARS = 12          # en dessous (« Ahh... »), une réplique ne désigne personne
 SUB_MIN_VOTES = 2       # un sous-bloc ne contredit son bloc qu'avec au moins 2 voix…

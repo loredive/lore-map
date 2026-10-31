@@ -1,10 +1,7 @@
 """Décodage des illustrations de Bloodborne : ordre des tuiles PS4 et disposition des paramètres."""
 import struct
-import sys
-from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent.parent / "games" / "bloodborne"))
-from icons import deswizzle, morton, paramdef_offsets  # noqa: E402
+from lore_map.sources.bloodborne.icons import deswizzle, morton, paramdef_offsets
 
 
 def test_morton_interleaves_bits():

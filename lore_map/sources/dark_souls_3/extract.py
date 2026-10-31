@@ -17,22 +17,22 @@ objets coupés) : seul un texte dont la ligne, dans les tables d'objets du jeu, 
 Les interlocuteurs des dialogues viennent de speakers.json (blocs d'identifiants -> nom).
 
 Usage :
-    uv run --with cryptography python games/dark-souls-3/icons.py --download /tmp/paramdex
-    uv run --with cryptography python games/dark-souls-3/extract.py --paramdex /tmp/paramdex \\
+    uv run --with cryptography python -m lore_map.sources.dark_souls_3.icons --download /tmp/paramdex
+    uv run --with cryptography python -m lore_map.sources.dark_souls_3.extract --paramdex /tmp/paramdex \\
         --msg "/mnt/c/Games/Steam/steamapps/common/DARK SOULS III/Game/msg" --out ../dark-souls-3-text/ds3_text.json
 """
 import argparse
 import json
-import sys
 from collections import Counter
 from pathlib import Path
 
-HERE = Path(__file__).parent
-sys.path.insert(0, str(HERE.parent.parent))      # souls_formats.py, à la racine du dépôt
-from lore_map.formats.archives import read_bnd4, read_dcx  # noqa: E402
-from lore_map.formats.dialog import dialog, gender_twin, speaker_for  # noqa: E402
-from lore_map.formats.fmg import read_fmg, unwrap  # noqa: E402
-from lore_map.formats.params import DS3_LAYOUTS, DS3_REGULATION_KEY, icon_ids, read_regulation  # noqa: E402
+from lore_map.formats.archives import read_bnd4, read_dcx
+from lore_map.formats.dialog import dialog, gender_twin, speaker_for
+from lore_map.formats.fmg import read_fmg, unwrap
+from lore_map.formats.params import DS3_LAYOUTS, DS3_REGULATION_KEY, icon_ids, read_regulation
+from lore_map.games import GAMES
+
+HERE = GAMES / "dark-souls-3"                 # les données du jeu : game.json, speakers.json…
 
 LANGS = {"en": "engus", "jp": "jpnjp", "fr": "frafr"}
 ARCHIVES = ("item_dlc2", "menu_dlc2")

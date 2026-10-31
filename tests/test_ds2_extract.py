@@ -1,12 +1,5 @@
 """Textes de Dark Souls II (Scholar of the First Sin) : les règles de l'extracteur, sur de petites tables."""
-import importlib.util
-from pathlib import Path
-
-# extract.py existe dans chaque dossier de jeu : celui-ci est chargé sous un nom à lui
-_path = Path(__file__).parent.parent / "games" / "dark-souls-2" / "extract.py"
-_spec = importlib.util.spec_from_file_location("ds2_extract", _path)
-ds2 = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(ds2)
+from lore_map.sources.dark_souls_2 import extract as ds2
 
 SPEAKERS = {"blocks": {"7050": "Firekeepers"}, "sub_blocks": {}, "unknown": "Unknown NPC"}
 
@@ -75,10 +68,8 @@ def test_an_item_named_in_the_dlc_list_is_marked_dlc():
 
 def test_an_icon_is_cropped_to_what_shows_and_centred_in_a_square():
     from PIL import Image
-    _icons_path = Path(__file__).parent.parent / "games" / "dark-souls-2" / "icons.py"
-    spec = importlib.util.spec_from_file_location("ds2_icons", _icons_path)
-    icons = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(icons)
+
+    from lore_map.sources.dark_souls_2 import icons
     im = Image.new("RGBA", (128, 256))
     im.paste((200, 50, 50, 255), (40, 100, 60, 180))          # 20 × 80 visibles
     out = icons.square(im, size=160)
