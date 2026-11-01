@@ -6,6 +6,7 @@
 export const FLIGHT_MS = 2200;
 const LABEL = 40;     // place sous une constellation pour son nom et son nombre de textes
 const GAP = 28;       // écart minimal entre deux constellations
+const SIDE = 16;      // marge sur les côtés de l'écran
 
 // La galaxie, ou la carte d'un jeu. ?game=… (ou l'ancien ?jeu=…) d'un jeu connu : sa carte. Sinon, un
 // lien vers une page (#…) ouvre cette page sur le jeu par défaut : on est venu pour elle. Sinon, la galaxie.
@@ -38,7 +39,7 @@ export function layoutGalaxy(skies, { width, height, top }) {
   // la plus grande échelle permise par chaque contrainte
   let scale = 0.24 * Math.min(width, room);
   for (const p of places) {
-    scale = Math.min(scale, p.cx / p.w, (width - p.cx) / p.w, (p.cy - top) / p.w, (top + room - p.cy) / p.w);
+    scale = Math.min(scale, (p.cx - SIDE) / p.w, (width - SIDE - p.cx) / p.w, (p.cy - top) / p.w, (top + room - p.cy) / p.w);
   }
   for (let i = 0; i < count; i++) for (let j = i + 1; j < count; j++) {
     const a = places[i], b = places[j];

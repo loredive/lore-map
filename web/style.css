@@ -553,3 +553,36 @@ body.sky-d[data-game]::after {
 @keyframes mode-pulse { 50% { opacity: .25; } }
 @media (prefers-reduced-motion: reduce) { #mode.loading::before { animation: none; } }
 .lang .only { padding: .2rem .7rem; color: var(--dim); font-size: .85rem; font-style: italic; }
+
+/* ---------- page d'accueil : la galaxie (galaxy-ui.js) ----------
+   body.booting : le temps de savoir quel écran montrer ; body.galaxy : la galaxie ; body.flying : en vol ;
+   body.leaving : la galaxie s'efface sur la carte. La barre du haut est masquée sans display: none,
+   car resize() la mesure pour cadrer la carte où le vol se pose. */
+#galaxy, .galaxy-title, #galaxy-nav, .galaxy-credit { display: none; }
+body.galaxy #galaxy, body.leaving #galaxy { display: block; position: fixed; inset: 0; z-index: 7; width: 100%; height: 100%; }
+body.leaving #galaxy { opacity: 0; transition: opacity 400ms ease-out; }
+body.galaxy .galaxy-title {
+  display: block; position: fixed; z-index: 8; top: 6vh; left: 16px; right: 16px; text-align: center; pointer-events: none;
+  transition: opacity .6s;
+}
+.galaxy-title h2 { margin: 0; font: 500 clamp(2rem, 4.2vw, 3.1rem)/1.1 var(--display); letter-spacing: .08em; color: var(--parch); }
+.galaxy-title p { margin: .35em 0 0; font: italic 1.05rem var(--body); color: var(--moon); opacity: .75; }
+body.galaxy #galaxy-nav { display: block; position: fixed; inset: 0; z-index: 8; pointer-events: none; }
+#galaxy-nav button {
+  position: absolute; pointer-events: auto; border: 0; border-radius: 50%; padding: 0;
+  background: transparent; cursor: pointer; color: transparent;
+}
+#galaxy-nav button:disabled { cursor: default; }
+#galaxy-nav button:focus-visible { outline: 1px solid rgba(217, 196, 142, .45); outline-offset: 6px; }
+body.galaxy .galaxy-credit {
+  display: block; position: fixed; z-index: 8; left: 16px; right: 16px; bottom: 10px; margin: 0;
+  text-align: center; font-size: .75rem; color: var(--dim);
+}
+body.flying .galaxy-title, body.flying .galaxy-credit { opacity: 0; }
+body.flying .galaxy-credit { transition: opacity .6s; }
+body.booting .topbar, body.galaxy .topbar, body.booting .under-bar, body.galaxy .under-bar,
+body.booting .credit, body.galaxy .credit, body.galaxy #welcome, body.galaxy #status {
+  visibility: hidden; opacity: 0;
+}
+.topbar, .under-bar, .credit { transition: opacity 400ms ease-out; }
+.brand h1 a.home { color: inherit; text-decoration: none; cursor: pointer; }

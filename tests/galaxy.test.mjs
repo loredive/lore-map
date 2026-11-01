@@ -32,7 +32,7 @@ function checkLayout(skies, view) {
   assert.equal(places.length, skies.length);
   for (const p of places) {
     assert.ok(p.r > 0, `${p.id} has a size`);
-    assert.ok(p.cx - p.r >= 0 && p.cx + p.r <= view.width, `${p.id} fits across`);
+    assert.ok(p.cx - p.r >= 16 && p.cx + p.r <= view.width - 16, `${p.id} keeps clear of the sides`);
     assert.ok(p.cy - p.r >= view.top && p.cy + p.r <= view.height, `${p.id} fits down`);
   }
   for (let i = 0; i < places.length; i++) for (let j = i + 1; j < places.length; j++) {
