@@ -1,6 +1,8 @@
 {
   "id": "dark-souls-2",
   "title": "Dark Souls II",
+  "year": 2014,
+  "sky_tint": "#7d93c2",
   "source": "message archives of the player's Steam copy of Dark Souls II: Scholar of the First Sin (Game/GameDataEbl.bdt, read in place), read by lore_map/sources/dark_souls_2/extract.py",
   "text_lang": "en",
   "alt_lang": "fr",

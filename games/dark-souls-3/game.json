@@ -1,6 +1,8 @@
 {
   "id": "dark-souls-3",
   "title": "Dark Souls III",
+  "year": 2016,
+  "sky_tint": "#d07a4a",
   "source": "message archives of the player's Steam copy (Game/msg/engus, frafr, jpnjp, unpacked by UXM), read by lore_map/sources/dark_souls_3/extract.py",
   "text_lang": "en",
   "alt_lang": "fr",

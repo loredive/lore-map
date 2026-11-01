@@ -1,6 +1,8 @@
 {
   "id": "dark-souls-1",
   "title": "Dark Souls",
+  "year": 2011,
+  "sky_tint": "#c79a5a",
   "source": "message archives of the player's Steam copy of Dark Souls: Prepare to Die Edition (DATA/dvdbnd*.bdt, read in place), read by lore_map/sources/dark_souls_1/extract.py",
   "text_lang": "en",
   "alt_lang": "fr",

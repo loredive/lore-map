@@ -1,6 +1,8 @@
 {
   "id": "elden-ring",
   "title": "Elden Ring",
+  "year": 2022,
+  "sky_tint": "#d9c48e",
   "source": "EldenRingTextExplorer : https://github.com/EldenRingExplorer/EldenRingTextExplorer (elden_ring_text.json)",
   "categories": {
     "goods": {

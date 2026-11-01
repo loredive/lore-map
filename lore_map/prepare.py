@@ -29,6 +29,7 @@ from lore_map.entities import KINDS, candidate_names, load_entities, rank_mentio
 from lore_map.games import DEFAULT, list_games, load_game, publish
 from lore_map.labels import load_titles, match_titles, save_titles
 from lore_map.lore_format import write_lore
+from lore_map.sky import write_sky
 
 MODEL_NAME = "intfloat/multilingual-e5-small"      # mêmes poids que Xenova/multilingual-e5-small (navigateur)
 BROWSER_MODEL = "Xenova/multilingual-e5-small"
@@ -369,6 +370,7 @@ def main():
     entities = resolve_entities(docs, labels, titles, names, entities_path, out)
     export(docs, emb, views, labels, names, titles, entities, neighbors(emb), a.embedder, out)
     publish(game)
+    write_sky(game)    # la constellation de la page d'accueil, tirée du lore.json qu'on vient d'écrire
 
 
 if __name__ == "__main__":
