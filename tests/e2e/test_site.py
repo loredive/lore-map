@@ -1198,3 +1198,56 @@ def test_title_leads_back_to_the_galaxy(browser, site):
     page.click(".brand a.home")
     page.wait_for_function(GALAXY_LIVE, timeout=20000)
     assert problems == []
+
+
+# ------------------------------------------------------------------ revue finale
+def test_no_top_bar_before_the_galaxy(browser, site):
+    """Pendant que les sky.json arrivent, rien de la carte ne se montre (ni barre, ni « Loading texts… »)."""
+    ctx = browser.new_context(**DESKTOP)
+    _contexts.append(ctx)
+
+    def slow(route):
+        time.sleep(0.8)
+        route.continue_()
+    ctx.route("**/sky.json", slow)
+    ctx.add_init_script("""
+      window.__seen = [];
+      const look = () => {
+        const bar = document.querySelector('.topbar');
+        if (bar && !document.body.classList.contains('galaxy') && getComputedStyle(bar).visibility === 'visible'
+            && +getComputedStyle(bar).opacity > 0) window.__seen.push(performance.now());
+        if (!document.querySelector('#galaxy-nav button')) requestAnimationFrame(look);
+      };
+      requestAnimationFrame(look);
+    """)
+    page = ctx.new_page()
+    page.goto(site)
+    page.wait_for_function("() => document.querySelectorAll('#galaxy-nav button').length > 0", timeout=20000)
+    assert page.evaluate("window.__seen.length") == 0, "the map's top bar showed before the galaxy"
+
+
+def test_old_page_link_survives_back_and_forward(browser, site):
+    _, address, view, title = ADDRESSES["bloodborne"][0]
+    page, problems = open_page(browser, f"{site}{address}", DESKTOP)
+    assert "?game=bloodborne" in page.url
+    page.keyboard.press("Escape")
+    page.wait_for_selector("#panel", state="hidden")
+    page.go_back()
+    wait_shown(page, (view, title))
+    page.go_forward()
+    page.wait_for_selector("#panel", state="hidden")
+    page.wait_for_timeout(500)
+    assert not page.evaluate("document.body.classList.contains('galaxy')")
+    assert page.evaluate("document.body.dataset.game") == "bloodborne"
+    assert problems == []
+
+
+def test_keyboard_lands_on_the_map(browser, site):
+    page, problems, _ = open_galaxy(browser, site, DESKTOP)
+    page.keyboard.press("Tab")
+    assert page.evaluate("document.activeElement.closest('#galaxy-nav') !== null"), "Tab went somewhere hidden"
+    page.keyboard.press("Enter")
+    wait_arrived(page)
+    page.wait_for_timeout(600)
+    assert page.evaluate("document.activeElement.id") == "sky"
+    assert problems == []

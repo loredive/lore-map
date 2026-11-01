@@ -3,7 +3,7 @@
 // toucher, le clavier et les lecteurs d'écran. Choisir un jeu lance le vol ; app.js charge la carte
 // pendant ce temps, puis finish() fond la galaxie dans la carte, dessinée au même cadre dessous.
 // Les calculs (disposition, cadre d'arrivée, vol) sont dans galaxy.js.
-import { $, reducedMotion } from "./state.js";
+import { $, canvas, reducedMotion } from "./state.js";
 import { layoutGalaxy, landingFrame, flightAt, FLIGHT_MS } from "./galaxy.js";
 import { FADE_MS } from "./intro.js";
 
@@ -29,6 +29,7 @@ export async function runGalaxy(games) {
   const byId = new Map(skies.map(s => [s.id, s]));
   for (const s of skies) s.twinkle = Array.from({ length: s.n }, () => rnd() * 6.283);
 
+  let keyboard = false;
   let places = [], lit = null, chosen = null, t0 = 0, phase = "idle", running = true, dpr = 1;
   let landedResolve;
   const landed = new Promise(r => { landedResolve = r; });
@@ -64,7 +65,10 @@ export async function runGalaxy(games) {
     });
     nav.append(b);
   }
+  // la galaxie remplace l'écran d'attente ; la carte, cachée dessous, sort de l'ordre de tabulation
   document.body.classList.add("galaxy");
+  document.body.classList.remove("booting");
+  canvas.inert = true;
   layout();
   addEventListener("resize", layout);
 
@@ -165,6 +169,7 @@ export async function runGalaxy(games) {
       const b = e.target.closest("button");
       if (!b || chosen) return;
       chosen = b.dataset.id;
+      keyboard = e.detail === 0;                          // Entrée ou Espace, pas un clic
       lit = null;
       t0 = performance.now();
       phase = reducedMotion ? "landed" : "flying";
@@ -181,6 +186,9 @@ export async function runGalaxy(games) {
     document.body.classList.remove("galaxy", "flying");
     document.body.classList.add("leaving");
     removeEventListener("resize", layout);
+    // venu au clavier : le focus passe à la carte (Entrée y ouvre l'étoile visée), pas au corps de la page
+    canvas.inert = false;
+    if (keyboard) canvas.focus({ preventScroll: true });
     setTimeout(() => {
       running = false;
       document.body.classList.remove("leaving");

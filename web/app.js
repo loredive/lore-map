@@ -447,14 +447,18 @@ async function start() {
     const now = startOf();
     if (now.screen !== shown.screen || now.game !== shown.game) location.reload();
   });
-  document.body.classList.remove("booting");
   let game = shown.game, chosen = null;
   if (shown.screen === "galaxy") {
-    chosen = await runGalaxy(S.games);
+    chosen = await runGalaxy(S.games);                   // retire lui-même l'écran d'attente (booting)
     game = chosen ? chosen.game : DEFAULT_GAME;          // aucune constellation lisible : la carte, comme avant
     shown = { screen: "map", game };
     if (chosen) history.pushState(null, "", `?game=${encodeURIComponent(game)}`);
+  } else if (new URLSearchParams(location.search).get("game") !== game) {
+    // ancien lien (#… sans ?game, ou ?jeu=…) : l'adresse nomme désormais le jeu, pour que les pages
+    // fermées (adresse sans #) ne ramènent pas à la galaxie par Retour ou Suivant
+    history.replaceState(history.state, "", `?game=${encodeURIComponent(game)}${location.hash}`);
   }
+  document.body.classList.remove("booting");
   const [loaded] = await Promise.all([load(game), chosen?.landed]);
   if (!loaded) { chosen?.finish(); return; }            // la ligne d'état dit ce qui manque
   wire();
