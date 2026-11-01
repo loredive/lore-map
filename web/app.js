@@ -2,6 +2,8 @@
 import { S, $, canvas, panel, listColumn, tip, status, input, mode, esc, colorOf, announce, dataPath, DEFAULT_GAME, nameOf, groupName, resetContext, focusPanel, reducedMotion } from "./state.js";
 import { buildGrid, buildSprites, computeHulls, resize, draw, nearest, setHover, starsNear, startIntro, skipIntro } from "./render.js";
 import { introMode } from "./intro.js";
+import { chooseStart } from "./galaxy.js";
+import { runGalaxy } from "./galaxy-ui.js";
 import { showWelcome } from "./welcome.js";
 import { camera, toWorld, panBy, zoomAt, canZoom, flyTo, viewCenter, frameFrom } from "./camera.js";
 import { buildViewSwitch } from "./views.js";
@@ -65,13 +67,10 @@ const startPanel = () => startPages({
 // ------------------------------------------------------------------ jeu
 const optional = (f, empty) => fetch(f).then(r => r.ok ? r.json() : empty).catch(() => empty);
 
-// ?game=… (ou l'ancien ?jeu=…) s'il fait partie des jeux dont les données sont prêtes (data/games.json), sinon le jeu par
-// défaut ; puis ses couleurs et ses exemples (data/<jeu>/game.json)
-async function chooseGame() {
-  S.games = await optional("data/games.json", []);
-  const params = new URLSearchParams(location.search);
-  const want = params.get("game") || params.get("jeu");
-  S.game = S.games.some(g => g.id === want) ? want : DEFAULT_GAME;
+// le jeu choisi au démarrage (l'adresse ou la galaxie : voir plus bas) ; ses couleurs et ses exemples
+// (data/<jeu>/game.json). S.games (data/games.json) est déjà lu.
+async function chooseGame(game) {
+  S.game = game;
   const g = await optional(dataPath("game.json"), {});
   S.colors = g.colors || {};
   document.body.dataset.game = S.game;        // ciel propre au jeu (style.css)
@@ -104,8 +103,8 @@ function buildGameSwitch() {
 }
 
 // ------------------------------------------------------------------ données
-async function load() {
-  await chooseGame();
+async function load(game) {
+  await chooseGame(game);
   let lore, meta, images;
   try {
     [lore, meta, images] = await Promise.all([
@@ -434,13 +433,46 @@ function refreshVisible() {
   draw();
 }
 
-if (await load()) {
+// ------------------------------------------------------------------ l'écran du démarrage
+// L'adresse décide (galaxy.js : chooseStart) : la carte d'un jeu, ou la galaxie. Depuis la galaxie, le jeu
+// choisi se charge pendant le vol ; la carte prend la main quand le vol et les données sont là tous deux.
+const startOf = () => chooseStart({ search: location.search, hash: location.hash,
+  games: S.games.map(g => g.id), fallback: DEFAULT_GAME });
+let shown = null;   // l'écran affiché ; Retour ou Suivant vers un autre écran recharge la page
+
+async function start() {
+  S.games = await optional("data/games.json", []);
+  shown = startOf();
+  addEventListener("popstate", () => {
+    const now = startOf();
+    if (now.screen !== shown.screen || now.game !== shown.game) location.reload();
+  });
+  let game = shown.game, chosen = null;
+  if (shown.screen === "galaxy") {
+    chosen = await runGalaxy(S.games);                   // retire lui-même l'écran d'attente (booting)
+    game = chosen ? chosen.game : DEFAULT_GAME;          // aucune constellation lisible : la carte, comme avant
+    shown = { screen: "map", game };
+    if (chosen) history.pushState(null, "", `?game=${encodeURIComponent(game)}`);
+  } else if (new URLSearchParams(location.search).get("game") !== game) {
+    // ancien lien (#… sans ?game, ou ?jeu=…) : l'adresse nomme désormais le jeu, pour que les pages
+    // fermées (adresse sans #) ne ramènent pas à la galaxie par Retour ou Suivant
+    history.replaceState(history.state, "", `?game=${encodeURIComponent(game)}${location.hash}`);
+  }
+  document.body.classList.remove("booting");
+  const [loaded] = await Promise.all([load(game), chosen?.landed]);
+  if (!loaded) { chosen?.finish(); return; }            // la ligne d'état dit ce qui manque
   wire();
   resize();
   const opened = openFirstPage(location.hash);   // la page du lien collé, ou la carte seule
-  // brouillard sur la carte seule ; un simple fondu si le système demande moins d'animations
-  const intro = introMode({ opened, reducedMotion });
+  // brouillard sur la carte seule ; arrivée sans brouillard depuis la galaxie ; un simple fondu si le
+  // système demande moins d'animations
+  const intro = introMode({ opened, reducedMotion, arrived: !!chosen });
+  document.body.dataset.intro = intro;
   if (intro === "full") startIntro();
+  else if (intro === "arrive") startIntro("arrive");
   else if (intro === "fade") canvas.classList.add("fade-in");
+  chosen?.finish();
   if (!opened) showWelcome();                    // première visite : par où commencer
 }
+
+start();

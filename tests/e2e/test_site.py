@@ -168,7 +168,7 @@ def test_broken_data_names_the_missing_field(browser, site, game):
 
 
 def test_phone_menu_names_the_categories(browser, site):
-    page, _ = open_page(browser, site, PHONE)
+    page, _ = open_page(browser, f"{site}?game=bloodborne", PHONE)
     assert not page.is_visible("#legend")
     page.click(".menu-btn")
     labels = page.eval_on_selector_all("#legend .label", "xs => xs.map(x => x.offsetParent ? x.textContent : '')")
@@ -176,7 +176,7 @@ def test_phone_menu_names_the_categories(browser, site):
 
 
 def test_views_and_language_switch(browser, site):
-    page, problems = open_page(browser, site, DESKTOP)
+    page, problems = open_page(browser, f"{site}?game=bloodborne", DESKTOP)
     page.click("#views button[data-v='1']")
     page.wait_for_timeout(1500)
     page.click("#lang button[data-alt='1']")
@@ -1011,4 +1011,243 @@ def test_a_confirmed_speaker_has_no_mark(browser, site, game, speaker):
     page, problems = open_page(browser, f"{site}?game={game}#dialogue={quote(speaker)}", DESKTOP)
     wait_shown(page, ("dialogue", speaker))
     assert page.query_selector("#panel .unsure") is None and page.query_selector("#panel .unsure-note") is None
+    assert problems == []
+
+
+# ------------------------------------------------------------------ la galaxie (page d'accueil)
+GALAXY_ORDER = ["Dark Souls", "Dark Souls II", "Bloodborne", "Dark Souls III", "Elden Ring"]
+
+
+def open_galaxy(browser, url, device, allow=(), **context):
+    """La galaxie chargée ; problems comme open_page (sauf les adresses de allow), requests : toutes les
+    adresses demandées."""
+    ctx = browser.new_context(**device, **context)
+    _contexts.append(ctx)
+    page = ctx.new_page()
+    problems, requests = [], []
+    page.on("pageerror", lambda e: problems.append(f"page error: {e}"))
+    page.on("console", lambda m: "Content Security Policy" in m.text and problems.append(f"CSP: {m.text}"))
+    page.on("response", lambda r: r.status >= 400 and "/img/" not in r.url
+            and not any(x in r.url for x in allow) and problems.append(f"{r.status} {r.url}"))
+    page.on("request", lambda r: requests.append(r.url))
+    page.goto(url)
+    page.wait_for_function("() => document.querySelectorAll('#galaxy-nav button').length > 0", timeout=20000)
+    page.wait_for_timeout(300)
+    return page, problems, requests
+
+
+def galaxy_names(page):
+    return page.eval_on_selector_all("#galaxy-nav button", "bs => bs.map(b => b.getAttribute('aria-label'))")
+
+
+def choose(page, title):
+    page.click(f"#galaxy-nav button[aria-label^='{title},']")
+
+
+def wait_arrived(page, timeout=20000):
+    page.wait_for_function("() => !document.body.classList.contains('galaxy') && "
+                           "document.querySelector('#status').textContent === ''", timeout=timeout)
+
+
+@pytest.mark.parametrize("device", [DESKTOP, PHONE], ids=["desktop", "phone"])
+def test_plain_address_shows_the_galaxy(browser, site, device):
+    page, problems, requests = open_galaxy(browser, site, device)
+    assert problems == []
+    names = galaxy_names(page)
+    assert [n.split(",")[0] for n in names] == GALAXY_ORDER
+    assert all(n.endswith(" texts") for n in names), names
+    assert not any(u.endswith("/lore.json") for u in requests), "the galaxy loaded a full map"
+    assert not page.is_visible(".topbar")
+    assert page.evaluate("() => document.documentElement.scrollWidth <= innerWidth"), "the page scrolls sideways"
+
+
+def test_choosing_a_game_flies_into_its_map(browser, site):
+    page, problems, _ = open_galaxy(browser, site, DESKTOP)
+    choose(page, "Dark Souls III")
+    wait_arrived(page)
+    assert page.url.endswith("?game=dark-souls-3")
+    assert page.evaluate("document.body.dataset.intro") == "arrive"
+    assert page.evaluate("document.body.dataset.game") == "dark-souls-3"
+    page.wait_for_timeout(600)
+    assert page.is_visible(".topbar")
+    assert problems == []
+
+
+def test_keyboard_chooses_a_game(browser, site):
+    page, problems, _ = open_galaxy(browser, site, DESKTOP)
+    page.focus("#galaxy-nav button")
+    page.keyboard.press("ArrowRight")
+    assert page.evaluate("document.activeElement.getAttribute('aria-label')").startswith("Dark Souls II,")
+    page.keyboard.press("Enter")
+    wait_arrived(page)
+    assert page.url.endswith("?game=dark-souls-2")
+    assert problems == []
+
+
+def test_reduced_motion_fades_instead_of_flying(browser, site):
+    page, problems, _ = open_galaxy(browser, site, DESKTOP, reduced_motion="reduce")
+    choose(page, "Bloodborne")
+    wait_arrived(page, timeout=10000)
+    assert page.evaluate("document.body.dataset.intro") == "none"
+    assert problems == []
+
+
+def test_game_address_skips_the_galaxy(browser, site):
+    page, problems = open_page(browser, f"{site}?game=elden-ring", DESKTOP)
+    assert not page.is_visible("#galaxy-nav")
+    assert page.evaluate("document.body.dataset.intro") == "full"
+    assert problems == []
+
+
+def test_unknown_game_shows_the_galaxy(browser, site):
+    page, problems, _ = open_galaxy(browser, f"{site}?game=nope", DESKTOP)
+    assert len(galaxy_names(page)) == 5
+    assert problems == []
+
+
+@pytest.mark.parametrize("prefix", ["?game=nope", ""], ids=["unknown-game", "no-game"])
+def test_page_link_without_known_game_opens_bloodborne(browser, site, prefix):
+    _, address, view, title = ADDRESSES["bloodborne"][0]
+    page, problems = open_page(browser, f"{site}{prefix}{address}", DESKTOP)
+    assert page.evaluate("document.body.dataset.game") == "bloodborne"
+    assert not page.is_visible("#galaxy-nav")
+    assert shown(page) == [view, title]
+    assert problems == []
+
+
+def test_resize_mid_flight_lands_cleanly(browser, site):
+    page, problems, _ = open_galaxy(browser, site, DESKTOP)
+    choose(page, "Elden Ring")
+    page.wait_for_timeout(500)
+    page.set_viewport_size({"width": 900, "height": 700})
+    wait_arrived(page)
+    assert page.url.endswith("?game=elden-ring")
+    assert problems == []
+
+
+def test_double_click_loads_one_game(browser, site):
+    page, problems, requests = open_galaxy(browser, site, DESKTOP)
+    page.dblclick("#galaxy-nav button[aria-label^='Bloodborne,']")
+    page.click("#galaxy-nav button[aria-label^='Elden Ring,']", force=True)
+    wait_arrived(page)
+    assert page.url.endswith("?game=bloodborne")
+    assert [u for u in requests if u.endswith("/lore.json")] == [f"{site}data/bloodborne/lore.json"]
+    assert problems == []
+
+
+def test_missing_sky_file_drops_that_game(browser, site):
+    ctx = browser.new_context(**DESKTOP)
+    _contexts.append(ctx)
+    ctx.route("**/dark-souls-2/sky.json", lambda route: route.fulfill(status=404, body=""))
+    page = ctx.new_page()
+    errors = []
+    page.on("pageerror", lambda e: errors.append(str(e)))
+    page.goto(site)
+    page.wait_for_function("() => document.querySelectorAll('#galaxy-nav button').length > 0", timeout=20000)
+    assert [n.split(",")[0] for n in galaxy_names(page)] == ["Dark Souls", "Bloodborne", "Dark Souls III", "Elden Ring"]
+    choose(page, "Dark Souls")
+    wait_arrived(page)
+    assert page.url.endswith("?game=dark-souls-1")
+    assert errors == []
+
+
+def test_slow_data_after_choosing(browser, site):
+    ctx = browser.new_context(**DESKTOP)
+    _contexts.append(ctx)
+
+    def slow(route):
+        time.sleep(3.0)
+        route.continue_()
+    ctx.route("**/lore.json", slow)
+    page = ctx.new_page()
+    errors = []
+    page.on("pageerror", lambda e: errors.append(str(e)))
+    page.goto(site)
+    page.wait_for_function("() => document.querySelectorAll('#galaxy-nav button').length > 0", timeout=20000)
+    choose(page, "Bloodborne")
+    page.wait_for_timeout(2600)                    # le vol est fini, les données pas encore
+    assert page.evaluate("document.body.classList.contains('galaxy')")
+    wait_arrived(page)
+    assert errors == []
+
+
+def test_phone_galaxy_shows_names(browser, site):
+    page, problems, _ = open_galaxy(browser, site, PHONE)
+    assert page.get_attribute("#galaxy-nav", "data-names") == "always"
+    assert problems == []
+
+
+# la galaxie affichée et prête à servir (pas les boutons d'une galaxie qui s'efface)
+GALAXY_LIVE = ("() => document.body.classList.contains('galaxy') && "
+               "[...document.querySelectorAll('#galaxy-nav button')].filter(b => !b.disabled).length === 5")
+
+
+def test_back_after_choosing_returns_to_the_galaxy(browser, site):
+    page, problems, _ = open_galaxy(browser, site, DESKTOP)
+    choose(page, "Elden Ring")
+    wait_arrived(page)
+    page.go_back()
+    page.wait_for_function(GALAXY_LIVE, timeout=20000)
+    assert "?game" not in page.url
+    assert problems == []
+
+
+def test_title_leads_back_to_the_galaxy(browser, site):
+    page, problems = open_page(browser, f"{site}?game=bloodborne", DESKTOP)
+    assert page.evaluate("document.querySelector('.brand a.home').href") == site
+    page.click(".brand a.home")
+    page.wait_for_function(GALAXY_LIVE, timeout=20000)
+    assert problems == []
+
+
+# ------------------------------------------------------------------ revue finale
+def test_no_top_bar_before_the_galaxy(browser, site):
+    """Pendant que les sky.json arrivent, rien de la carte ne se montre (ni barre, ni « Loading texts… »)."""
+    ctx = browser.new_context(**DESKTOP)
+    _contexts.append(ctx)
+
+    def slow(route):
+        time.sleep(0.8)
+        route.continue_()
+    ctx.route("**/sky.json", slow)
+    ctx.add_init_script("""
+      window.__seen = [];
+      const look = () => {
+        const bar = document.querySelector('.topbar');
+        if (bar && !document.body.classList.contains('galaxy') && getComputedStyle(bar).visibility === 'visible'
+            && +getComputedStyle(bar).opacity > 0) window.__seen.push(performance.now());
+        if (!document.querySelector('#galaxy-nav button')) requestAnimationFrame(look);
+      };
+      requestAnimationFrame(look);
+    """)
+    page = ctx.new_page()
+    page.goto(site)
+    page.wait_for_function("() => document.querySelectorAll('#galaxy-nav button').length > 0", timeout=20000)
+    assert page.evaluate("window.__seen.length") == 0, "the map's top bar showed before the galaxy"
+
+
+def test_old_page_link_survives_back_and_forward(browser, site):
+    _, address, view, title = ADDRESSES["bloodborne"][0]
+    page, problems = open_page(browser, f"{site}{address}", DESKTOP)
+    assert "?game=bloodborne" in page.url
+    page.keyboard.press("Escape")
+    page.wait_for_selector("#panel", state="hidden")
+    page.go_back()
+    wait_shown(page, (view, title))
+    page.go_forward()
+    page.wait_for_selector("#panel", state="hidden")
+    page.wait_for_timeout(500)
+    assert not page.evaluate("document.body.classList.contains('galaxy')")
+    assert page.evaluate("document.body.dataset.game") == "bloodborne"
+    assert problems == []
+
+
+def test_keyboard_lands_on_the_map(browser, site):
+    page, problems, _ = open_galaxy(browser, site, DESKTOP)
+    page.keyboard.press("Tab")
+    assert page.evaluate("document.activeElement.closest('#galaxy-nav') !== null"), "Tab went somewhere hidden"
+    page.keyboard.press("Enter")
+    wait_arrived(page)
+    page.wait_for_timeout(600)
+    assert page.evaluate("document.activeElement.id") == "sky"
     assert problems == []

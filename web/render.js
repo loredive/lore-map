@@ -4,7 +4,7 @@ import { startCamera, setViewport, camera, toScreen, toWorld, viewCenter } from 
 import { STYLE, starWeight, drawNebulae, drawConstellations, drawThread, drawEntity, labelStyle, muteColor } from "./sky.js";
 import { drawClouds } from "./nebula.js";
 import { isQuiet, dimmer, showsHulls, showsGroupNames } from "./focus.js";
-import { createIntro, introLevels, fogLevel } from "./intro.js";
+import { createIntro, introLevels, fogLevel, arrivalLevels, ARRIVE_MS } from "./intro.js";
 import { drawFog } from "./fog.js";
 
 // Grille spatiale pour retrouver vite l'étoile sous le curseur
@@ -167,11 +167,14 @@ export function draw() {
 // intro.js dit à quel point chaque couche est apparue ; ici, on multiplie les opacités par groupe
 // (nuage, étoiles, nom) et on pose le brouillard par-dessus. Le rang d'un groupe : sa place dans
 // S.clusters (les plus gros d'abord).
-let intro = null, rankOf = new Map();
+// kind : "fog" (ouverture dans le brouillard) ou "arrive" (arrivée par la galaxie : sans brouillard,
+// les étoiles déjà là, nuages et noms qui viennent)
+let intro = null, introKind = "fog", rankOf = new Map();
 const CLEAR = { nebula: 1, stars: 1, names: 1 };
-export function startIntro() {
+export function startIntro(kind = "fog") {
   rankOf = new Map(S.clusters.map((c, j) => [c.id, j]));
-  intro = createIntro(performance.now());
+  introKind = kind;
+  intro = kind === "arrive" ? createIntro(performance.now(), ARRIVE_MS) : createIntro(performance.now());
   draw();
 }
 export function skipIntro() { if (intro) { intro.skip(); draw(); } }
@@ -184,9 +187,10 @@ export function render() {
   const now = performance.now(), t = intro ? intro.progress(now) : 1;
   if (t >= 1) intro = null;
   // pendant l'ouverture : les niveaux de chaque groupe, et ceux d'un texte sans groupe (le brouillard seul)
-  const levels = intro ? new Map(S.clusters.map(c => [c.id, introLevels(t, rankOf.get(c.id), S.clusters.length)])) : null;
-  const bare = 1 - fogLevel(t);
-  const reveal = id => (levels ? levels.get(id) ?? { nebula: bare, stars: bare, names: bare } : CLEAR);
+  const arriving = intro && introKind === "arrive";
+  const levels = intro && !arriving ? new Map(S.clusters.map(c => [c.id, introLevels(t, rankOf.get(c.id), S.clusters.length)])) : null;
+  const bare = 1 - fogLevel(t), arrival = arriving ? arrivalLevels(t) : null;
+  const reveal = id => (arrival || (levels ? levels.get(id) ?? { nebula: bare, stars: bare, names: bare } : CLEAR));
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, W, H);
 
@@ -330,7 +334,7 @@ export function render() {
   ctx.globalAlpha = 1;
 
   // 6. le brouillard de l'ouverture, par-dessus tout ; l'image suivante est demandée tant qu'il dure
-  if (intro) { drawFog(ctx, cam, fogLevel(t), now); draw(); }
+  if (intro) { if (!arriving) drawFog(ctx, cam, fogLevel(t), now); draw(); }
 }
 
 // vue rayons : le nom de chaque colonne (sa catégorie) et son nombre de textes, au-dessus d'elle

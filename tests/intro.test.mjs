@@ -1,7 +1,7 @@
 // L'ouverture dans le brouillard (web/intro.js) : quand elle se joue, et l'ordre où les groupes apparaissent.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { INTRO_MS, FADE_MS, introMode, fogLevel, introLevels, createIntro } from "../web/intro.js";
+import { INTRO_MS, FADE_MS, ARRIVE_MS, introMode, fogLevel, introLevels, arrivalLevels, createIntro } from "../web/intro.js";
 
 test("the intro plays on a plain load, fades with reduced motion, and never on a linked page", () => {
   assert.equal(INTRO_MS, 7000);
@@ -41,4 +41,18 @@ test("the intro clock runs over its duration and a skip ends it at once", () => 
   const skipped = createIntro(1000);
   skipped.skip();
   assert.equal(skipped.progress(1001), 1);
+});
+
+test("arriving from the galaxy never plays the fog", () => {
+  assert.equal(introMode({ opened: false, reducedMotion: false, arrived: true }), "arrive");
+  assert.equal(introMode({ opened: false, reducedMotion: true, arrived: true }), "none");
+  assert.equal(introMode({ opened: false, reducedMotion: false, arrived: false }), "full");
+});
+
+test("after the flight the stars are already there; clouds then names fade in", () => {
+  assert.equal(ARRIVE_MS, 1500);
+  assert.deepEqual(arrivalLevels(0), { nebula: 0, stars: 1, names: 0 });
+  assert.deepEqual(arrivalLevels(1), { nebula: 1, stars: 1, names: 1 });
+  for (const t of [0, 0.25, 0.5, 0.75]) assert.equal(arrivalLevels(t).stars, 1);
+  assert.ok(arrivalLevels(0.5).nebula > arrivalLevels(0.5).names);
 });

@@ -1,6 +1,8 @@
 {
   "id": "bloodborne",
   "title": "Bloodborne",
+  "year": 2015,
+  "sky_tint": "#b0505e",
   "source": "message archives of the player's PS4 copy (msg/engus, frafr, jpnjp), read by lore_map/sources/bloodborne/extract.py",
   "text_lang": "en",
   "alt_lang": "fr",
