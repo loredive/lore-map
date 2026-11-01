@@ -1155,10 +1155,10 @@ def test_slow_data_after_choosing(browser, site):
     ctx = browser.new_context(**DESKTOP)
     _contexts.append(ctx)
 
-    def slow(route):
-        time.sleep(3.0)
-        route.continue_()
-    ctx.route("**/lore.json", slow)
+    # lore.json retenu jusqu'à ce que le test le relâche : pas de time.sleep dans le gestionnaire, qui
+    # bloquerait aussi l'attente ci-dessous (API synchrone) et ferait arriver les données avant la vérification
+    held = []
+    ctx.route("**/lore.json", lambda route: held.append(route))
     page = ctx.new_page()
     errors = []
     page.on("pageerror", lambda e: errors.append(str(e)))
@@ -1166,7 +1166,9 @@ def test_slow_data_after_choosing(browser, site):
     page.wait_for_function("() => document.querySelectorAll('#galaxy-nav button').length > 0", timeout=20000)
     choose(page, "Bloodborne")
     page.wait_for_timeout(2600)                    # le vol est fini, les données pas encore
+    assert len(held) == 1, "the map data was not requested during the flight"
     assert page.evaluate("document.body.classList.contains('galaxy')")
+    held[0].continue_()
     wait_arrived(page)
     assert errors == []
 
