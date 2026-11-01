@@ -1175,3 +1175,26 @@ def test_phone_galaxy_shows_names(browser, site):
     page, problems, _ = open_galaxy(browser, site, PHONE)
     assert page.get_attribute("#galaxy-nav", "data-names") == "always"
     assert problems == []
+
+
+# la galaxie affichée et prête à servir (pas les boutons d'une galaxie qui s'efface)
+GALAXY_LIVE = ("() => document.body.classList.contains('galaxy') && "
+               "[...document.querySelectorAll('#galaxy-nav button')].filter(b => !b.disabled).length === 5")
+
+
+def test_back_after_choosing_returns_to_the_galaxy(browser, site):
+    page, problems, _ = open_galaxy(browser, site, DESKTOP)
+    choose(page, "Elden Ring")
+    wait_arrived(page)
+    page.go_back()
+    page.wait_for_function(GALAXY_LIVE, timeout=20000)
+    assert "?game" not in page.url
+    assert problems == []
+
+
+def test_title_leads_back_to_the_galaxy(browser, site):
+    page, problems = open_page(browser, f"{site}?game=bloodborne", DESKTOP)
+    assert page.evaluate("document.querySelector('.brand a.home').href") == site
+    page.click(".brand a.home")
+    page.wait_for_function(GALAXY_LIVE, timeout=20000)
+    assert problems == []
