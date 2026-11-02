@@ -290,17 +290,19 @@ export function render() {
   // 3. constellation : le texte choisi relié à ses échos
   if (sel && !S.path) {
     const [x0, y0] = toScreen(sel.x, sel.y);
-    ctx.strokeStyle = GRACE;
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 1.75;
     sel.echoes.forEach((e, k) => {
       const d = S.docs[e];
       const [x1, y1] = toScreen(d.x, d.y);
-      ctx.globalAlpha = 0.65 - k * 0.05;
+      ctx.strokeStyle = colorOf(d.cat);     // la couleur de la catégorie du texte d'arrivée
+      ctx.globalAlpha = 0.85 - k * 0.05;
       ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
       ctx.globalAlpha = 1;
       ctx.drawImage(S.sprites[d.cat], x1 - R * 1.4, y1 - R * 1.4, 2.8 * R, 2.8 * R);
     });
     ctx.globalAlpha = 1;
+    ctx.strokeStyle = GRACE;
+    ctx.lineWidth = 1;
     ctx.drawImage(S.sprites.grace, x0 - R * 2.2, y0 - R * 2.2, 4.4 * R, 4.4 * R);
     ctx.beginPath(); ctx.arc(x0, y0, R * 1.5 + 4, 0, Math.PI * 2);
     ctx.globalAlpha = 0.8; ctx.stroke();

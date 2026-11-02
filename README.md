@@ -4,6 +4,33 @@ An interactive map of the texts in Elden Ring, Bloodborne and Dark Souls I, II a
 NPC dialogue. Each star is a text, and texts about the same things sit close together. You can
 search by meaning, follow guided tours, or browse by category. Everything runs in the browser.
 
+## How it works
+
+The map is computed once, ahead of time, and published as static files. There is no server behind the site.
+
+**Ahead of time, in Python** (`lore_map/prepare.py`):
+
+1. Each text, with its name, goes through a small multilingual model,
+   [multilingual-e5-small](https://huggingface.co/intfloat/multilingual-e5-small), which turns it into an
+   embedding: 384 numbers that describe what it is about.
+2. t-SNE flattens these embeddings to 2D. That gives each star its place on the map.
+3. Each text gets its 8 echoes: the texts with the closest embeddings. They are measured before flattening,
+   so an echo can sit far away on the map.
+4. HDBSCAN finds the groups on the 2D map. Their titles are written by hand (`games/<id>/labels.json`).
+5. Mentions of characters and places are found by name, from a hand-edited list (`games/<id>/entities.json`).
+6. Everything is written to `web/data/<id>/`: `lore.json` for the page, and `emb.bin` for the embeddings,
+   rounded to one byte per number to make the file smaller.
+
+**In the browser, when you search** (`web/search-ui.js`, `web/search.js`):
+
+1. Keyword results (BM25) appear right away.
+2. The first search also loads [Transformers.js](https://huggingface.co/docs/transformers.js) and the same
+   model in a browser version (about 120 MB, once). The model turns your query into an embedding on your own device.
+3. That embedding is compared to the stored ones to find the closest texts.
+4. Both result lists are merged with Reciprocal Rank Fusion.
+
+If the model can't load, search falls back to keywords only.
+
 ## Run it
 
 ```bash

@@ -116,7 +116,7 @@ function card(d) {
     ${mentions.length ? `<h3>Mentions</h3>
     ${entityChips(mentions)}` : ""}
     <h3>Echoes</h3>
-    <p class="hint">Closest in meaning, linked to it on the map.</p>
+    <p class="hint">Closest in meaning, linked to it on the map by a line in the color of their category.</p>
     <ol class="echoes">${d.echoes.map(e => {
       const x = S.docs[e];
       return `<li><button type="button" data-i="${e}"><span class="head"><span class="dot" style="--c:${colorOf(x.cat)}"></span><span class="name">${esc(x.name)}</span></span><small>${esc(S.cats[x.cat])}</small><span class="why">${esc(reasonParts(linkReason(d.i, e, ctx)).join(" · ") || "no shared name or rare word")}</span></button></li>`;
