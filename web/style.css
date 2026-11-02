@@ -506,6 +506,7 @@ body.sky-d[data-game]::after {
   margin: 1rem 0 0; padding: .7rem .9rem; border-left: 3px solid var(--grace); background: rgba(217, 196, 142, .07);
   font-size: 1.05rem; line-height: 1.55;
 }
+.tour-caveat { margin: .5rem 0 0; color: var(--faint); font-size: .8rem; }
 .tour-text { margin-top: 1.1rem; padding-top: .9rem; border-top: 1px solid var(--rim); }
 .tour-text h3 { margin: .15rem 0 0; font: 600 1.3rem var(--display); color: var(--parch); }
 .tour-text .topen { margin-top: .6rem; }

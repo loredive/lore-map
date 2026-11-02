@@ -1,4 +1,4 @@
-// Visites guidées (data/<jeu>/tours.json, écrites à la main) : une suite de textes, chacun avec
+// Visites guidées (data/<jeu>/tours.json) : une suite de textes, chacun avec
 // une phrase qui le situe. La carte trace la visite comme un chemin numéroté (render.js), l'étape
 // en cours entourée ; le panneau lit l'étape, avec Précédent / Suivant.
 import { S, $, esc, colorOf, portrait, dataPath, nameOf, textOf, textLang } from "./state.js";
@@ -7,6 +7,7 @@ import { registerPage, openPage } from "./pages.js";
 import { linkText, bindEntityButtons, dlcBadge } from "./links.js";
 
 const button = $("#tours");
+const CAVEAT = `<p class="tour-caveat">These notes are an interpretation of the game's texts, and can be wrong.</p>`;
 
 export async function loadTours() {
   S.tours = [];
@@ -40,6 +41,7 @@ registerPage({
     html: `<article class="card">
     <h2>Guided tours</h2>
     <p class="hint">Short walks through the texts, each step with a line of context. A good way in if you're new to the story.</p>
+    ${CAVEAT}
     <ol class="tours">${S.tours.map(t => `<li><button type="button" data-t="${esc(t.id)}">
       <span class="name">${esc(t.title)}</span> <span class="n">${t.steps.length} steps</span>
       <span class="snip">${esc(t.intro)}</span></button></li>`).join("")}</ol>
@@ -74,6 +76,7 @@ registerPage({
     <h2>${esc(t.title)}</h2>
     ${k === 0 ? `<p class="tour-intro">${esc(t.intro)}</p>` : ""}
     <p class="tour-note">${esc(step.note)}</p>
+    ${CAVEAT}
     <div class="tour-text">
       <div class="card-head${icon ? " has-img" : ""}">${icon}<div>
         <div class="cat"><span class="dot" style="--c:${colorOf(d.cat)}"></span>${esc(S.cats[d.cat])}${dlcBadge(d)}</div>

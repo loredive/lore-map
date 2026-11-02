@@ -459,6 +459,20 @@ def test_tour_list_and_steps(browser, site, game):
 
 
 @pytest.mark.parametrize("game", GAMES)
+def test_tours_say_their_notes_are_an_interpretation(browser, site, game):
+    tour, title = TOURS[game]
+    page, problems = open_page(browser, f"{site}?game={game}", DESKTOP)
+    page.click("#tours")
+    wait_shown(page, ("tours", "Guided tours"))
+    assert "an interpretation" in page.text_content("#panel .tour-caveat")
+    # une étape s'ouvre aussi par un lien partagé, sans passer par la liste
+    page.goto(f"{site}?game={game}#tour={tour}/2")
+    wait_shown(page, ("tour", title))
+    assert "an interpretation" in page.text_content("#panel .tour-caveat")
+    assert problems == []
+
+
+@pytest.mark.parametrize("game", GAMES)
 def test_typing_a_search_is_one_step(browser, site, game):
     first = FIRST_TEXT[game]
     page, _ = open_page(browser, f"{site}?game={game}{ADDRESSES[game][0][1]}", DESKTOP)
