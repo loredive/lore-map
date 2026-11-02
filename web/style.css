@@ -586,3 +586,15 @@ body.booting .credit, body.galaxy .credit, body.galaxy #welcome, body.galaxy #st
 }
 .topbar, .under-bar, .credit { transition: opacity 400ms ease-out; }
 .brand h1 a.home { color: inherit; text-decoration: none; cursor: pointer; }
+
+/* ---------- lire la carte : la note sous la barre, les textes en commun, ce que partage un écho ---------- */
+.map-note {
+  margin: 0; padding: 0 16px; text-align: center; color: var(--dim); font-size: .78rem;
+  text-shadow: 0 0 3px var(--night), 0 0 8px var(--night), 0 0 14px var(--night);
+}
+.link-chip { display: inline-flex; border: 1px solid var(--rim); border-radius: 999px; overflow: hidden; }
+.link-chip button { background: none; border: 0; padding: .12rem .6rem .16rem; color: var(--parch); font: .92rem/1.35 var(--body); cursor: pointer; }
+.link-chip .to-shared { border-left: 1px solid var(--rim); color: var(--faint); font-size: .78rem; }
+.link-chip button:hover, .link-chip button:focus-visible { color: var(--grace); }
+.link-chip button:focus-visible { outline-offset: -2px; }
+.echoes .why { display: block; color: var(--faint); font-size: .8rem; line-height: 1.35; font-style: italic; }

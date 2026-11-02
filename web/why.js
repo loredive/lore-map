@@ -21,3 +21,11 @@ export function linkReason(a, b, { docEntities, docTerms, df, N, echoes }) {
   const rank = ab >= 0 && ba >= 0 ? Math.min(ab, ba) + 1 : Math.max(ab, ba) + 1 || null;
   return { entities, terms, rank };
 }
+
+// Ce que partagent deux textes, en mots (sans HTML) ; rien s'ils ne partagent rien de notable.
+export function reasonParts({ entities, terms }) {
+  const parts = [];
+  if (entities.length) parts.push(`both mention ${entities.map(e => e.label).join(", ")}`);
+  if (terms.length) parts.push(`shared words ${terms.map(t => `“${t}”`).join(", ")}`);
+  return parts;
+}

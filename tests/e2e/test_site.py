@@ -1253,3 +1253,72 @@ def test_keyboard_lands_on_the_map(browser, site):
     page.wait_for_timeout(600)
     assert page.evaluate("document.activeElement.id") == "sky"
     assert problems == []
+
+
+# ------------------------------------------------------------------ lire la carte sans s'y tromper
+@pytest.mark.parametrize("device", [DESKTOP, PHONE], ids=["desktop", "phone"])
+def test_map_says_it_is_not_a_map_of_the_world(browser, site, device):
+    page, problems = open_page(browser, f"{site}?game=bloodborne", device)
+    assert page.is_visible(".map-note")
+    assert "not of the world" in page.text_content(".map-note")
+    assert "not a place" in page.text_content("#welcome")
+    assert problems == []
+
+
+def test_galaxy_says_the_maps_chart_texts(browser, site):
+    page, problems, _ = open_galaxy(browser, site, DESKTOP)
+    assert "not its world" in page.text_content("#galaxy-title")
+    assert problems == []
+
+
+def test_help_says_only_closeness_is_reliable(browser, site):
+    page, problems = open_page(browser, f"{site}?game=bloodborne", DESKTOP)
+    page.click("#help")
+    wait_shown(page, ("help", "How to read this map"))
+    help_text = page.text_content("#panel .help")
+    assert "not of the game's world" in help_text
+    assert "the only reliable signal" in help_text
+    assert "distant ones" not in help_text
+    assert problems == []
+
+
+@pytest.mark.parametrize("game", GAMES)
+def test_linked_names_open_the_texts_they_share(browser, site, game):
+    name = ENTITIES[game]
+    page, problems = open_page(browser, f"{site}?game={game}#entity={name}", DESKTOP)
+    other = page.text_content("#panel .link-chip .to-entity").strip()
+    count = int(page.text_content("#panel .link-chip .to-shared").split()[0])
+    page.click("#panel .link-chip .to-shared")
+    title = f"{name} and {other}"
+    wait_shown(page, ("link", title))
+    assert page.locator("#panel .results li").count() == count
+    assert page.evaluate("() => document.querySelector('#panel .count').textContent").startswith(f"{count} text")
+    assert "#link=" in page.url
+    page.reload()
+    page.wait_for_function("() => document.querySelector('#status').textContent === ''", timeout=20000)
+    wait_shown(page, ("link", title))                     # l'adresse rouvre la page
+    page.click("#panel .results button")                  # le texte garde la liste à côté
+    page.wait_for_function("() => document.querySelector('#panel').dataset.page === 'doc'")
+    assert title in page.text_content("#list-column h2")
+    page.go_back()
+    wait_shown(page, ("link", title))
+    page.click(f"#panel .chips .chip:has-text('{other}')")
+    wait_shown(page, ("entity", other))
+    assert problems == []
+
+
+def test_linked_name_itself_still_opens_its_page(browser, site):
+    page, problems = open_page(browser, f"{site}?game=bloodborne#entity=Gehrman", DESKTOP)
+    other = page.text_content("#panel .link-chip .to-entity").strip()
+    page.click("#panel .link-chip .to-entity")
+    wait_shown(page, ("entity", other))
+    assert problems == []
+
+
+@pytest.mark.parametrize("game", GAMES)
+def test_each_echo_says_what_it_shares(browser, site, game):
+    page, problems = open_page(browser, f"{site}?game={game}{ADDRESSES[game][0][1]}", DESKTOP)
+    whys = page.locator("#panel .echoes .why").all_inner_texts()
+    assert len(whys) == page.locator("#panel .echoes li").count() > 0
+    assert all(w.strip() for w in whys)
+    assert problems == []

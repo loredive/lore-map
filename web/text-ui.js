@@ -9,7 +9,8 @@ import { S, esc, colorOf, isHidden, docRow, clusterById, portrait, nameOf, textO
 import { setHover } from "./render.js";
 import { registerPage, openPage, describeEntry, reopen } from "./pages.js";
 import { startPath } from "./pathbar.js";
-import { entityChips, bindEntityButtons, linkText, dialogueButtons, bindDialogueButtons, dlcBadge, groupOf, snippet, mark, unsureMark } from "./links.js";
+import { entityChips, bindEntityButtons, linkText, dialogueButtons, bindDialogueButtons, dlcBadge, groupOf, snippet, mark, unsureMark, reasonContext } from "./links.js";
+import { linkReason, reasonParts } from "./why.js";
 import { tipAtStar } from "./tip.js";
 
 registerPage({
@@ -93,7 +94,7 @@ const mentionsOf = d => S.docEntities[d.i].filter(e => !e.broad);   // Erdtree, 
 
 function card(d) {
   const terms = tokenize(S.query || ""), mentions = mentionsOf(d), o = other(d);
-  const icon = portrait(d, "portrait", 96);
+  const icon = portrait(d, "portrait", 96), ctx = reasonContext();
   return `<article class="card">
     <div class="card-head${icon ? " has-img" : ""}">${icon}<div>
     <div class="cat"><span class="dot" style="--c:${colorOf(d.cat)}"></span>${esc(S.cats[d.cat])}${dlcBadge(d)}</div>
@@ -118,7 +119,7 @@ function card(d) {
     <p class="hint">Closest in meaning, linked to it on the map.</p>
     <ol class="echoes">${d.echoes.map(e => {
       const x = S.docs[e];
-      return `<li><button type="button" data-i="${e}"><span class="head"><span class="dot" style="--c:${colorOf(x.cat)}"></span><span class="name">${esc(x.name)}</span></span><small>${esc(S.cats[x.cat])}</small></button></li>`;
+      return `<li><button type="button" data-i="${e}"><span class="head"><span class="dot" style="--c:${colorOf(x.cat)}"></span><span class="name">${esc(x.name)}</span></span><small>${esc(S.cats[x.cat])}</small><span class="why">${esc(reasonParts(linkReason(d.i, e, ctx)).join(" · ") || "no shared name or rare word")}</span></button></li>`;
     }).join("")}</ol>
   </article>`;
 }

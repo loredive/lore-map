@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mentionSpans } from "../web/mentions.js";
+import { mentionSpans, sharedTexts } from "../web/mentions.js";
 
 const E = (name, extra = {}) => ({ name, aliases: [], ...extra });
 const words = (text, ents) => mentionSpans(text, ents).map(([a, b, e]) => [text.slice(a, b), e.name]);
@@ -23,4 +23,9 @@ test("aliases, excluded phrases and broad entities", () => {
                    [["Master Willem", "Willem"], ["Torrent", "Torrent"]]);
   assert.deepEqual(words("Vieux Yharnam brûle.", [E("Old Yharnam", { aliases: ["Vieux Yharnam"] })]),
                    [["Vieux Yharnam", "Old Yharnam"]]);       // lettres accentuées : mots entiers aussi
+});
+
+test("the texts two entities share, in the first one's order", () => {
+  assert.deepEqual(sharedTexts({ docs: [7, 2, 9, 4] }, { docs: [4, 1, 7] }), [7, 4]);
+  assert.deepEqual(sharedTexts({ docs: [1] }, { docs: [2] }), []);
 });

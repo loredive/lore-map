@@ -25,3 +25,9 @@ export function mentionSpans(text, entities) {
   }
   return spans.sort((p, q) => p[0] - q[0]);
 }
+
+// Les textes qui citent deux entités à la fois, dans l'ordre de la première (les plus parlants d'abord).
+export function sharedTexts(a, b) {
+  const inB = new Set(b.docs);
+  return a.docs.filter(i => inB.has(i));
+}
