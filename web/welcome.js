@@ -18,7 +18,7 @@ function close() {
 
 export function showWelcome() {
   if (seen()) return;
-  box.innerHTML = `<p>Each star is a text: click one to read it. Search by name or by meaning.</p>
+  box.innerHTML = `<p>Each star is a text, not a place: click one to read it. Search by name or by meaning.</p>
     <p>New here? ${S.tours.length ? `Start with a <button type="button" data-go="tours">guided tour</button>, or read the ` : "Read the "}<button type="button" data-go="help">help</button>.</p>
     <button type="button" class="close" aria-label="Close this hint">×</button>`;
   box.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => { close(); openPage(b.dataset.go); }));

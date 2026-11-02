@@ -1,12 +1,26 @@
 // Ce que plusieurs pages du panneau partagent : pastilles et liens vers les personnages et lieux,
 // boutons des dialogues, extraits, surlignage, badge du DLC, groupe d'un texte. Ce n'est pas une page :
 // les modules de pages l'importent sans s'importer entre eux, et ses liens ouvrent les pages par pages.js.
-import { S, panel, esc, clusterById } from "./state.js";
+import { S, panel, esc, clusterById, nameOf, textOf } from "./state.js";
 import { openPage, currentPage } from "./pages.js";
 import { mentionSpans } from "./mentions.js";
+import { tokenize } from "./search.js";
 
 export const KIND_LABELS = { personnage: ["Character", "Characters"], lieu: ["Place", "Places"],
                       faction: ["Faction", "Factions"], notion: ["Concept", "Concepts"] };
+
+// ------------------------------------------------------------------ ce que partagent deux textes
+// Les mots de chaque texte dans la langue affichée, et dans combien de textes chacun apparaît : ce que
+// linkReason (why.js) a besoin de connaître. Construit une fois par langue, au premier texte ouvert.
+const contexts = {};
+export function reasonContext() {
+  return contexts[+S.altLang] ||= (() => {
+    const docTerms = S.docs.map(d => new Set(tokenize(`${nameOf(d)} ${textOf(d)}`)));
+    const df = new Map();
+    docTerms.forEach(ts => ts.forEach(t => df.set(t, (df.get(t) || 0) + 1)));
+    return { docEntities: S.docEntities, docTerms, df, N: S.docs.length, echoes: S.docs.map(d => d.echoes) };
+  })();
+}
 
 // ------------------------------------------------------------------ extraits et surlignage
 export function snippet(text, terms, len = 150) {

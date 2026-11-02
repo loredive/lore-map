@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { linkReason } from "../web/why.js";
+import { linkReason, reasonParts } from "../web/why.js";
 
 const moon = { name: "Moon Presence", aliases: ["Paleblood"] };
 const dream = { name: "Hunter's Dream" };
@@ -38,4 +38,14 @@ test("explains nothing when two texts share only common words", () => {
   const r = linkReason(0, 2, ctx);
   assert.deepEqual(r.entities, []);
   assert.deepEqual(r.terms, []);
+});
+
+test("says what two texts share, in words", () => {
+  assert.deepEqual(reasonParts({ entities: [{ label: "Moon Presence" }, { label: "Laurence" }], terms: ["cord", "lumenwood"] }),
+    ["both mention Moon Presence, Laurence", "shared words “cord”, “lumenwood”"]);
+  assert.deepEqual(reasonParts({ entities: [], terms: ["cord"] }), ["shared words “cord”"]);
+});
+
+test("says nothing when they share nothing", () => {
+  assert.deepEqual(reasonParts({ entities: [], terms: [] }), []);
 });

@@ -1,6 +1,7 @@
 // Personnages, lieux, factions et notions : l'index et la fiche de chacun.
 import { S, $, esc, fold, clusterById, docRow, isHidden, nameOf, textOf, groupName } from "./state.js";
 import { registerPage, openPage } from "./pages.js";
+import { sharedTexts } from "./mentions.js";
 import { KIND_LABELS, entityChips, bindEntityButtons, speakersFor, dialogueButtons, bindDialogueButtons, snippet, mark, openInList } from "./links.js";
 
 registerPage({
@@ -50,7 +51,6 @@ registerPage({
       .map(([id, n]) => [clusterById(id), n]).filter(([c]) => c);
     const byName = new Map(S.entities.map(x => [x.name, x]));
     const related = (e.related || []).map(([n, k]) => [byName.get(n), k]).filter(([r]) => r);
-    const shared = new Map(related);
     return {
       announce: `${e.label}: ${e.docs.length} texts mention it`,
       frame: docs,
@@ -63,8 +63,8 @@ registerPage({
     <p class="count">${e.docs.length} texts mention it${visible.length < docs.length ? `, ${visible.length} of them shown` : ""}.</p>
     <p class="hint">On the map, the brightest stars talk about it most.</p>
     ${related.length ? `<h3>Linked to</h3>
-    <p class="hint">Names that come up with it most (the number: texts in common).</p>
-    ${entityChips(related.map(([r]) => r), r => shared.get(r))}` : ""}
+    <p class="hint">Names that come up with it most. The number opens the texts they share.</p>
+    <div class="chips">${related.map(([r, k]) => `<span class="link-chip"><button type="button" class="to-entity" data-e="${S.entities.indexOf(r)}">${esc(r.label)}</button><button type="button" class="to-shared" data-with="${esc(r.name)}" aria-label="${k} texts mention both ${esc(e.label)} and ${esc(r.label)}">${k} ${k > 1 ? "texts" : "text"}</button></span>`).join("")}</div>` : ""}
     ${groups.length ? `<h3>Mostly in</h3><div class="chips">${groups.map(([c, n]) =>
       `<button type="button" class="chip" data-c="${c.id}">${esc(groupName(c))} <span class="n">${n}</span></button>`).join("")}</div>` : ""}
     <h3>The texts</h3>
@@ -75,11 +75,55 @@ registerPage({
         p.querySelector(".to-index").addEventListener("click", () => openPage("index"));
         bindDialogueButtons(-1, p);
         bindEntityButtons(p);
+        p.querySelectorAll("button[data-with]").forEach(b => b.addEventListener("click", () => openPage("link", { a: name, b: b.dataset.with })));
         p.querySelectorAll("button[data-i]").forEach(b => b.addEventListener("click", () => openInList(+b.dataset.i, visible.map(d => d.i))));
         p.querySelectorAll("button[data-c]").forEach(b => b.addEventListener("click", () => {
           const c = clusterById(+b.dataset.c);
           openPage("cluster", { id: c.id, label: c.label });
         }));
+      },
+    };
+  },
+});
+
+// Les textes que deux noms ont en commun : ce qui se cache derrière le chiffre de « Linked to ». Être cités
+// ensemble dit qu'ils reviennent ensemble, pas comment ils sont liés : la page le précise.
+const pairLabel = ({ a, b }) => `${entityNamed(a).label} and ${entityNamed(b).label}`;
+
+registerPage({
+  name: "link",
+  address: {
+    write: ({ a, b }) => "#link=" + encodeURIComponent(a) + "&" + encodeURIComponent(b),
+    keys: ["link"],
+    read: (_, raw) => {
+      const [a, b] = raw.split("&").map(decodeURIComponent);
+      return entityNamed(a) && entityNamed(b) ? { a, b } : null;
+    },
+  },
+  backLabel: args => `Back to “${pairLabel(args)}”`,
+  describe: args => ({ kind: "Texts in common", label: pairLabel(args) }),
+  render: args => {
+    const a = entityNamed(args.a), b = entityNamed(args.b);
+    const shared = sharedTexts(a, b);
+    S.lit = new Set(shared);
+    const docs = shared.map(i => S.docs[i]);
+    const visible = docs.filter(d => !isHidden(d));
+    const names = [a, b].flatMap(e => [e.name, ...e.aliases]), folded = names.map(fold);
+    const count = `${docs.length} ${docs.length > 1 ? "texts mention" : "text mentions"} both`;
+    return {
+      announce: `${pairLabel(args)}: ${count}`,
+      frame: docs,
+      html: `<article class="card">
+    <div class="cat">Texts in common</div>
+    <h2>${esc(pairLabel(args))}</h2>
+    <p class="count">${count}${visible.length < docs.length ? `, ${visible.length} of them shown` : ""}.</p>
+    <p class="hint">They come up together here. That alone doesn't say how they are related: read the texts.</p>
+    ${entityChips([a, b])}
+    <ol class="results">${visible.map(d => docRow(d, mark(esc(nameOf(d)), names), mark(esc(snippet(textOf(d), folded)), names))).join("")}</ol>
+  </article>`,
+      bind: p => {
+        bindEntityButtons(p);
+        p.querySelectorAll("button[data-i]").forEach(x => x.addEventListener("click", () => openInList(+x.dataset.i, visible.map(d => d.i))));
       },
     };
   },
