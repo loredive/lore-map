@@ -94,7 +94,7 @@ def publish(game: Game) -> None:
 
 
 def publish_tours(game: Game) -> None:
-    """Copie games/<id>/tours.json (visites guidées, écrites à la main) dans web/data/<id>/ ;
+    """Copie games/<id>/tours.json (visites guidées) dans web/data/<id>/ ;
     chaque étape doit nommer un texte de la carte, sinon la publication s'arrête."""
     src, dst = game.dir / "tours.json", game.data_dir / "tours.json"
     if not src.exists():
