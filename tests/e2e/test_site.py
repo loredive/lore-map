@@ -1322,3 +1322,27 @@ def test_each_echo_says_what_it_shares(browser, site, game):
     assert len(whys) == page.locator("#panel .echoes li").count() > 0
     assert all(w.strip() for w in whys)
     assert problems == []
+
+
+@pytest.mark.parametrize("game", GAMES)
+def test_echo_lines_take_the_color_of_their_text(browser, site, game):
+    page, problems = open_page(browser, f"{site}?game={game}{ADDRESSES[game][0][1]}", DESKTOP)
+    lines, want = page.evaluate("""async () => {
+        const { S, colorOf } = await import('./state.js');
+        const { render } = await import('./render.js');
+        const sky = document.querySelector('#sky'), seen = [];
+        const stroke = CanvasRenderingContext2D.prototype.stroke;
+        CanvasRenderingContext2D.prototype.stroke = function (...a) {
+          if (this.canvas === sky) seen.push([this.strokeStyle, Math.round(this.globalAlpha * 100), this.lineWidth]);
+          return stroke.apply(this, a);
+        };
+        render();
+        CanvasRenderingContext2D.prototype.stroke = stroke;
+        // la couleur telle que le canvas la rend, et l'opacité de chaque rang
+        const norm = c => { const x = document.createElement('canvas').getContext('2d'); x.fillStyle = c; return x.fillStyle; };
+        return [seen, S.docs[S.selected].echoes.map((e, k) => [norm(colorOf(S.docs[e].cat)), Math.round((0.85 - k * 0.05) * 100), 1.75])];
+    }""")
+    assert len(want) == 8
+    for line in want:
+        assert line in lines
+    assert problems == []
